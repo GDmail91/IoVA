@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:onClick="onLoginClick"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="@string/intro_title"
+            android:textSize="30sp"
+            android:textColor="@color/white"
+            android:gravity="center" />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/fb_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="30dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/com_facebook_button_background_color"
+        android:text="페이스북으로 로그인"
+        android:textSize="20dp"
+        android:textColor="@color/com_facebook_button_text_color" />
+
+</RelativeLayout>

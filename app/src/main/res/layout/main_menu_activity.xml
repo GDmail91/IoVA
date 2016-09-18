@@ -26,5 +26,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="기록보기"/>
+        <Button
+            android:id="@+id/fb_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="페북연결해제"
+            android:onClick="onMenuClick"/>
     </LinearLayout>
 </RelativeLayout>

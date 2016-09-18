@@ -8,25 +8,61 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainMenu.MainMenuActivity" >
 
-    <Button
-        android:id="@+id/btn_connect"
+    <TextView
+        android:id="@+id/forward_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="연결" />
+        android:layout_alignParentTop="true"
+        android:text="앞차간격"/>
 
-    <TextView
-        android:id="@+id/cur_speed"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_connect"
-        android:text="속도가 출력됩니다." />
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/cur_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="속도가 출력됩니다." />
+
+        <TextView
+            android:id="@+id/safe_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/cur_speed"
+            android:text="현재속도의 안전거리가 출력됩니다." />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/safe_distance"
+        android:id="@+id/back_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/cur_speed"
-        android:text="현재속도의 안전거리가 출력됩니다." />
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/scan_btn"
+        android:text="뒷차간격"/>
+
+    <LinearLayout
+        android:id="@+id/scan_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="왼쪽스캔"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="오른쪽스캔"/>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">EX_Bluetooth</string>
+    <string name="app_name">IoVA</string>
     <string name="action_settings">Settings</string>
+    <string name="facebook_app_id">168944296881609</string>
+
+    <string name="intro_title">IoVA와 함께 안전한 도로를 만들어주세요.</string>
     
 </resources>
