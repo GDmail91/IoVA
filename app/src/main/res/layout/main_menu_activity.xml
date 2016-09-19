@@ -20,7 +20,8 @@
             android:id="@+id/safe_score_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="안전지수"/>
+            android:text="안전지수"
+            android:onClick="onMenuClick"/>
         <Button
             android:id="@+id/history_btn"
             android:layout_width="wrap_content"

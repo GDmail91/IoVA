@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <!-- Bluetooth 사용하기 위한 퍼미션 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -29,7 +33,16 @@
 
         <activity android:name=".Driving.DrivingActivity"/>
 
+        <activity android:name=".SafeScore.SafeScoreActivity"/>
+
         <activity android:name=".Facebook.FacebookLogin"/>
+
+        <!-- 블루투스 장치 검색 Dialog -->
+        <activity
+            android:name=".Driving.Bluetooth.DeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="장치를 선택하세요"
+            android:theme="@android:style/Theme.Holo.Dialog"/>
     </application>
 
 </manifest>

@@ -85,8 +85,7 @@ public class DrivingActivity extends AppCompatActivity {
                     // 만약 T map api 중 경로API 에서 turnType 의 정보중 191 번이 제한속도일경우 경로 API 사용도 가능할 듯
                     // roadType(1:고속, 2:자동차전용, 3~:일반도로)이 바뀌었을때 turnType에대한 정보가 없다면 기본 제한속도를 roadType으로 결정
                     // nodeType이 POINT 인 것중 turnType이 191 이면 제한속도 변경
-                }
-                else {
+                } else {
                     //Network 위치제공자에 의한 위치변화
                     //Network 위치는 Gps에 비해 정확도가 많이 떨어진다.
                 }

@@ -22,7 +22,6 @@
             android:layout_margin="15dp"
             android:text="@string/intro_title"
             android:textSize="30sp"
-            android:textColor="@color/white"
             android:gravity="center" />
 
 

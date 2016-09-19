@@ -14,6 +14,7 @@ import com.facebook.login.LoginManager;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Facebook.FacebookLogin;
 import org.multibluetooth.multibluetooth.R;
+import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -39,19 +40,28 @@ public class MainMenuActivity extends AppCompatActivity {
 		Log.d(TAG, v.toString());
 
 		switch (v.getId()) {
-			case R.id.driving_btn:
+			case R.id.driving_btn:	// 운전중 센서 스캔
 				Intent drivingIntent = new Intent(MainMenuActivity.this, DrivingActivity.class);
 				startActivity(drivingIntent);
 				break;
-			case R.id.fb_logout:
+
+			case R.id.safe_score_btn:	// 안전점수 보기
+				Intent scoreIntent = new Intent(MainMenuActivity.this, SafeScoreActivity.class);
+				startActivity(scoreIntent);
+				break;
+
+			case R.id.fb_logout:	// 페이스북 로그아웃
+				// access_token 초기화
 				SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
 				SharedPreferences.Editor editor = pref.edit();
 				editor.putString("access_token", "");
 				editor.apply();
 
+				// 페북 연결 해제
 				FacebookSdk.sdkInitialize(getApplicationContext());
 				LoginManager.getInstance().logOut();
 
+				// 로그인 화면으로 이동
 				Intent logoutIntent = new Intent(MainMenuActivity.this, FacebookLogin.class);
 				logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -60,11 +70,13 @@ public class MainMenuActivity extends AppCompatActivity {
 		}
 	}
 
+	// 페이스북 로그인 확인
 	public void faccebookLoginCheck() {
 		// Facebook login check
 		FacebookSdk.sdkInitialize(getApplicationContext());
 		SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
 		if (pref.getString("access_token", "").equals("")) {
+			// 미 로그인시 로그인 화면으로 이동
 			Intent intent = new Intent(MainMenuActivity.this, FacebookLogin.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

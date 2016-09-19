@@ -48,6 +48,7 @@ public class FacebookLogin extends AppCompatActivity {
         fbButton = (Button) findViewById(R.id.fb_button);
         loginButton = (LoginButton) findViewById(R.id.login_button);
 
+        // 페이스북 로그인 버튼
         fbButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,6 +60,7 @@ public class FacebookLogin extends AppCompatActivity {
 
     public void onLoginClick(View v) {
 
+        // 로그인시 가져올 목록
         loginButton.setReadPermissions("public_profile", "user_friends");
         // Other app specific specialization
 
