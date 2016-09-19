@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.R;
+import org.multibluetooth.multibluetooth.SafeScore.ScoreCalculator;
 
 /**
  * Created by YS on 2016-09-13.
@@ -62,13 +63,7 @@ public class DrivingActivity extends AppCompatActivity {
                     // 여기에 날씨정보를 포함하여
                     // 비가올경우 x1.5
                     // 눈이올경우 x3 을한다.
-                    if (mySpeed < 80) {
-                        double safeDistance = mySpeed - 15;
-                        safeDistanceView.setText("Safe Distance : " + safeDistance);
-                    } else if (mySpeed >= 80) {
-                        double safeDistance = mySpeed;
-                        safeDistanceView.setText("Safe Distance : " + safeDistance);
-                    }
+                    safeDistanceView.setText("Safe Distance : " + ScoreCalculator.scoreCalculator.getSafeDistance(mySpeed));
                 }
 
                 if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
