@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -29,8 +30,11 @@ import org.multibluetooth.multibluetooth.R;
  */
 public class FacebookLogin extends AppCompatActivity {
 
+    // VIEW
     private Button fbButton;
     private LoginButton loginButton;
+    private ImageView loginBackground;
+
     private CallbackManager callbackManager;
     private AccessToken accessToken;
 
@@ -39,7 +43,20 @@ public class FacebookLogin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.facebook_login_activity);
 
+        loginBackground = (ImageView) findViewById(R.id.login_background);
 
+        int now = (int) System.currentTimeMillis();
+        switch (now%3) {
+            case 0:
+                loginBackground.setImageResource(R.drawable.sunset_car);
+                break;
+            case 1:
+                loginBackground.setImageResource(R.drawable.lamborghini);
+                break;
+            case 2:
+                loginBackground.setImageResource(R.drawable.night_car);
+                break;
+        }
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 

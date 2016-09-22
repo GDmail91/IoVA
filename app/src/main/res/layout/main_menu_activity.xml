@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#000000">
 
-    <TextView
-        android:id="@+id/bt_device_name"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/menu_background"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/bt_connect"
-        android:text="-" />
+        android:layout_alignParentTop="true"
+        android:src="@drawable/forest_car"
+        android:scaleType="fitStart"/>
 
     <ImageButton
         android:id="@+id/bt_check"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginRight="15dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
@@ -23,33 +27,69 @@
 
     <LinearLayout
         android:id="@+id/menu_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="bottom"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/driving_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="운전하기"
-            android:onClick="onMenuClick"/>
-        <Button
-            android:id="@+id/safe_score_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="안전지수"
-            android:onClick="onMenuClick"/>
-        <Button
-            android:id="@+id/history_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="기록보기"/>
-        <Button
-            android:id="@+id/fb_logout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="페북연결해제"
-            android:onClick="onMenuClick"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <Button
+                android:id="@+id/driving_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#44DD44"
+                style="?android:attr/borderlessButtonStyle"
+                android:text="운전하기"
+                android:textSize="30dp"
+                android:textColor="#ffffff"
+                android:onClick="onMenuClick"/>
+            <Button
+                android:id="@+id/safe_score_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#DDDD44"
+                style="?android:attr/borderlessButtonStyle"
+                android:text="안전지수"
+                android:textSize="30dp"
+                android:textColor="#ffffff"
+                android:onClick="onMenuClick"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <Button
+                android:id="@+id/history_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#DD4444"
+                style="?android:attr/borderlessButtonStyle"
+                android:text="기록보기"
+                android:textSize="30dp"
+                android:textColor="#ffffff"/>
+            <Button
+                android:id="@+id/fb_logout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#4477DD"
+                style="?android:attr/borderlessButtonStyle"
+                android:text="로그아웃"
+                android:textSize="30dp"
+                android:textColor="#ffffff"
+                android:onClick="onMenuClick"/>
+        </LinearLayout>
+
     </LinearLayout>
 </RelativeLayout>
