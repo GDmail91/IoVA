@@ -1,10 +1,15 @@
 package org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothChatService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 
 import java.util.LinkedList;
@@ -14,6 +19,10 @@ import java.util.LinkedList;
  */
 public class LaserScanner extends BluetoothConnection {
     private static final String TAG = "LaserScanner";
+
+    public static final int REQUEST_CONNECT_DEVICE_SECURE_BY_LASER = 2001;
+    public static final int REQUEST_ENABLE_BT_BY_LASER = 2003;
+
     private static final LinkedList<Character> buffer = new LinkedList<>();
 
     public LaserScanner(Context context) {
@@ -21,7 +30,32 @@ public class LaserScanner extends BluetoothConnection {
     }
 
     @Override
-    protected void messageCheck(String message) {
+    public void conn() {
+        // If BT is not on, request that it be enabled.
+        // setupChat() will then be called during onActivityResult
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
+        } else if (mChatService == null) {
+            // TODO sendMessage() 를 할 컴포넌트 연결
+            // ex) sendMessage(message);
+            //setupChat(context);
+            setupService();
+        }
+    }
+
+    @Override
+    protected void setupService() {
+        mChatService = new BluetoothChatService(mContext, mHandler);
+        mOutStringBuffer = new StringBuffer("");
+
+        // Launch the DeviceListActivity to see devices and do scan
+        Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
+        ((AppCompatActivity) mContext).startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE_BY_LASER);
+    }
+
+    @Override
+    protected void messageParse(String message) {
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
 
         message = message.toUpperCase();

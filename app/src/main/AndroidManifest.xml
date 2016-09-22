@@ -37,6 +37,9 @@
 
         <activity android:name=".Facebook.FacebookLogin"/>
 
+        <!-- 블루투스 연결상태 Dialog -->
+        <activity android:name=".MainMenu.BluetoothCheckDialog" android:theme="@android:style/Theme.DeviceDefault.Light.Dialog"/>
+
         <!-- 블루투스 장치 검색 Dialog -->
         <activity
             android:name=".Driving.Bluetooth.DeviceListActivity"

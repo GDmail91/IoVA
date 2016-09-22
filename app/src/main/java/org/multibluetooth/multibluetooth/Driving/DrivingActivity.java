@@ -71,6 +71,10 @@ public class DrivingActivity extends AppCompatActivity {
             btCon.serviceStop();
     }
 
+    private void onListen() {
+
+    }
+
 
     private void gpsListen() {
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

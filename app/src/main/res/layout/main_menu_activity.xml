@@ -3,6 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/bt_device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bt_connect"
+        android:text="-" />
+
+    <ImageButton
+        android:id="@+id/bt_check"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/bluetooth"
+        android:scaleType="fitXY"
+        android:onClick="checkBtStatus"/>
+
     <LinearLayout
         android:id="@+id/menu_layout"
         android:layout_width="wrap_content"

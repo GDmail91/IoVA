@@ -16,10 +16,12 @@ import android.widget.Toast;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.R;
 
+import java.io.Serializable;
+
 /**
  * Created by YS on 2016-09-19.
  */
-public class BluetoothConnection {
+public class BluetoothConnection implements Serializable {
     private static final String TAG = "BluetoothConnection";
 
     // Intent request codes
@@ -100,13 +102,17 @@ public class BluetoothConnection {
         }
     }
 
-    private void setupService() {
+    protected void setupService() {
         mChatService = new BluetoothChatService(mContext, mHandler);
         mOutStringBuffer = new StringBuffer("");
 
         // Launch the DeviceListActivity to see devices and do scan
         Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
         ((AppCompatActivity) mContext).startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+    }
+
+    public int getConnectionStatus() {
+        return mChatService.getState();
     }
 
     /**
@@ -208,7 +214,7 @@ public class BluetoothConnection {
 
                     // 메세지 파싱
                     // TODO byte[] 로 넘겨줄것
-                    messageCheck(readMessage);
+                    messageParse(readMessage);
                     Log.d(TAG, readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
@@ -218,7 +224,8 @@ public class BluetoothConnection {
                         Toast.makeText(activity, "Connected to "
                                 + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                     }*/
-                    ((DrivingActivity) mContext).setChangeText(mConnectedDeviceName);
+                    // TODO 지울것
+                    //((DrivingActivity) mContext).setChangeText(mConnectedDeviceName);
                     Log.d(TAG, mConnectedDeviceName);
                     break;
                 case Constants.MESSAGE_TOAST:
@@ -262,7 +269,7 @@ public class BluetoothConnection {
         }
     }
 
-    protected void messageCheck(String message) {
+    protected void messageParse(String message) {
 
         ((DrivingActivity) mContext).setChangeText(message);
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
