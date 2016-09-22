@@ -16,12 +16,10 @@ import android.widget.Toast;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.R;
 
-import java.io.Serializable;
-
 /**
  * Created by YS on 2016-09-19.
  */
-public class BluetoothConnection implements Serializable {
+public class BluetoothConnection {
     private static final String TAG = "BluetoothConnection";
 
     // Intent request codes
@@ -81,6 +79,10 @@ public class BluetoothConnection implements Serializable {
             //setupChat(context);
             setupService();
         }
+    }
+
+    public void setChangeContext(Context context) {
+        this.mContext = context;
     }
 
     public void serviceConn() {
@@ -199,23 +201,28 @@ public class BluetoothConnection implements Serializable {
                     }
                     break;
                 case Constants.MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
-                    Toast.makeText(mContext, writeMessage, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "message write: "+writeMessage);
+                    if (mContext.getApplicationInfo().className.equals("org.multibluetooth.multibluetooth.Driving.DrivingActivity")) {
+                        byte[] writeBuf = (byte[]) msg.obj;
+                        // construct a string from the buffer
+                        String writeMessage = new String(writeBuf);
+                        Toast.makeText(mContext, writeMessage, Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "message write: " + writeMessage);
+                    }
                     break;
                 case Constants.MESSAGE_READ:
-                    Bundle bundle = (Bundle) msg.obj;
-                    String readMessage = bundle.getString("MESSAGE");
-                    /*byte[] readBuf = (byte[]) bundle.getByteArray("MESSAGE");
-                    // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);*/
+                    Log.d(TAG, "activity name: "+mContext.getClass().getName());
+                    if (mContext.getClass().getName().equals("org.multibluetooth.multibluetooth.Driving.DrivingActivity")) {
+                        Bundle bundle = (Bundle) msg.obj;
+                        String readMessage = bundle.getString("MESSAGE");
+                        /*byte[] readBuf = (byte[]) bundle.getByteArray("MESSAGE");
+                        // construct a string from the valid bytes in the buffer
+                        String readMessage = new String(readBuf, 0, msg.arg1);*/
 
-                    // 메세지 파싱
-                    // TODO byte[] 로 넘겨줄것
-                    messageParse(readMessage);
-                    Log.d(TAG, readMessage);
+                        // 메세지 파싱
+                        // TODO byte[] 로 넘겨줄것
+                        messageParse(readMessage);
+                        Log.d(TAG, readMessage);
+                    }
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

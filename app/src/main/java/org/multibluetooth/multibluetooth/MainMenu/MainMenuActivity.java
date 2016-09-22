@@ -31,8 +31,8 @@ public class MainMenuActivity extends AppCompatActivity {
 	private Button btConnect;
 	private ImageButton btCheck;
 
-	private BluetoothConnection btLaserCon;
-	private BluetoothConnection btOBDCon;
+	public static BluetoothConnection btLaserCon;
+	public static BluetoothConnection btOBDCon;
 
 	private static final int BLUETOOTH_CONNECTING = 1000;
 	public static final int BLUETOOTH_LASER_CONNECT = 1010;

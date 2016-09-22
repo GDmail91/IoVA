@@ -2,7 +2,6 @@ package org.multibluetooth.multibluetooth.Driving;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,13 +10,11 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
+import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.ScoreCalculator;
 
@@ -31,8 +28,6 @@ public class DrivingActivity extends AppCompatActivity {
     private TextView safeDistanceView;
     private TextView btDeviceName;
     private Button btConnect;
-
-    private BluetoothConnection btCon;
 
     private LocationManager lm;
     private LocationListener ll;
@@ -52,6 +47,11 @@ public class DrivingActivity extends AppCompatActivity {
 
         maxSpeed = mySpeed = 0;
 
+        if (MainMenuActivity.btLaserCon != null)
+            MainMenuActivity.btLaserCon.setChangeContext(this);
+        if (MainMenuActivity.btOBDCon != null)
+            MainMenuActivity.btOBDCon.setChangeContext(this);
+
         gpsListen();
 
         registerLocationUpdates();
@@ -60,21 +60,11 @@ public class DrivingActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (btCon != null)
-            btCon.serviceConn();
+        if (MainMenuActivity.btLaserCon != null)
+            MainMenuActivity.btLaserCon.serviceConn();
+        if (MainMenuActivity.btOBDCon != null)
+            MainMenuActivity.btOBDCon.serviceConn();
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (btCon != null)
-            btCon.serviceStop();
-    }
-
-    private void onListen() {
-
-    }
-
 
     private void gpsListen() {
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -151,18 +141,20 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
+/*
 
     // 불루투스 연결
     public void onBluetoothConnect(View v) {
         btCon = new LaserScanner(this);
         btCon.conn();
     }
+*/
 
     // 디바이스 메세지 전달
     public void setChangeText(String message) {
         btDeviceName.setText(message);
     }
-
+/*
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case BluetoothConnection.REQUEST_CONNECT_DEVICE_SECURE:
@@ -175,5 +167,5 @@ public class DrivingActivity extends AppCompatActivity {
 
     public void test(View v) {
         btCon.sendMessage("test");
-    }
+    }*/
 }
