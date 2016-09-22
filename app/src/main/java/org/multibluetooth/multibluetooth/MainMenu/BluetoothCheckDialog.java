@@ -25,21 +25,6 @@ public class BluetoothCheckDialog extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_check_dialog);
         setTitle("블루투스 연결상태");
-/*
-        laserConn = (RelativeLayout) findViewById(R.id.laser_conn);
-        obdConn = (RelativeLayout) findViewById(R.id.obd_conn);
-        laserConn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBluetoothConnecting(v);
-            }
-        });
-        obdConn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBluetoothConnecting(v);
-            }
-        });*/
 
         Intent intent = getIntent();
         Log.d(TAG, intent.toString());

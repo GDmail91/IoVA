@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="300dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/drive_start_btn"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="자동차 운행기록을\n 시작합니다."
+        android:textSize="30dp"/>
+
+    <Button
+        android:id="@+id/drive_start_btn"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:background="#ff3333"
+        android:text="운행 시작"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:onClick="onStart"/>
+</RelativeLayout>

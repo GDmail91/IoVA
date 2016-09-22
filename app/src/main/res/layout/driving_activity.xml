@@ -6,68 +6,48 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainMenu.MainMenuActivity" >
+    tools:context=".MainMenu.MainMenuActivity"
+    android:background="#000000">
 
-    <Button
-        android:id="@+id/test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:text="메세지"
-        android:onClick="test" />
     <TextView
         android:id="@+id/bt_device_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/bt_connect"
-        android:text="-" />
-    <Button
-        android:id="@+id/bt_connect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:text="블투"
-        android:onClick="onBluetoothConnect" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="-"
+        android:textColor="#ffffff"/>
 
     <TextView
         android:id="@+id/forward_distance"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"
-        android:text="앞차간격"/>
+        android:layout_above="@+id/half_divider"
+        android:gravity="center"
+        android:text="앞차간격"
+        android:textColor="#ffffff"
+        android:textSize="30dp" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/cur_speed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="속도가 출력됩니다." />
-
-        <TextView
-            android:id="@+id/safe_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/cur_speed"
-            android:text="현재속도의 안전거리가 출력됩니다." />
-    </LinearLayout>
+        android:id="@+id/half_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_centerVertical="true"
+        android:orientation="horizontal"
+        android:background="#ffffff"/>
 
     <TextView
         android:id="@+id/back_distance"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/scan_btn"
-        android:text="뒷차간격"/>
+        android:layout_below="@+id/half_divider"
+        android:gravity="center"
+        android:text="뒷차간격"
+        android:textColor="#ffffff"
+        android:textSize="30dp" />
 
     <LinearLayout
         android:id="@+id/scan_btn"

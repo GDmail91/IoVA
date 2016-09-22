@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
@@ -26,10 +24,7 @@ public class MainMenuActivity extends AppCompatActivity {
 	private static final String TAG = "MainMenuActivity";
 
 	// VIEW
-	private Button driving_btn;
 	private TextView btDeviceName;
-	private Button btConnect;
-	private ImageButton btCheck;
 
 	public static BluetoothConnection btLaserCon;
 	public static BluetoothConnection btOBDCon;
@@ -43,13 +38,11 @@ public class MainMenuActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_menu_activity);
 
+		// 페이스북으로 로그인 됬는지 확인
 		faccebookLoginCheck();
-		// VIEW 연결
-		driving_btn = (Button) findViewById(R.id.driving_btn);
 
+		// VIEW 연결
 		btDeviceName = (TextView) findViewById(R.id.bt_device_name);
-		btConnect = (Button) findViewById(R.id.bt_connect);
-		btCheck = (ImageButton) findViewById(R.id.bt_check);
 
 	}
 
@@ -93,6 +86,7 @@ public class MainMenuActivity extends AppCompatActivity {
 		// Facebook login check
 		FacebookSdk.sdkInitialize(getApplicationContext());
 		SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+		// TODO 페이스북에 해당토큰이 아직 유효한지 질의
 		if (pref.getString("access_token", "").equals("")) {
 			// 미 로그인시 로그인 화면으로 이동
 			Intent intent = new Intent(MainMenuActivity.this, FacebookLogin.class);
