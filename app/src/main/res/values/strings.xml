@@ -17,7 +17,15 @@
     <string name="button_scan">Scan for devices</string>
 
     <!-- Bluetooth Comunication -->
+    <string name="not_connected">You are not connected to a device</string>
     <string name="title_connecting">connecting...</string>
     <string name="title_connected_to">connected to <xliff:g id="device_name">%1$s</xliff:g></string>
     <string name="title_not_connected">not connected</string>
+
+
+    <string name="text_bluetooth_nodevice">No Bluetooth device selected</string>
+    <string name="service_starting">Starting OBD connection..</string>
+    <string name="notification_action">Tap to open OBD-Reader</string>
+    <string name="service_started">OBD connection has started.</string>
+
 </resources>

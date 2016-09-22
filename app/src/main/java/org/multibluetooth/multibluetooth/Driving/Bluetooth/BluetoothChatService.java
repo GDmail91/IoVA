@@ -29,6 +29,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
 import java.util.UUID;
 
 /**
@@ -60,6 +61,8 @@ public class BluetoothChatService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
+
+    private static final LinkedList<Character> messageStack = new LinkedList<>();
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -196,6 +199,8 @@ public class BluetoothChatService {
             mInsecureAcceptThread = null;
         }
 
+        setState(STATE_CONNECTED);
+
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(socket, socketType);
         mConnectedThread.start();
@@ -210,7 +215,6 @@ public class BluetoothChatService {
         // Set device name
         deviceName = device.getName();
 
-        setState(STATE_CONNECTED);
     }
 
     /**
@@ -339,6 +343,7 @@ public class BluetoothChatService {
                 // If a connection was accepted
                 if (socket != null) {
                     synchronized (BluetoothChatService.this) {
+                        Log.d(TAG, "AcceptThread mState:"+mState);
                         switch (mState) {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
@@ -436,6 +441,7 @@ public class BluetoothChatService {
                 mConnectThread = null;
             }
 
+            Log.d(TAG, "여기 실행 되야해");
             // Start the connected thread
             connected(mmSocket, mmDevice, mSocketType);
         }
@@ -481,18 +487,25 @@ public class BluetoothChatService {
             byte[] buffer = new byte[1024];
             int bytes;
 
+            Log.d(TAG, "ConnectedThread mState:"+mState);
             // Keep listening to the InputStream while connected
             while (mState == STATE_CONNECTED) {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
+                    toMessageStack(new String(buffer, 0, bytes));
+
+                    String message = "";
+                    while(messageStack.size() >= 10) {
+                        message += messageCheck();
+                    }
 
                     Bundle bundle = new Bundle();
                     bundle.putString(Constants.DEVICE_NAME, deviceName);
-                    bundle.putByteArray("MESSAGE", buffer);
+                    bundle.putString("MESSAGE", message);
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, bundle)
+                    mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
                             .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
@@ -501,6 +514,38 @@ public class BluetoothChatService {
                     BluetoothChatService.this.start();
                     break;
                 }
+            }
+            Log.d(TAG, "connected thread end");
+        }
+
+        protected void toMessageStack(String message) {
+            message = message.toUpperCase();
+
+            for(char c : message.toCharArray()) {
+                Log.d(TAG, ""+c);
+                messageStack.add(c);
+            }
+        }
+        protected String messageCheck() {
+            char msgFirst = messageStack.removeFirst();
+            char msgSecond = messageStack.removeFirst();
+            String msgMode = "";
+            String msgBody = "";
+
+            if (msgFirst == 'A' && msgSecond == 'A') {
+                for (int i=0; i<8; i++) {
+                    if (i<2) {
+                        msgMode += messageStack.removeFirst();
+                    } else {
+                        msgBody += messageStack.removeFirst();
+                    }
+                }
+
+                return ""+msgFirst+msgSecond+msgMode+msgBody;
+            } else {
+                messageStack.addFirst(msgSecond);
+                Log.d(TAG, "쓰레기값");
+                return "";
             }
         }
 

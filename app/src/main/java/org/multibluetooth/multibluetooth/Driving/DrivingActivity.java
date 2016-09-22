@@ -2,6 +2,7 @@ package org.multibluetooth.multibluetooth.Driving;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -10,9 +11,13 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.ScoreCalculator;
 
@@ -24,7 +29,10 @@ public class DrivingActivity extends AppCompatActivity {
     // VIEW
     private TextView curSpeedView;
     private TextView safeDistanceView;
+    private TextView btDeviceName;
+    private Button btConnect;
 
+    private BluetoothConnection btCon;
 
     private LocationManager lm;
     private LocationListener ll;
@@ -39,8 +47,32 @@ public class DrivingActivity extends AppCompatActivity {
         // VIEW 연결
         curSpeedView = (TextView) findViewById(R.id.cur_speed);
         safeDistanceView = (TextView) findViewById(R.id.safe_distance);
+        btDeviceName = (TextView) findViewById(R.id.bt_device_name);
+        btConnect = (Button) findViewById(R.id.bt_connect);
 
         maxSpeed = mySpeed = 0;
+
+        gpsListen();
+
+        registerLocationUpdates();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (btCon != null)
+            btCon.serviceConn();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (btCon != null)
+            btCon.serviceStop();
+    }
+
+
+    private void gpsListen() {
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         // GPS 값 가져오는 리스너
@@ -94,9 +126,6 @@ public class DrivingActivity extends AppCompatActivity {
             public void onStatusChanged(String provider, int status, Bundle extras) {
             }
         };
-
-
-        registerLocationUpdates();
     }
 
     private void registerLocationUpdates() {
@@ -116,5 +145,31 @@ public class DrivingActivity extends AppCompatActivity {
                             Manifest.permission.ACCESS_COARSE_LOCATION },
                     TAG_CODE_PERMISSION_LOCATION);
         }
+    }
+
+
+    // 불루투스 연결
+    public void onBluetoothConnect(View v) {
+        btCon = new LaserScanner(this);
+        btCon.conn();
+    }
+
+    // 디바이스 메세지 전달
+    public void setChangeText(String message) {
+        btDeviceName.setText(message);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case BluetoothConnection.REQUEST_CONNECT_DEVICE_SECURE:
+            case BluetoothConnection.REQUEST_CONNECT_DEVICE_INSECURE:
+            case BluetoothConnection.REQUEST_ENABLE_BT:
+                btCon.onActivityResult(requestCode, resultCode, data);
+                break;
+        }
+    }
+
+    public void test(View v) {
+        btCon.sendMessage("test");
     }
 }

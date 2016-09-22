@@ -8,6 +8,31 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainMenu.MainMenuActivity" >
 
+    <Button
+        android:id="@+id/test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:text="메세지"
+        android:onClick="test" />
+    <TextView
+        android:id="@+id/bt_device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/bt_connect"
+        android:text="-" />
+    <Button
+        android:id="@+id/bt_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="블투"
+        android:onClick="onBluetoothConnect" />
+
     <TextView
         android:id="@+id/forward_distance"
         android:layout_width="wrap_content"
