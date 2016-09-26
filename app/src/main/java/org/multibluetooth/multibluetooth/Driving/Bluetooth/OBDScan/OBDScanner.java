@@ -3,14 +3,17 @@ package org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothChatService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothOBDService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
+import org.multibluetooth.multibluetooth.R;
 
 import java.util.LinkedList;
 
@@ -18,7 +21,7 @@ import java.util.LinkedList;
  * Created by YS on 2016-09-13.
  */
 public class OBDScanner extends BluetoothConnection {
-    private static final String TAG = "LaserScanner";
+    private static final String TAG = "OBDScanner";
 
     public static final int REQUEST_CONNECT_DEVICE_SECURE_BY_OBD = 3001;
     public static final int REQUEST_ENABLE_BT_BY_OBD = 3003;
@@ -46,7 +49,7 @@ public class OBDScanner extends BluetoothConnection {
 
     @Override
     protected void setupService() {
-        mChatService = new BluetoothChatService(mContext, mHandler);
+        mChatService = new BluetoothOBDService(mContext, mHandler);
         mOutStringBuffer = new StringBuffer("");
 
         // Launch the DeviceListActivity to see devices and do scan
@@ -54,42 +57,31 @@ public class OBDScanner extends BluetoothConnection {
         ((AppCompatActivity) mContext).startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE_BY_OBD);
     }
 
+    /**
+     * Sends a message.
+     *
+     */
+    public void sendMessage(int id) {
+        // Check that we're actually connected before trying anything
+        Log.d(TAG, "message 보낼때 "+ mChatService.getState());
+        if (mChatService.getState() != BluetoothLaserService.STATE_CONNECTED) {
+            Toast.makeText(mContext, mContext.getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check that there's actually something to send
+        // Get the message bytes and tell the BluetoothLaserService to write
+        Bundle out = new Bundle();
+        out.putInt("sensing_id", id);
+        out.putInt("out", BluetoothOBDService.REQUEST_SENSOR_DATA);
+        mChatService.write(out);
+
+        // Reset out string buffer to zero and clear the edit text field
+        mOutStringBuffer.setLength(0);
+    }
+
     @Override
     protected void messageParse(String message) {
-        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
-
-        message = message.toUpperCase();
-
-        for(char c : message.toCharArray()) {
-            Log.d(TAG, ""+c);
-            buffer.add(c);
-        }
-
-        if (buffer.size() >= 10) {
-            String msgStart = buffer.removeFirst().toString() + buffer.removeFirst().toString();
-            String msgMode = "";
-            String msgBody = "";
-
-            if (msgStart.equals("AA")) {
-                for (int i=0; i<8; i++) {
-                    if (i<2) {
-                        msgMode += buffer.removeFirst();
-                    } else {
-                        msgBody += buffer.removeFirst();
-                    }
-                }
-
-                switch (msgMode) {
-                    case "01":
-                        ((DrivingActivity) mContext).setChangeText("\n\nmode: "+msgMode+"\nbody: "+msgBody);
-                        break;
-                    case "02":
-                        ((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
-                        break;
-                }
-            } else {
-                Log.d(TAG, "쓰레기값");
-            }
-        }
+        ((DrivingActivity) mContext).setChangeText(message);
     }
 }

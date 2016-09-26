@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
@@ -26,6 +27,7 @@ public class DrivingActivity extends AppCompatActivity {
     private static final int DRIVE_START_FLAG = 1;
     public static final int FORWARD_MESSAGE = 100;
     public static final int BACK_MESSAGE = 101;
+    public static final int OBD_MESSAGE = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,15 @@ public class DrivingActivity extends AppCompatActivity {
             MainMenuActivity.btOBDCon.serviceConn();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (MainMenuActivity.btLaserCon != null)
+            MainMenuActivity.btLaserCon.serviceStop();
+        if (MainMenuActivity.btOBDCon != null)
+            MainMenuActivity.btOBDCon.serviceStop();
+    }
+
     // 디바이스 메세지 전달
     public void setChangeText(String message) {
         btDeviceName.setText(message);
@@ -68,7 +79,7 @@ public class DrivingActivity extends AppCompatActivity {
         forwardDistance.setText(message);
     }
 
-    // 후방 데이터 전달
+    // 후방 데이터 전달010C410C0FA0
     public void setBackText(String message) {
         backDistance.setText(message);
     }
@@ -98,9 +109,21 @@ public class DrivingActivity extends AppCompatActivity {
                             Bundle bBundle = msg.getData();
                             setBackText(bBundle.getString("message"));
                             break;
+                        case OBD_MESSAGE:
+                            Bundle obdBundle = msg.getData();
+                            setChangeText(obdBundle.getString("message"));
+                            break;
                     }
                     break;
             }
         }
     };
+
+    public void sendTest(View v) {
+        switch (v.getId()) {
+            case R.id.speed:
+                MainMenuActivity.btOBDCon.sendMessage("01 42\r");
+                break;
+        }
+    }
 }

@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothChatService;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.R;
 
 /**
@@ -31,27 +31,27 @@ public class BluetoothCheckDialog extends Activity {
         Bundle extras = getIntent().getExtras();
 
         if (extras != null) {
-            setChangeText(extras.getInt("LASER", BluetoothChatService.STATE_NONE), R.id.laser_state);
-            setChangeText(extras.getInt("OBD", BluetoothChatService.STATE_NONE), R.id.obd_state);
+            setChangeText(extras.getInt("LASER", BluetoothLaserService.STATE_NONE), R.id.laser_state);
+            setChangeText(extras.getInt("OBD", BluetoothLaserService.STATE_NONE), R.id.obd_state);
         } else {
-            setChangeText(BluetoothChatService.STATE_NONE, R.id.laser_state);
-            setChangeText(BluetoothChatService.STATE_NONE, R.id.obd_state);
+            setChangeText(BluetoothLaserService.STATE_NONE, R.id.laser_state);
+            setChangeText(BluetoothLaserService.STATE_NONE, R.id.obd_state);
         }
     }
 
     private void setChangeText(int status, int viewId) {
         TextView v = (TextView) findViewById(viewId);
         switch (status) {
-            case BluetoothChatService.STATE_NONE:
+            case BluetoothLaserService.STATE_NONE:
                 v.setText("연결끊김");
                 break;
-            case BluetoothChatService.STATE_LISTEN:
+            case BluetoothLaserService.STATE_LISTEN:
                 v.setText("연결 시도중");
                 break;
-            case BluetoothChatService.STATE_CONNECTING:
+            case BluetoothLaserService.STATE_CONNECTING:
                 v.setText("연결중");
                 break;
-            case BluetoothChatService.STATE_CONNECTED:
+            case BluetoothLaserService.STATE_CONNECTED:
                 v.setText("연결됨");
                 break;
             default:

@@ -16,19 +16,21 @@
 
 package org.multibluetooth.multibluetooth.Driving.Bluetooth;
 
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
+
 /**
- * Defines several constants used between {@link BluetoothChatService} and the UI.
+ * Defines several constants used between {@link BluetoothLaserService} and the UI.
  */
 public interface Constants {
 
-    // Message types sent from the BluetoothChatService Handler
+    // Message types sent from the BluetoothLaserService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_READ = 2;
     public static final int MESSAGE_WRITE = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
 
-    // Key names received from the BluetoothChatService Handler
+    // Key names received from the BluetoothLaserService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
