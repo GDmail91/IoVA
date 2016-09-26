@@ -217,17 +217,14 @@ public class BluetoothConnection {
                     Log.d(TAG, "activity name: "+mContext.getClass().getName());
                     if (mContext.getClass().getName().equals("org.multibluetooth.multibluetooth.Driving.DrivingActivity")) {
                         Bundle bundle = (Bundle) msg.obj;
-                        String readMessage = bundle.getString("MESSAGE");
                         /*byte[] readBuf = (byte[]) bundle.getByteArray("MESSAGE");
                         // construct a string from the valid bytes in the buffer
                         String readMessage = new String(readBuf, 0, msg.arg1);*/
 
                         // 메세지 파싱
                         // TODO byte[] 로 넘겨줄것
-                        messageParse(readMessage);
+                        updateData(bundle);
 
-
-                        Log.d(TAG, readMessage);
                     }
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
@@ -282,9 +279,19 @@ public class BluetoothConnection {
         }
     }
 
-    protected void messageParse(String message) {
+    protected String messageParse(String message) {
 
         ((DrivingActivity) mContext).setChangeText(message);
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+
+        return message;
+    }
+
+    protected String updateData(Bundle bundle) {
+        String parsedMessage = messageParse(bundle.getString("MESSAGE"));
+
+        Log.d(TAG, parsedMessage);
+
+        return parsedMessage;
     }
 }

@@ -10,10 +10,30 @@
     android:background="#000000">
 
     <Button
-        android:id="@+id/speed"
+        android:id="@+id/delete_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="db초기화"
         android:onClick="sendTest"/>
+
+    <Button
+        android:id="@+id/dbdata"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/delete_all"
+        android:text="db데이터보기"
+        android:onClick="sendTest"/>
+
+
+    <Button
+        android:id="@+id/driving_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="onDrivingStop"/>
+
 
     <TextView
         android:id="@+id/bt_device_name"
@@ -21,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/driving_stop"
         android:text="-"
         android:textColor="#ffffff"/>
 

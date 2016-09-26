@@ -5,12 +5,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
+
+import java.util.ArrayList;
 
 /**
  * Created by YS on 2016-09-13.
@@ -23,6 +28,8 @@ public class DrivingActivity extends AppCompatActivity {
     private TextView btDeviceName;
 
     double mySpeed, maxSpeed;
+
+    private DriveThread driveThread;
 
     private static final int DRIVE_START_FLAG = 1;
     public static final int FORWARD_MESSAGE = 100;
@@ -89,7 +96,8 @@ public class DrivingActivity extends AppCompatActivity {
         switch (requestCode) {
             case DRIVE_START_FLAG:
                 // 운행 시작
-                new DriveThread(mHandler).start();
+                driveThread = new DriveThread(this, mHandler);
+                driveThread.start();
                 break;
         }
     }
@@ -119,10 +127,28 @@ public class DrivingActivity extends AppCompatActivity {
         }
     };
 
+    public void onDrivingStop(View v) {
+        driveThread.setRequest(false);
+    }
+
     public void sendTest(View v) {
         switch (v.getId()) {
-            case R.id.speed:
+            /*case R.id.speed:
                 MainMenuActivity.btOBDCon.sendMessage("01 42\r");
+                break;*/
+            case R.id.dbdata:
+                DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
+                ArrayList<DriveInfo> testArray = driveInfoModel.getAllData();
+                Log.d("TEST", testArray.toString());
+                driveInfoModel.close();
+
+                for(DriveInfo dinfo : testArray) {
+                    Log.d("TEST", dinfo.toString());
+                }
+                break;
+            case R.id.delete_all:
+                DriveInfoModel tempModel = new DriveInfoModel(this, "DriveInfo.db", null);
+                tempModel.deleteAll();
                 break;
         }
     }

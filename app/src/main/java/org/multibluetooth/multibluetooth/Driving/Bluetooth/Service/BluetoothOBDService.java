@@ -281,6 +281,7 @@ public class BluetoothOBDService extends BluetoothService {
                             Bundle bundle = new Bundle();
                             bundle.putString(Constants.DEVICE_NAME, deviceName);
                             // 명령마다 구분
+                            bundle.putString("CATEGORY", "OBD");
                             bundle.putInt("sensing_id", sensingId);
                             bundle.putString("MESSAGE", message);
                             Log.d(TAG, message);

@@ -13,6 +13,8 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothOBDService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.R;
 
 import java.util.LinkedList;
@@ -81,7 +83,37 @@ public class OBDScanner extends BluetoothConnection {
     }
 
     @Override
-    protected void messageParse(String message) {
+    protected String messageParse(String message) {
         ((DrivingActivity) mContext).setChangeText(message);
+
+        return message;
+    }
+
+    @Override
+    protected String updateData(Bundle bundle) {
+        String parsedMessage = messageParse(bundle.getString("MESSAGE"));
+
+        Log.d(TAG, parsedMessage);
+        String category = bundle.getString("CATEGORY");
+        Log.d(TAG, category);
+        try {
+            switch (category) {
+                case "OBD":
+                    Log.d(TAG, "OBD 저장");
+                    // OBD 센싱된 데이터 DB에 저장
+                    int sensingId = bundle.getInt("sensing_id");
+                    DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+                    DriveInfo driveInfo = new DriveInfo();
+                    driveInfo.setOBDSensor(sensingId, Integer.valueOf(parsedMessage));
+                    driveInfoModel.updateOBD(driveInfo);
+                    driveInfoModel.close();
+                    break;
+                case "Laser":
+                    break;
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return parsedMessage;
     }
 }

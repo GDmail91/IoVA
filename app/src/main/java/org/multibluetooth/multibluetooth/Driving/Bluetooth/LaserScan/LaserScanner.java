@@ -55,7 +55,7 @@ public class LaserScanner extends BluetoothConnection {
     }
 
     @Override
-    protected void messageParse(String message) {
+    protected String messageParse(String message) {
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
 
         message = message.toUpperCase();
@@ -91,5 +91,6 @@ public class LaserScanner extends BluetoothConnection {
                 Log.d(TAG, "쓰레기값");
             }
         }
+        return message;
     }
 }
