@@ -10,13 +10,42 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <TextView
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:gravity="center"
-                android:background="#0fffff"
-                android:text="70"
-                android:textSize="50dp"/>
+                android:background="#FF0000">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="평균점수"
+                    android:textSize="20dp" />
+
+                <TextView
+                    android:id="@+id/avg_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="70"
+                    android:textSize="60dp"
+                    android:textColor="#ffffff"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/avg_score"
+                    android:layout_alignBaseline="@+id/avg_score"
+                    android:text="점"
+                    android:textSize="20dp"
+                    android:textColor="#ffffff" />
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -24,23 +53,102 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <TextView
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#ff00ff"
-                    android:text="50"
-                    android:textSize="40dp"
-                    android:gravity="center" />
+                    android:background="@drawable/score_border">
+                    <!--<TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:text="안전거리"
+                        android:textSize="10dp" />-->
 
-                <TextView
+                    <TextView
+                        android:id="@+id/safe_distance_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="50"
+                        android:textSize="40dp"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/safe_distance_score"
+                        android:layout_alignBaseline="@+id/safe_distance_score"
+                        android:text="점"
+                        android:textSize="15dp"
+                        android:textColor="#000000" />
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/safe_distance"
+                        android:scaleType="fitStart"/>
+                </RelativeLayout>
+
+
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#ff00ff"
-                    android:text="60"
-                    android:textSize="40dp"
-                    android:gravity="center" />
+                    android:background="@drawable/score_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:text="과속"
+                        android:textSize="10dp" />
+
+                    <TextView
+                        android:id="@+id/speeding_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="60"
+                        android:textSize="40dp"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/speeding_score"
+                        android:layout_alignBaseline="@+id/speeding_score"
+                        android:text="점"
+                        android:textSize="15dp"
+                        android:textColor="#000000" />
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/speeding"
+                        android:scaleType="fitStart"/>
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -49,23 +157,101 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <TextView
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#ff00ff"
-                    android:text="70"
-                    android:textSize="40dp"
-                    android:gravity="center" />
+                    android:background="@drawable/score_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:text="급가속"
+                        android:textSize="10dp" />
 
-                <TextView
+                    <TextView
+                        android:id="@+id/fast_acc_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="70"
+                        android:textSize="40dp"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/fast_acc_score"
+                        android:layout_alignBaseline="@+id/fast_acc_score"
+                        android:text="점"
+                        android:textSize="15dp"
+                        android:textColor="#000000" />
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/fast_acc"
+                        android:scaleType="fitStart"/>
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#ff00ff"
-                    android:text="80"
-                    android:textSize="40dp"
-                    android:gravity="center" />
+                    android:background="@drawable/score_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:text="급감속"
+                        android:textSize="10dp" />
+
+                    <TextView
+                        android:id="@+id/fast_break_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="80"
+                        android:textSize="40dp"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/fast_break_score"
+                        android:layout_alignBaseline="@+id/fast_break_score"
+                        android:text="점"
+                        android:textSize="15dp"
+                        android:textColor="#000000" />
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/fast_break"
+                        android:scaleType="fitStart"/>
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -74,31 +260,110 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <TextView
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#ff00ff"
-                    android:text="90"
-                    android:textSize="40dp"
-                    android:gravity="center" />
+                    android:background="@drawable/score_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:text="급출발"
+                        android:textSize="10dp" />
 
-                <TextView
+                    <TextView
+                        android:id="@+id/sudden_start_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="90"
+                        android:textSize="40dp"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/sudden_start_score"
+                        android:layout_alignBaseline="@+id/sudden_start_score"
+                        android:text="점"
+                        android:textSize="15dp"
+                        android:textColor="#000000" />
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/sudden_start"
+                        android:scaleType="fitStart"/>
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#ff00ff"
-                    android:text="70"
-                    android:textSize="40dp"
-                    android:gravity="center" />
+                    android:background="@drawable/score_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginStart="5dp"
+                        android:text="급정거"
+                        android:textSize="10dp" />
+
+                    <TextView
+                        android:id="@+id/sudden_stop_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="70"
+                        android:textSize="40dp"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/sudden_stop_score"
+                        android:layout_alignBaseline="@+id/sudden_stop_score"
+                        android:text="점"
+                        android:textSize="15dp"
+                        android:textColor="#000000" />
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/sudden_stop"
+                        android:scaleType="fitStart"/>
+                </RelativeLayout>
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:background="#00ff00"
+                android:background="#00aaaa"
                 android:text="평가"
                 android:textSize="40dp"
+                android:textColor="#ffffff"
                 android:gravity="center" />
 
             <TextView
