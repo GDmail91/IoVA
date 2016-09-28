@@ -96,7 +96,9 @@ public class DrivingActivity extends AppCompatActivity {
         switch (requestCode) {
             case DRIVE_START_FLAG:
                 // 운행 시작
-                driveThread = new DriveThread(this, mHandler);
+                DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
+                int topNumber = driveInfoModel.getTopNumber();
+                driveThread = new DriveThread(this, mHandler, topNumber);
                 driveThread.start();
                 break;
         }

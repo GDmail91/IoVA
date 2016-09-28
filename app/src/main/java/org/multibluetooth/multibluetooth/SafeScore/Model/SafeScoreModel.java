@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.Model;
+package org.multibluetooth.multibluetooth.SafeScore.Model;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,22 +6,24 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
- * Created by YS on 2016-09-20.
+ * Created by YS on 2016-09-28.
  */
-public class DriveInfoModel extends SQLiteOpenHelper {
-    private static final String TAG = "DriveInfoModel";
+public class SafeScoreModel extends SQLiteOpenHelper {
+    private static final String TAG = "SafeScoreModel";
 
-    protected static final int DB_VERSION = 2;
+    protected static final int DB_VERSION = 1;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
 
 
-    public DriveInfoModel(Context context, String name, SQLiteDatabase.CursorFactory factory) {
+    public SafeScoreModel(Context context, String name, SQLiteDatabase.CursorFactory factory) {
         super(context, name, factory, DB_VERSION);
     }
 
@@ -30,14 +32,23 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         // 새로운 테이블을 생성한다.
         // create table 테이블명 (컬럼명 타입 옵션);
 
-        Log.d("MEMOMODEL", "생성");
-        db.execSQL("CREATE TABLE DriveInfo ( " +
+        Log.d(TAG, "생성");
+        db.execSQL("CREATE TABLE SafeScore ( " +
                 "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "drive_id INTEGER NOT NULL, " +
-                "vehicle_speed INTEGER DEFAULT 0, " +
-                "front_distance INTEGER DEFAULT 0, " +
-                "back_distance INTEGER DEFAULT 0, " +
-                "measure_time DATETIME DEFAULT CURRENT_TIMESTAMP);");
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "safe_distance INTEGER DEFAULT 0, " +
+                "speeding_count INTEGER DEFAULT 0, " +
+                "fast_acc_count INTEGER DEFAULT 0, " +
+                "fast_break_count INTEGER DEFAULT 0, " +
+                "sudden_start_count INTEGER DEFAULT 0, " +
+                "sudden_stop_count INTEGER DEFAULT 0 );");
+/*
+
+        db.execSQL("CREATE TABLE MemoSchedule ( " +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "memoId INTEGER, " +
+                "alarmDate INTEGER);");
+*/
 
     }
 
@@ -91,7 +102,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
      *
      * @return topNumber
      */
-    public int createIndex(int topDriveNumber) {
+    public int createIndex() {
         int topNumber = 0;
 
         Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
@@ -104,8 +115,8 @@ public class DriveInfoModel extends SQLiteOpenHelper {
 
         topNumber = topNumber+1;
 
-        String sql = "INSERT INTO DriveInfo (_id, drive_id) " +
-                "VALUES('"+ topNumber+"', '"+ topDriveNumber +"');";
+        String sql = "INSERT INTO DriveInfo (_id) " +
+                "VALUES('"+ topNumber+"');";
 
 
         // DB 작업 실행
@@ -119,25 +130,6 @@ public class DriveInfoModel extends SQLiteOpenHelper {
             dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
         }
         return topNumber;
-    }
-
-    /** 읽기 SQL
-     *
-     * @return topNumber
-     */
-    public int getTopNumber() {
-        int topDriveNumber = 0;
-
-        Cursor cursor = dbR.rawQuery("SELECT drive_id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                topDriveNumber = cursor.getInt(0);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-        topDriveNumber = topDriveNumber +1;
-
-        return topDriveNumber;
     }
 
     /** 수정 SQL

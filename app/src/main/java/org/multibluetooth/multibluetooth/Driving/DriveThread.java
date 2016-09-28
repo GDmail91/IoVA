@@ -18,13 +18,15 @@ public class DriveThread extends Thread {
 
     private Context mContext;
     private Handler mHandler;
+    private int topNumber;
     private boolean request = true;
     private int i=0;
     OBDCommandList message = new OBDCommandList();
 
-    public DriveThread(Context context, Handler handler) {
+    public DriveThread(Context context, Handler handler, int topNumber) {
         this.mContext = context;
         this.mHandler = handler;
+        this.topNumber = topNumber;
     }
 
     public void setRequest(boolean request) {
@@ -44,7 +46,7 @@ public class DriveThread extends Thread {
 
                     // TODO 센서 ID 가져와야함
                     DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
-                    int id = driveInfoModel.createIndex();
+                    int id = driveInfoModel.createIndex(topNumber);
                     driveInfoModel.close();
 
                     // 앞쪽 센서 데이터 출력

@@ -19,7 +19,24 @@ public class ScoreCalculator {
     private static int SLOW_COUNT = 0;
     private static int START_COUNT = 0;
     private static int STOP_COUNT = 0;
+    private static int SPEEDING_COUNT = 0;
 
+    public ScoreCalculator() {
+        init();
+    }
+
+    public void init() {
+        FAST_COUNT = 0;
+        SLOW_COUNT = 0;
+        START_COUNT = 0;
+        STOP_COUNT = 0;
+        SPEEDING_COUNT = 0;
+
+        FAST_FLAG = false;
+        SLOW_FLAG = false;
+        START_FLAG = false;
+        STOP_FLAG = false;
+    }
 
     /**
      * Safe Distance calculator
@@ -42,7 +59,7 @@ public class ScoreCalculator {
     }
 
     // 급 가속 횟수
-    public int getSuddenFastCount(ArrayList<DriveData> driveData) {
+    public int getFastAccCount(ArrayList<DriveData> driveData) {
 
         int length = driveData.size();
         // 3초 이내 급가속 건수
@@ -65,7 +82,7 @@ public class ScoreCalculator {
     }
 
     // 급 감속 횟수
-    public int getSuddenSlowCount(ArrayList<DriveData> driveData) {
+    public int getFastBreakCount(ArrayList<DriveData> driveData) {
 
         int length = driveData.size();
         // 1초 이내 급감속 건수
@@ -89,7 +106,7 @@ public class ScoreCalculator {
     public int getSuddenStartCount(ArrayList<DriveData> driveData) {
 
         int length = driveData.size();
-        // 정지에서 초당 11km/h 이상으로 가속한경우
+        // 정지에서 초당 11km/h 이상 가속한경우
         if (driveData.get(length-1).getSpeed() == 0
         && driveData.get(length).getSpeed() > 11) {
             if (!START_FLAG) {
@@ -111,7 +128,7 @@ public class ScoreCalculator {
     public int getSuddenStopCount(ArrayList<DriveData> driveData) {
 
         int length = driveData.size();
-        // 초당 7km/h 이상에서 속도가 0이 된경우
+        // 초당 7km/h 이상 감속하여 속도가 0이 된경우
         if ((driveData.get(length-1).getSpeed() - driveData.get(length).getSpeed()) > 7
         && driveData.get(length).getSpeed() == 0) {
             if (!STOP_FLAG) {
@@ -127,5 +144,15 @@ public class ScoreCalculator {
 
             return STOP_COUNT;
         }
+    }
+
+    public int getSpeedingCount(ArrayList<DriveData> driveData) {
+
+        int length = driveData.size();
+        if (driveData.get(length).getSpeed() > 120) {
+            SPEEDING_COUNT++;
+        }
+
+        return SPEEDING_COUNT;
     }
 }
