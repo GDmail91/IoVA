@@ -284,5 +284,41 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public void close() {
         dbR.close();
     }
+
+    public int randomDataInsert() {
+        int topNumber = 0;
+        for (int i=0; i<20; i++) {
+
+            Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    topNumber = cursor.getInt(0);
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+
+            topNumber = topNumber + 1;
+
+            String sql = "INSERT INTO DriveInfo (_id, vehicle_speed, front_distance, back_distance) " +
+                    "VALUES(" +
+                    "'" + topNumber + "', " +
+                    "'60', " +
+                    "'80', " +
+                    "'60');";
+
+
+            // DB 작업 실행
+            dbW.beginTransaction();
+            try {
+                dbW.execSQL(sql);
+                dbW.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
+            }
+        }
+        return topNumber;
+    }
 }
 

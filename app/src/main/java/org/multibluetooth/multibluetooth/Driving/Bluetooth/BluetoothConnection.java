@@ -16,6 +16,7 @@ import android.widget.Toast;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
+import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
 
 /**
@@ -194,6 +195,7 @@ public class BluetoothConnection {
                         case BluetoothLaserService.STATE_CONNECTED:
                             // String Resource 값 변경
                             setStatus(mContext.getString(R.string.title_connected_to, mConnectedDeviceName));
+                            ((MainMenuActivity) mContext).setBtConnectSign();
                             break;
                         case BluetoothLaserService.STATE_CONNECTING:
                             setStatus(R.string.title_connecting);

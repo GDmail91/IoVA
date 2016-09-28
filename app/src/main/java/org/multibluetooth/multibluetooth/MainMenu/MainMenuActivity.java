@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
@@ -14,6 +15,7 @@ import com.facebook.login.LoginManager;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Facebook.FacebookLogin;
 import org.multibluetooth.multibluetooth.R;
@@ -25,6 +27,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
 	// VIEW
 	private TextView btDeviceName;
+	private ImageView btconnectSign;
 
 	public static BluetoothConnection btLaserCon;
 	public static BluetoothConnection btOBDCon;
@@ -43,9 +46,9 @@ public class MainMenuActivity extends AppCompatActivity {
 
 		// VIEW 연결
 		btDeviceName = (TextView) findViewById(R.id.bt_device_name);
+		btconnectSign = (ImageView) findViewById(R.id.bt_connect_sign);
 
 	}
-
 
 	public void onMenuClick(View v) {
 		Log.d(TAG, v.toString());
@@ -115,6 +118,7 @@ public class MainMenuActivity extends AppCompatActivity {
 			btOBDCon = new OBDScanner(this);
 			btOBDCon.conn();
 		}
+
 	}
 
 	// 디바이스 메세지 전달
@@ -145,6 +149,14 @@ public class MainMenuActivity extends AppCompatActivity {
 				} else if (resultCode == BLUETOOTH_OBD_CONNECT)
 				 	onBluetoothConnect(BLUETOOTH_OBD_CONNECT);
 				break;
+		}
+	}
+
+	public void setBtConnectSign() {
+		if (btLaserCon != null && btOBDCon != null
+				&& btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED
+				&& btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED) {
+			btconnectSign.setImageResource(R.drawable.green_dot);
 		}
 	}
 }
