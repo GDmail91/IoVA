@@ -6,10 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
-
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by YS on 2016-09-28.
@@ -34,55 +31,37 @@ public class SafeScoreModel extends SQLiteOpenHelper {
 
         Log.d(TAG, "생성");
         db.execSQL("CREATE TABLE SafeScore ( " +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " + // foreign key to drive ID
                 "safe_distance INTEGER DEFAULT 0, " +
                 "speeding_count INTEGER DEFAULT 0, " +
                 "fast_acc_count INTEGER DEFAULT 0, " +
                 "fast_break_count INTEGER DEFAULT 0, " +
                 "sudden_start_count INTEGER DEFAULT 0, " +
                 "sudden_stop_count INTEGER DEFAULT 0 );");
-/*
-
-        db.execSQL("CREATE TABLE MemoSchedule ( " +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "memoId INTEGER, " +
-                "alarmDate INTEGER);");
-*/
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d("MEMOMODEL", oldVersion + " => " +newVersion);
+        Log.d(TAG, oldVersion + " => " +newVersion);
         db.execSQL("DROP TABLE IF EXISTS DriveInfo");
         onCreate(db);
     }
 
     /** 삽입 SQL
      *
-     * @param driveInfo
+     * @param safeScore
      * @return topNumber
      */
-    public int insert(DriveInfo driveInfo) {
-        int topNumber = 0;
-
-        Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                topNumber = cursor.getInt(0);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-
-        topNumber = topNumber+1;
-
-        String sql = "INSERT INTO DriveInfo (_id, vehicle_speed, front_distance, back_distance) " +
+    public int insert(SafeScore safeScore) {
+        String sql = "INSERT INTO SafeScore (_id, speeding_count, fast_acc_count, fast_break_count, sudden_start_count, sudden_stop_count) " +
                 "VALUES(" +
-                "'" + topNumber + "', " +
-                "'" + driveInfo.getVehicleSpeed() + "', " +
-                "'" + driveInfo.getFrontDistance() + "', " +
-                "'" + driveInfo.getBackDistance() + "');";
+                "'" + safeScore.getDriveId() + "', " +
+                "'" + safeScore.getSpeedingCount() + "', " +
+                "'" + safeScore.getFastAccCount() + "', " +
+                "'" + safeScore.getFastBreakCount() + "', " +
+                "'" + safeScore.getSuddenStartCount() + "', " +
+                "'" + safeScore.getSuddenStopCount() + "') ;";
 
 
         // DB 작업 실행
@@ -95,54 +74,22 @@ public class SafeScoreModel extends SQLiteOpenHelper {
         } finally {
             dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
         }
-        return topNumber;
-    }
-
-    /** 삽입 SQL
-     *
-     * @return topNumber
-     */
-    public int createIndex() {
-        int topNumber = 0;
-
-        Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                topNumber = cursor.getInt(0);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-
-        topNumber = topNumber+1;
-
-        String sql = "INSERT INTO DriveInfo (_id) " +
-                "VALUES('"+ topNumber+"');";
-
-
-        // DB 작업 실행
-        dbW.beginTransaction();
-        try {
-            dbW.execSQL(sql);
-            dbW.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
-        }
-        return topNumber;
+        return safeScore.getDriveId();
     }
 
     /** 수정 SQL
      *
-     * @param driveInfo
+     * @param safeScore
      * @return id
      */
-    public int update(DriveInfo driveInfo) {
-        String sql = "UPDATE DriveInfo SET " +
-                "vehicle_speed='" + driveInfo.getVehicleSpeed() + "', " +
-                "front_distance='" + driveInfo.getFrontDistance() + "', " +
-                "back_distance='" + driveInfo.getBackDistance() + "' " +
-                "WHERE _id='"+driveInfo.getId()+"' ;";
+    public int update(SafeScore safeScore) {
+        String sql = "UPDATE SafeScore SET " +
+                "speeding_count='" + safeScore.getSpeedingCount() + "', " +
+                "fast_acc_count='" + safeScore.getFastAccCount() + "', " +
+                "fast_break_count='" + safeScore.getFastBreakCount() + "'," +
+                "sudden_start_count='" + safeScore.getSuddenStartCount() + "'," +
+                "sudden_stop_count='" + safeScore.getSuddenStopCount() + "' " +
+                "WHERE _id='"+ safeScore.getDriveId() +"' ;";
 
         // DB 작업 실행
         dbW.beginTransaction();
@@ -155,56 +102,7 @@ public class SafeScoreModel extends SQLiteOpenHelper {
             dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
         }
 
-        return driveInfo.getId();
-    }
-
-    /** 수정 SQL
-     *
-     * @param driveInfo
-     * @return id
-     */
-    public int updateOBD(DriveInfo driveInfo) {
-        String sql = "UPDATE DriveInfo SET " +
-                "vehicle_speed='" + driveInfo.getVehicleSpeed() + "' " +
-                "WHERE _id='"+driveInfo.getId()+"' ;";
-
-        // DB 작업 실행
-        dbW.beginTransaction();
-        try {
-            dbW.execSQL(sql);
-            dbW.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
-        }
-
-        return driveInfo.getId();
-    }
-
-    /** 수정 SQL
-     *
-     * @param driveInfo
-     * @return id
-     */
-    public int updateLaser(DriveInfo driveInfo) {
-        String sql = "UPDATE DriveInfo SET " +
-                "front_distance='" + driveInfo.getFrontDistance() + "', " +
-                "back_distance='" + driveInfo.getBackDistance() + "' " +
-                "WHERE _id='"+driveInfo.getId()+"' ;";
-
-        // DB 작업 실행
-        dbW.beginTransaction();
-        try {
-            dbW.execSQL(sql);
-            dbW.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
-        }
-
-        return driveInfo.getId();
+        return safeScore.getDriveId();
     }
 
     public void update(String _query) {
@@ -214,7 +112,7 @@ public class SafeScoreModel extends SQLiteOpenHelper {
     public void delete(int ids) {
         dbW.beginTransaction();
         try {
-            dbW.execSQL("DELETE FROM DriveInfo WHERE _id='" + ids + "'");
+            dbW.execSQL("DELETE FROM SafeScore WHERE _id='" + ids + "'");
             dbW.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,7 +124,7 @@ public class SafeScoreModel extends SQLiteOpenHelper {
     public void deleteAll() {
         dbW.beginTransaction();
         try {
-            dbW.execSQL("DELETE FROM DriveInfo");
+            dbW.execSQL("DELETE FROM SafeScore");
             dbW.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
@@ -238,27 +136,27 @@ public class SafeScoreModel extends SQLiteOpenHelper {
     public int printCountOfData() {
         int count=0;
 
-        Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo ORDER BY _id DESC", null);
+        Cursor cursor = dbR.rawQuery("SELECT * FROM SafeScore ORDER BY _id DESC", null);
         while(cursor.moveToNext()) {
             count += cursor.getInt(0);
         }
         return count;
     }
 
-    public ArrayList<DriveInfo> getAllData() {
-        ArrayList<DriveInfo> allData = new ArrayList<>();
+    public ArrayList<SafeScore> getAllData() {
+        ArrayList<SafeScore> allData = new ArrayList<>();
         int i =0;
-        Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo ORDER BY _id DESC", null);
+        Cursor cursor = dbR.rawQuery("SELECT * FROM SafeScore ORDER BY _id DESC", null);
 
         while(cursor.moveToNext()) {
             Log.d(TAG, ""+cursor.getInt(0));
-            DriveInfo tempData = new DriveInfo(
+            SafeScore tempData = new SafeScore(
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
                     cursor.getInt(3),
                     cursor.getInt(4),
-                    cursor.getString(5));
+                    cursor.getInt(5));
 
             allData.add(i++, tempData);
         }
@@ -266,22 +164,20 @@ public class SafeScoreModel extends SQLiteOpenHelper {
         return allData;
     }
 
-    public DriveInfo getData(int id) {
-        DriveInfo data = null;
+    public SafeScore getData(int id) {
+        SafeScore data = null;
 
-        Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo WHERE _id='"+id+"' ORDER BY _id DESC", null);
+        Cursor cursor = dbR.rawQuery("SELECT * FROM SafeScore WHERE _id='"+id+"' ORDER BY _id DESC", null);
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(cursor.getInt(2));
 
-            data = new DriveInfo(
+            data = new SafeScore(
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
                     cursor.getInt(3),
                     cursor.getInt(4),
-                    cursor.getString(5)
+                    cursor.getInt(5)
             );
         }
 
@@ -292,40 +188,5 @@ public class SafeScoreModel extends SQLiteOpenHelper {
         dbR.close();
     }
 
-    public int randomDataInsert() {
-        int topNumber = 0;
-        for (int i=0; i<20; i++) {
-
-            Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    topNumber = cursor.getInt(0);
-                } while (cursor.moveToNext());
-                cursor.close();
-            }
-
-            topNumber = topNumber + 1;
-
-            String sql = "INSERT INTO DriveInfo (_id, vehicle_speed, front_distance, back_distance) " +
-                    "VALUES(" +
-                    "'" + topNumber + "', " +
-                    "'60', " +
-                    "'80', " +
-                    "'60');";
-
-
-            // DB 작업 실행
-            dbW.beginTransaction();
-            try {
-                dbW.execSQL(sql);
-                dbW.setTransactionSuccessful();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
-            }
-        }
-        return topNumber;
-    }
 }
 
