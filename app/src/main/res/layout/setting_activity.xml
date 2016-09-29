@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/setting_view">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginTop="44.6dp"
+            android:text="로그인 정보"
+            android:textSize="12dp"
+            android:textColor="#727272"
+            android:id="@+id/facebook_info"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/facebook_info"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginRight="7dp"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="7dp"
+            android:paddingLeft="7dp"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:id="@+id/facebook_layout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="로그인 아이디"
+                android:textSize="14dp"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:id="@+id/facebook_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="15.3dp"
+                android:layout_marginEnd="15.3dp"
+                android:text="-"
+                android:textColor="#0000FF"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginTop="44.6dp"
+            android:layout_below="@+id/facebook_layout"
+            android:text="프로그램 정보"
+            android:textSize="12dp"
+            android:textColor="#727272"
+            android:id="@+id/app_info_text"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/app_info_text"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginRight="7dp"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="7dp"
+            android:paddingLeft="7dp"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:id="@+id/app_info_layout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="버전 정보"
+                android:textSize="14dp"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="15.3dp"
+                android:layout_marginEnd="15.3dp"
+                android:text="1.0"
+                android:textColor="#0000FF"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="62.6dp"
+            android:layout_below="@id/app_info_layout"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginRight="7dp"
+            android:background="#FFFFFF"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="로그아웃"
+            android:textSize="14dp"
+            android:textColor="@drawable/logout_button"
+            android:textColorHighlight="@drawable/logout_button"
+            android:textColorLink="@drawable/logout_button"
+            android:id="@+id/logout_button"
+            android:onClick="onLogout"/>
+    </RelativeLayout>
+</LinearLayout>

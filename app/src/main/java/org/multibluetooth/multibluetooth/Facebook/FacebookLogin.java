@@ -21,6 +21,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
@@ -124,8 +125,14 @@ public class FacebookLogin extends AppCompatActivity {
                                         // 사용자 토큰 저장
                                         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
                                         SharedPreferences.Editor editor = pref.edit();
-                                        editor.putString("access_token", "something");
-                                        editor.apply();
+                                        // TODO 사용자 토큰 저장
+                                        try {
+                                            editor.putString("access_token", "something");
+                                            editor.putString("user_name", object.getString("name"));
+                                            editor.apply();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                         // 정보 저장후 메인으로 이동
                                         Intent intent = new Intent(FacebookLogin.this, MainMenuActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

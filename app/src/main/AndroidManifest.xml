@@ -35,6 +35,8 @@
 
         <activity android:name=".Facebook.FacebookLogin"/>
 
+        <activity android:name=".Setting.SettingActivity"/>
+
         <!-- 운행시작 Dialog -->
         <activity android:name=".Driving.DriveStartDialog" android:theme="@android:style/Theme.DeviceDefault.Light.Dialog"/>
 

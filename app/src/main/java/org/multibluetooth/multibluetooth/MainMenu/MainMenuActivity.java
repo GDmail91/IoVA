@@ -22,6 +22,7 @@ import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
+import org.multibluetooth.multibluetooth.Setting.SettingActivity;
 
 import java.util.ArrayList;
 
@@ -81,21 +82,9 @@ public class MainMenuActivity extends AppCompatActivity {
 				break;
 
 			case R.id.fb_logout:	// 페이스북 로그아웃
-				// access_token 초기화
-				SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-				SharedPreferences.Editor editor = pref.edit();
-				editor.putString("access_token", "");
-				editor.apply();
-
-				// 페북 연결 해제
-				FacebookSdk.sdkInitialize(getApplicationContext());
-				LoginManager.getInstance().logOut();
-
-				// 로그인 화면으로 이동
-				Intent logoutIntent = new Intent(MainMenuActivity.this, FacebookLogin.class);
-				logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(logoutIntent);
+				// 설정 창으로 이동
+				Intent settingIntent = new Intent(MainMenuActivity.this, SettingActivity.class);
+				startActivity(settingIntent);
 				break;
 		}
 	}
