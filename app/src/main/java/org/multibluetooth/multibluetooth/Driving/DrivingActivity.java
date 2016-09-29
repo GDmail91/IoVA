@@ -14,6 +14,8 @@ import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
+import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
+import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 
 import java.util.ArrayList;
 
@@ -147,10 +149,22 @@ public class DrivingActivity extends AppCompatActivity {
                 for(DriveInfo dinfo : testArray) {
                     Log.d("TEST", dinfo.toString());
                 }
+
+                SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+                ArrayList<SafeScore> testArray2 = safeScoreModel.getAllData();
+                Log.d("TEST", testArray2.toString());
+                safeScoreModel.close();
+
+                for(SafeScore dinfo : testArray2) {
+                    Log.d("TEST", dinfo.toString());
+                }
                 break;
             case R.id.delete_all:
                 DriveInfoModel tempModel = new DriveInfoModel(this, "DriveInfo.db", null);
                 tempModel.deleteAll();
+
+                SafeScoreModel tempModel2 = new SafeScoreModel(this, "DriveInfo.db", null);
+                tempModel2.deleteAll();
                 break;
         }
     }

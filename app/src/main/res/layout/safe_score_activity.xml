@@ -58,7 +58,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/score_border">
-                    <!--<TextView
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -68,7 +68,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginStart="5dp"
                         android:text="안전거리"
-                        android:textSize="10dp" />-->
+                        android:textSize="10dp" />
 
                     <TextView
                         android:id="@+id/safe_distance_score"
@@ -369,28 +369,28 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:background="#0000ff"
+                android:background="#FFFFFF"
                 android:text="이러이러한 이유로 못했다고 표시"
                 android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:background="#0000ff"
+                android:background="#FFFFFF"
                 android:text="이러이러한 이유로 못했다고 표시"
                 android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:background="#0000ff"
+                android:background="#FFFFFF"
                 android:text="이러이러한 이유로 못했다고 표시"
                 android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
-                android:background="#0000ff"
+                android:background="#FFFFFF"
                 android:text="이러이러한 이유로 못했다고 표시"
                 android:gravity="center" />
 

@@ -36,6 +36,10 @@ public class DriveThread extends Thread {
     @Override
     public void run() {
         super.run();
+
+        if (MainMenuActivity.btOBDCon != null) {
+            MainMenuActivity.btOBDCon.queueInit(topNumber);
+        }
         while (request) {
             if (MainMenuActivity.btOBDCon != null) {
                 // TODO && MainMenuActivity.btLaserCon != null) {

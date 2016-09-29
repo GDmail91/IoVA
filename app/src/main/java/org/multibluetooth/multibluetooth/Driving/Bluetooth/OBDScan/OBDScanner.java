@@ -102,9 +102,11 @@ public class OBDScanner extends BluetoothConnection {
                     Log.d(TAG, "OBD 저장");
                     // OBD 센싱된 데이터 DB에 저장
                     int sensingId = bundle.getInt("sensing_id");
-                    DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
                     DriveInfo driveInfo = new DriveInfo();
                     driveInfo.setOBDSensor(sensingId, Integer.valueOf(parsedMessage));
+                    mScoreCalculator.putOBDData(driveInfo);
+
+                    DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
                     driveInfoModel.updateOBD(driveInfo);
                     driveInfoModel.close();
                     break;

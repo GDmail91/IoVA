@@ -18,6 +18,9 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothServ
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
+import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
+import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
+import org.multibluetooth.multibluetooth.SafeScore.ScoreCalculator;
 
 /**
  * Created by YS on 2016-09-19.
@@ -29,6 +32,11 @@ public class BluetoothConnection {
     public static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
     public static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     public static final int REQUEST_ENABLE_BT = 3;
+
+    /**
+     * Safe Score calculator
+     */
+    protected ScoreCalculator mScoreCalculator;
 
     protected Context mContext;
     /**
@@ -67,7 +75,13 @@ public class BluetoothConnection {
         if (mBluetoothAdapter == null) {
             Toast.makeText(context, "Bluetooth is not available", Toast.LENGTH_LONG).show();
         }
+
         return 0;
+    }
+
+    public void queueInit(int topNumber) {
+        // make score calculate queue
+        mScoreCalculator = new ScoreCalculator(mContext, topNumber);
     }
 
     public void conn() {

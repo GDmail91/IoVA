@@ -1,6 +1,7 @@
 package org.multibluetooth.multibluetooth.SafeScore;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
  * Created by YS on 2016-09-19.
  */
 public class ScoreCalculator {
+    private static final String TAG = "ScoreCalculator";
 
     private static int drive_id;
     private boolean FAST_FLAG = false;
@@ -24,6 +26,7 @@ public class ScoreCalculator {
     private static int STOP_COUNT = 0;
     private static int SPEEDING_COUNT = 0;
 
+    private static int queueLength = 0;
     private static LinkedList<DriveInfo> mQueue = new LinkedList<>();
     private SafeScore safeScore;
     private SafeScoreModel safeScoreModel;
@@ -48,12 +51,16 @@ public class ScoreCalculator {
         START_FLAG = false;
         STOP_FLAG = false;
 
+        queueLength = 0;
+        mQueue.clear();
         // TODO 반드시 close하고 끝내도록 짤것
         safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
+        safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0));
     }
 
     // 데이터 RECIVE 프로세스
     public void putOBDData(DriveInfo driveInfo) {
+        Log.d(TAG, driveInfo.toString());
         mQueue.add(driveInfo);
 
         // 큐가 5개 이상일시 부터 운행안전정보 기록
@@ -61,7 +68,7 @@ public class ScoreCalculator {
             // 안전점수 계산
             safeScore = doCalculateScore(mQueue);
             // 점수 DB 삽입
-            safeScoreModel.insert(safeScore);
+            safeScoreModel.update(safeScore);
 
             // dequeue
             mQueue.removeFirst();
@@ -69,20 +76,25 @@ public class ScoreCalculator {
     }
 
     public SafeScore doCalculateScore(LinkedList<DriveInfo> mQueue) {
+        queueLength = mQueue.size() - 1;
+        int safeDistanceCount = getSafeDistance(mQueue);
+        int speedingCount = getSpeedingCount(mQueue);
         int fastAccCount = getFastAccCount(mQueue);
         int fastBreakCount = getFastBreakCount(mQueue);
         int suddenStartCount = getSuddenStartCount(mQueue);
         int suddenStopCount = getSuddenStopCount(mQueue);
 
-        return new SafeScore(drive_id, fastAccCount, fastBreakCount, suddenStartCount, suddenStopCount);
+        return new SafeScore(drive_id, speedingCount, fastAccCount, fastBreakCount, suddenStartCount, suddenStopCount);
     }
 
     /**
      * Safe Distance calculator
-     * @param speed
+     * @param driveData
      * @return safe distance
      */
-    public double getSafeDistance(double speed) {
+    public int getSafeDistance(LinkedList<DriveInfo> driveData) {
+        int speed = driveData.get(queueLength).getFrontDistance();
+
         // TODO 날씨정보 포함시킬것
         // 안전거리 계산
         // 도로교통공단 기준 80 km/h 미만일 경우 현재속도 - 15
@@ -99,12 +111,10 @@ public class ScoreCalculator {
 
     // 급 가속 횟수
     public int getFastAccCount(LinkedList<DriveInfo> driveData) {
-
-        int length = driveData.size();
         // 3초 이내 급가속 건수
-        if ((driveData.get(length).getVehicleSpeed() - driveData.get(length-1).getVehicleSpeed()) > 11
-        || (driveData.get(length).getVehicleSpeed() - driveData.get(length-2).getVehicleSpeed()) > 11
-        || (driveData.get(length).getVehicleSpeed() - driveData.get(length-3).getVehicleSpeed()) > 11) {
+        if ((driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-1).getVehicleSpeed()) > 11
+        || (driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-2).getVehicleSpeed()) > 11
+        || (driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-3).getVehicleSpeed()) > 11) {
             if (!FAST_FLAG) {
                 FAST_FLAG = true;
                 FAST_COUNT++;
@@ -122,10 +132,8 @@ public class ScoreCalculator {
 
     // 급 감속 횟수
     public int getFastBreakCount(LinkedList<DriveInfo> driveData) {
-
-        int length = driveData.size();
         // 1초 이내 급감속 건수
-        if ((driveData.get(length-1).getVehicleSpeed() - driveData.get(length).getVehicleSpeed()) > 7) {
+        if ((driveData.get(queueLength-1).getVehicleSpeed() - driveData.get(queueLength).getVehicleSpeed()) > 7) {
             if (!SLOW_FLAG) {
                 SLOW_FLAG = true;
                 SLOW_COUNT++;
@@ -144,10 +152,9 @@ public class ScoreCalculator {
     // 급 출발 횟수
     public int getSuddenStartCount(LinkedList<DriveInfo> driveData) {
 
-        int length = driveData.size();
         // 정지에서 초당 11km/h 이상 가속한경우
-        if (driveData.get(length-1).getVehicleSpeed() == 0
-        && driveData.get(length).getVehicleSpeed() > 11) {
+        if (driveData.get(queueLength-1).getVehicleSpeed() == 0
+        && driveData.get(queueLength).getVehicleSpeed() > 11) {
             if (!START_FLAG) {
                 START_FLAG = true;
                 START_COUNT++;
@@ -166,10 +173,9 @@ public class ScoreCalculator {
     // 급 정거 횟수
     public int getSuddenStopCount(LinkedList<DriveInfo> driveData) {
 
-        int length = driveData.size();
         // 초당 7km/h 이상 감속하여 속도가 0이 된경우
-        if ((driveData.get(length-1).getVehicleSpeed() - driveData.get(length).getVehicleSpeed()) > 7
-        && driveData.get(length).getVehicleSpeed() == 0) {
+        if ((driveData.get(queueLength-1).getVehicleSpeed() - driveData.get(queueLength).getVehicleSpeed()) > 7
+        && driveData.get(queueLength).getVehicleSpeed() == 0) {
             if (!STOP_FLAG) {
                 STOP_FLAG = true;
                 STOP_COUNT++;
@@ -187,11 +193,15 @@ public class ScoreCalculator {
 
     public int getSpeedingCount(LinkedList<DriveInfo> driveData) {
 
-        int length = driveData.size();
-        if (driveData.get(length).getVehicleSpeed() > 120) {
+        // 속도가 120 이상으로 달린 초
+        if (driveData.get(queueLength).getVehicleSpeed() > 120) {
             SPEEDING_COUNT++;
         }
 
         return SPEEDING_COUNT;
+    }
+
+    public void clearQueue() {
+        mQueue.clear();
     }
 }
