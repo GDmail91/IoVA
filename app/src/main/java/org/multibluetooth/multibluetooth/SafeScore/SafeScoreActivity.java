@@ -9,8 +9,6 @@ import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 
-import java.util.ArrayList;
-
 /**
  * Created by YS on 2016-09-19.
  */
@@ -42,56 +40,26 @@ public class SafeScoreActivity extends AppCompatActivity {
         suddenStartScore = (TextView) findViewById(R.id.sudden_start_score);
         suddenStopScore = (TextView) findViewById(R.id.sudden_stop_score);
 
-        // 안전점수 가져와서 뿌려줌
-        SafeScore safeScore = getScoreData();
-        safeDistanceScore.setText(""+safeScore.getSafeDistanceCount());
-        speedingScore.setText(""+safeScore.getSpeedingCount());
-        fastAccScore.setText(""+safeScore.getFastAccCount());
-        fastBreakScore.setText(""+safeScore.getFastBreakCount());
-        suddenStartScore.setText(""+safeScore.getSuddenStartCount());
-        suddenStopScore.setText(""+safeScore.getSuddenStopCount());
+        Bundle bundle = getIntent().getExtras();
+        SafeScore safeScore;
+        if (bundle == null) {
+
+            // 안전점수 가져와서 뿌려줌
+            SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+            safeScore = safeScoreModel.getScoreData();
+        } else {
+            safeScore = (SafeScore) bundle.getSerializable("drive_item");
+        }
+        Log.d(TAG, "Drive ID: "+safeScore.getDriveId());
+
+        safeDistanceScore.setText("" + safeScore.getSafeDistanceCount());
+        speedingScore.setText("" + safeScore.getSpeedingCount());
+        fastAccScore.setText("" + safeScore.getFastAccCount());
+        fastBreakScore.setText("" + safeScore.getFastBreakCount());
+        suddenStartScore.setText("" + safeScore.getSuddenStartCount());
+        suddenStopScore.setText("" + safeScore.getSuddenStopCount());
 
         // 전체 지표의 평균 계산
-        int avgScore = safeScore.getSafeDistanceCount() +
-                safeScore.getSpeedingCount() +
-                safeScore.getFastAccCount() +
-                safeScore.getFastBreakCount() +
-                safeScore.getSuddenStartCount() +
-                safeScore.getSuddenStopCount();
-        avgScore /= 6;
-        avgScoreView.setText(""+avgScore);
-    }
-
-    private SafeScore getScoreData() {
-        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
-        ArrayList<SafeScore> allData = safeScoreModel.getAllData();
-        Log.d(TAG, allData.toString());
-        int avgDistance = 0;
-        int avgSpeeding = 0;
-        int avgFastAcc = 0;
-        int avgFastBreak = 0;
-        int avgSuddenStart = 0;
-        int avgSuddenStop = 0;
-
-        int size = allData.size();
-        if (size != 0) {
-            for (SafeScore safeScore : allData) {
-                avgDistance += safeScore.getSafeDistanceCount();
-                avgSpeeding += safeScore.getSpeedingCount();
-                avgFastAcc += safeScore.getFastAccCount();
-                avgFastBreak += safeScore.getFastBreakCount();
-                avgSuddenStart += safeScore.getSuddenStartCount();
-                avgSuddenStop += safeScore.getSuddenStopCount();
-            }
-
-            // TODO 각 지표들의 평균 점수 계산? 혹은 합산 점수 계산 해야함
-            avgDistance = avgDistance / size;
-            avgSpeeding = avgSpeeding / size;
-            avgFastAcc = avgFastAcc / size;
-            avgFastBreak = avgFastBreak / size;
-            avgSuddenStart = avgSuddenStart / size;
-            avgSuddenStop = avgSuddenStop / size;
-        }
-        return new SafeScore(0, avgDistance, avgSpeeding, avgFastAcc, avgFastBreak, avgSuddenStart, avgSuddenStop);
+        avgScoreView.setText("" + safeScore.getAvgScore());
     }
 }

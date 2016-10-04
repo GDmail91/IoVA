@@ -10,7 +10,6 @@ import java.util.ArrayList;
  */
 public class OBDCommandList {
     // 왜 스피드밖에 필요가 없지?
-    public int vehicleSpeed=0;
     public ArrayList<ObdCommand> cmdList = new ArrayList<>();
 
     /**

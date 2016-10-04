@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:iova="http://schemas.android.com/apk/res-auto">
+
+    <!-- 액션 버튼으로써 나타나는 "서치" 아이템  -->
+    <item android:id="@+id/seleted_delete"
+        android:icon="@drawable/trash"
+        android:title="선택삭제"
+        android:showAsAction="ifRoom"
+        iova:showAsAction="ifRoom"/>
+
+    <!-- 오버플로우 공간 안에 있는 "셋팅" 액션 아이템 -->
+    <!--<item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:showAsAction="never" />-->
+
+</menu>

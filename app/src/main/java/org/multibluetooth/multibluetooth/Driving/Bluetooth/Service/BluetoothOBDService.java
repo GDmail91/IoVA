@@ -312,6 +312,7 @@ public class BluetoothOBDService extends BluetoothService {
                         // Send the obtained bytes to the UI Activity
                         mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
                                 .sendToTarget();
+                        testOBD = false;
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);

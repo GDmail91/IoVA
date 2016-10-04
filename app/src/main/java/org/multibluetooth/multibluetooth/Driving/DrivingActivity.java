@@ -72,10 +72,7 @@ public class DrivingActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (MainMenuActivity.btLaserCon != null)
-            MainMenuActivity.btLaserCon.serviceStop();
-        if (MainMenuActivity.btOBDCon != null)
-            MainMenuActivity.btOBDCon.serviceStop();
+        driveThread.stopRequest();
     }
 
     // 디바이스 메세지 전달
@@ -100,6 +97,7 @@ public class DrivingActivity extends AppCompatActivity {
                 // 운행 시작
                 DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
                 int topNumber = driveInfoModel.getTopNumber();
+                driveInfoModel.close();
                 driveThread = new DriveThread(this, mHandler, topNumber);
                 driveThread.start();
                 break;
@@ -132,7 +130,7 @@ public class DrivingActivity extends AppCompatActivity {
     };
 
     public void onDrivingStop(View v) {
-        driveThread.setRequest(false);
+        driveThread.stopRequest();
     }
 
     public void sendTest(View v) {

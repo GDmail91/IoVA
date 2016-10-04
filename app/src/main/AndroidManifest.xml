@@ -11,6 +11,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
 
+    <!-- Speech Recognizer 퍼미션 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/iova_icon"
@@ -32,6 +35,8 @@
         <activity android:name=".Driving.DrivingActivity"/>
 
         <activity android:name=".SafeScore.SafeScoreActivity"/>
+
+        <activity android:name=".History.HistoryActivity"/>
 
         <activity android:name=".Facebook.FacebookLogin"/>
 

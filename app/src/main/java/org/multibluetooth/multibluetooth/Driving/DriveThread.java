@@ -10,6 +10,7 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDCommandLis
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
+import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 
 /**
  * Created by YS on 2016-09-23.
@@ -18,27 +19,31 @@ public class DriveThread extends Thread {
 
     private Context mContext;
     private Handler mHandler;
-    private int topNumber;
+    private int topDriveNumber;
     private boolean request = true;
     private int i=0;
     OBDCommandList message = new OBDCommandList();
 
-    public DriveThread(Context context, Handler handler, int topNumber) {
+    public DriveThread(Context context, Handler handler, int topDriveNumber) {
         this.mContext = context;
         this.mHandler = handler;
-        this.topNumber = topNumber;
+        this.topDriveNumber = topDriveNumber;
     }
 
     public void setRequest(boolean request) {
         this.request = request;
     }
 
+    public void stopRequest() {
+        driveStop();
+        request = false;
+    }
     @Override
     public void run() {
         super.run();
 
         if (MainMenuActivity.btOBDCon != null) {
-            MainMenuActivity.btOBDCon.queueInit(topNumber);
+            MainMenuActivity.btOBDCon.queueInit(topDriveNumber);
         }
         while (request) {
             if (MainMenuActivity.btOBDCon != null) {
@@ -50,7 +55,7 @@ public class DriveThread extends Thread {
 
                     // TODO 센서 ID 가져와야함
                     DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
-                    int id = driveInfoModel.createIndex(topNumber);
+                    int id = driveInfoModel.createIndex(topDriveNumber);
                     driveInfoModel.close();
 
                     // 앞쪽 센서 데이터 출력
@@ -82,8 +87,15 @@ public class DriveThread extends Thread {
                     e.printStackTrace();
                 }
             } else {
+                driveStop();
                 request = false;
             }
         }
+    }
+
+    private void driveStop() {
+        SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
+        safeScoreModel.updateEndOfDrive(topDriveNumber);
+        safeScoreModel.close();
     }
 }

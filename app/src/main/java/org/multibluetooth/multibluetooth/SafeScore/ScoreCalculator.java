@@ -12,7 +12,7 @@ import java.util.LinkedList;
 /**
  * Created by YS on 2016-09-19.
  */
-public class ScoreCalculator {
+    public class ScoreCalculator {
     private static final String TAG = "ScoreCalculator";
 
     private static int drive_id;
@@ -55,7 +55,7 @@ public class ScoreCalculator {
         mQueue.clear();
         // TODO 반드시 close하고 끝내도록 짤것
         safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
-        safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0));
+        safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0,"",""));
     }
 
     // 데이터 RECIVE 프로세스
@@ -84,7 +84,7 @@ public class ScoreCalculator {
         int suddenStartCount = getSuddenStartCount(mQueue);
         int suddenStopCount = getSuddenStopCount(mQueue);
 
-        return new SafeScore(drive_id, speedingCount, fastAccCount, fastBreakCount, suddenStartCount, suddenStopCount);
+        return new SafeScore(drive_id, speedingCount, fastAccCount, fastBreakCount, suddenStartCount, suddenStopCount,"","");
     }
 
     /**

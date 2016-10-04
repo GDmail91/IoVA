@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
-import com.facebook.login.LoginManager;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
@@ -18,13 +17,10 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Facebook.FacebookLogin;
+import org.multibluetooth.multibluetooth.History.HistoryActivity;
 import org.multibluetooth.multibluetooth.R;
-import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
-import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
 import org.multibluetooth.multibluetooth.Setting.SettingActivity;
-
-import java.util.ArrayList;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -70,15 +66,8 @@ public class MainMenuActivity extends AppCompatActivity {
 				break;
 
 			case R.id.history_btn: // 운전 기록 보기
-				/*SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
-				ArrayList<SafeScore> testArray2 = safeScoreModel.getAllData();
-				Log.d("TEST", testArray2.toString());
-				safeScoreModel.close();
-
-				for(SafeScore dinfo : testArray2) {
-					Log.d("TEST", dinfo.toString());
-				}
-*/
+				Intent historyIntent = new Intent(MainMenuActivity.this, HistoryActivity.class);
+				startActivity(historyIntent);
 				break;
 
 			case R.id.fb_logout:	// 페이스북 로그아웃

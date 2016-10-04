@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class SafeScoreModel extends SQLiteOpenHelper {
     private static final String TAG = "SafeScoreModel";
 
-    protected static final int DB_VERSION = 5;
+    protected static final int DB_VERSION = 7;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -37,7 +37,9 @@ public class SafeScoreModel extends SQLiteOpenHelper {
                 "fast_acc_count INTEGER DEFAULT 0, " +
                 "fast_break_count INTEGER DEFAULT 0, " +
                 "sudden_start_count INTEGER DEFAULT 0, " +
-                "sudden_stop_count INTEGER DEFAULT 0 );");
+                "sudden_stop_count INTEGER DEFAULT 0, " +
+                "drive_start TEXT, " +
+                "drive_stop TEXT );");
 
     }
 
@@ -54,7 +56,7 @@ public class SafeScoreModel extends SQLiteOpenHelper {
      * @return topNumber
      */
     public int insert(SafeScore safeScore) {
-        String sql = "INSERT INTO SafeScore (_id, safe_distance_count, speeding_count, fast_acc_count, fast_break_count, sudden_start_count, sudden_stop_count) " +
+        String sql = "INSERT INTO SafeScore (_id, safe_distance_count, speeding_count, fast_acc_count, fast_break_count, sudden_start_count, sudden_stop_count, drive_start) " +
                 "VALUES(" +
                 "'" + safeScore.getDriveId() + "', " +
                 "'" + safeScore.getSafeDistanceCount() + "', " +
@@ -62,7 +64,8 @@ public class SafeScoreModel extends SQLiteOpenHelper {
                 "'" + safeScore.getFastAccCount() + "', " +
                 "'" + safeScore.getFastBreakCount() + "', " +
                 "'" + safeScore.getSuddenStartCount() + "', " +
-                "'" + safeScore.getSuddenStopCount() + "') ;";
+                "'" + safeScore.getSuddenStopCount() + "', " +
+                "'" + String.valueOf(System.currentTimeMillis()) + "') ;";
 
 
         // DB 작업 실행
@@ -104,6 +107,23 @@ public class SafeScoreModel extends SQLiteOpenHelper {
         }
 
         return safeScore.getDriveId();
+    }
+
+    public void updateEndOfDrive(int driveId) {
+        String sql = "UPDATE SafeScore SET " +
+                "drive_stop='" + System.currentTimeMillis() + "' " +
+                "WHERE _id='"+ driveId +"' ;";
+
+        // DB 작업 실행
+        dbW.beginTransaction();
+        try {
+            dbW.execSQL(sql);
+            dbW.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
+        }
     }
 
     public int updateDistance(SafeScore safeScore) {
@@ -180,7 +200,9 @@ public class SafeScoreModel extends SQLiteOpenHelper {
                     cursor.getInt(3),
                     cursor.getInt(4),
                     cursor.getInt(5),
-                    cursor.getInt(6));
+                    cursor.getInt(6),
+                    cursor.getString(7),
+                    cursor.getString(8));
 
             allData.add(i++, tempData);
         }
@@ -202,11 +224,44 @@ public class SafeScoreModel extends SQLiteOpenHelper {
                     cursor.getInt(3),
                     cursor.getInt(4),
                     cursor.getInt(5),
-                    cursor.getInt(6)
+                    cursor.getInt(6),
+                    cursor.getString(7),
+                    cursor.getString(8)
             );
         }
 
         return data;
+    }
+
+    public SafeScore getScoreData() {
+        ArrayList<SafeScore> allData = getAllData();
+        int avgDistance = 0;
+        int avgSpeeding = 0;
+        int avgFastAcc = 0;
+        int avgFastBreak = 0;
+        int avgSuddenStart = 0;
+        int avgSuddenStop = 0;
+
+        int size = allData.size();
+        if (size != 0) {
+            for (SafeScore safeScore : allData) {
+                avgDistance += safeScore.getSafeDistanceCount();
+                avgSpeeding += safeScore.getSpeedingCount();
+                avgFastAcc += safeScore.getFastAccCount();
+                avgFastBreak += safeScore.getFastBreakCount();
+                avgSuddenStart += safeScore.getSuddenStartCount();
+                avgSuddenStop += safeScore.getSuddenStopCount();
+            }
+
+            // TODO 각 지표들의 평균 점수 계산? 혹은 합산 점수 계산 해야함
+            avgDistance = avgDistance / size;
+            avgSpeeding = avgSpeeding / size;
+            avgFastAcc = avgFastAcc / size;
+            avgFastBreak = avgFastBreak / size;
+            avgSuddenStart = avgSuddenStart / size;
+            avgSuddenStop = avgSuddenStop / size;
+        }
+        return new SafeScore(0, avgDistance, avgSpeeding, avgFastAcc, avgFastBreak, avgSuddenStart, avgSuddenStop, "", "");
     }
 
     public void close() {
