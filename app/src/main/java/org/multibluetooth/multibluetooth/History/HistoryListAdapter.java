@@ -66,6 +66,11 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         holder.driveId.setText(""+item.getDriveId());
         holder.avgScore.setText(""+item.getAvgScore());
 
+        // 선택 되있을경우 선택 표시로 바꿈
+        if (selectedList.get(position)) holder.selected.setVisibility(View.VISIBLE);
+        else holder.selected.setVisibility(View.GONE);
+
+
         Calendar calendar = Calendar.getInstance();
         Log.d(TAG, item.getDriveStart());
         Log.d(TAG, Long.valueOf(item.getDriveStart()).toString());

@@ -16,6 +16,7 @@ import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
+import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
 
 import java.util.ArrayList;
 
@@ -34,6 +35,7 @@ public class DrivingActivity extends AppCompatActivity {
     private DriveThread driveThread;
 
     private static final int DRIVE_START_FLAG = 1;
+    private static final int DRIVE_STOP_FLAG = 2;
     public static final int FORWARD_MESSAGE = 100;
     public static final int BACK_MESSAGE = 101;
     public static final int OBD_MESSAGE = 102;
@@ -67,12 +69,6 @@ public class DrivingActivity extends AppCompatActivity {
             MainMenuActivity.btLaserCon.serviceConn();
         if (MainMenuActivity.btOBDCon != null)
             MainMenuActivity.btOBDCon.serviceConn();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        driveThread.stopRequest();
     }
 
     // 디바이스 메세지 전달
@@ -130,7 +126,24 @@ public class DrivingActivity extends AppCompatActivity {
     };
 
     public void onDrivingStop(View v) {
-        driveThread.stopRequest();
+        onDrivingStop();
+    }
+
+    public void onDrivingStop() {
+        int driveId = driveThread.stopRequest();
+        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+        SafeScore safeScore = safeScoreModel.getData(driveId);
+        // 해당 ID의 운행정보 가져옴
+        Intent intent = new Intent(DrivingActivity.this, SafeScoreActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("drive_item", safeScore);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        onDrivingStop();
     }
 
     public void sendTest(View v) {

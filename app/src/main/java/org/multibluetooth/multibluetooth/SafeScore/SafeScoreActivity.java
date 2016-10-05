@@ -1,5 +1,6 @@
 package org.multibluetooth.multibluetooth.SafeScore;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -62,4 +63,13 @@ public class SafeScoreActivity extends AppCompatActivity {
         // 전체 지표의 평균 계산
         avgScoreView.setText("" + safeScore.getAvgScore());
     }
+
+    /*
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Intent laserIntent = new Intent();
+        setResult(1, laserIntent);
+        finish();
+    }*/
 }

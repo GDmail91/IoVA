@@ -34,9 +34,10 @@ public class DriveThread extends Thread {
         this.request = request;
     }
 
-    public void stopRequest() {
+    public int stopRequest() {
         driveStop();
         request = false;
+        return topDriveNumber;
     }
     @Override
     public void run() {
