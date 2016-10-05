@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 
@@ -55,9 +56,14 @@ public class MainMenuActivity extends AppCompatActivity {
 		Log.d(TAG, v.toString());
 
 		switch (v.getId()) {
-			case R.id.driving_btn:	// 운전중 센서 스캔
-				Intent drivingIntent = new Intent(MainMenuActivity.this, DrivingActivity.class);
-				startActivity(drivingIntent);
+			case R.id.driving_btn:	// 운전하기
+				if ((btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)
+				|| (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
+					Intent drivingIntent = new Intent(MainMenuActivity.this, DrivingActivity.class);
+					startActivity(drivingIntent);
+				} else {
+					Toast.makeText(getApplicationContext(), "OBD 연결이 필요합니다.", Toast.LENGTH_LONG).show();
+				}
 				break;
 
 			case R.id.safe_score_btn:	// 안전점수 보기

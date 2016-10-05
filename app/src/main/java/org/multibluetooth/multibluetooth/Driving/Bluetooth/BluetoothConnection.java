@@ -18,8 +18,6 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothServ
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
-import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
-import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 import org.multibluetooth.multibluetooth.SafeScore.ScoreCalculator;
 
 /**
@@ -209,6 +207,7 @@ public class BluetoothConnection {
                         case BluetoothLaserService.STATE_CONNECTED:
                             // String Resource 값 변경
                             setStatus(mContext.getString(R.string.title_connected_to, mConnectedDeviceName));
+                            Toast.makeText(mContext, "OBD 연결됨", Toast.LENGTH_LONG).show();
                             ((MainMenuActivity) mContext).setBtConnectSign();
                             break;
                         case BluetoothLaserService.STATE_CONNECTING:

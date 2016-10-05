@@ -231,6 +231,27 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         }
     }
 
+    public void deleteByDriveIds(ArrayList<Integer> ids) {
+        String idList = "";
+
+        for (Integer id : ids) {
+            idList += id + ",";
+        }
+        // 마지막 쉼표 짜름
+        idList = idList.substring(0, idList.length()-1);
+        Log.d(TAG, idList);
+
+        dbW.beginTransaction();
+        try {
+            dbW.execSQL("DELETE FROM DriveInfo WHERE drive_id IN (" + idList + ")");
+            dbW.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbW.endTransaction();
+        }
+    }
+
     public void deleteAll() {
         dbW.beginTransaction();
         try {

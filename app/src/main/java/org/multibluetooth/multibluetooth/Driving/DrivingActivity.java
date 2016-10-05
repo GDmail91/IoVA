@@ -5,20 +5,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
-import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
-
-import java.util.ArrayList;
 
 /**
  * Created by YS on 2016-09-13.
@@ -145,12 +141,12 @@ public class DrivingActivity extends AppCompatActivity {
     public void onBackPressed() {
         onDrivingStop();
     }
-
+/*
     public void sendTest(View v) {
         switch (v.getId()) {
-            /*case R.id.speed:
+            *//*case R.id.speed:
                 MainMenuActivity.btOBDCon.sendMessage("01 42\r");
-                break;*/
+                break;*//*
             case R.id.dbdata:
                 DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
                 ArrayList<DriveInfo> testArray = driveInfoModel.getAllData();
@@ -178,5 +174,5 @@ public class DrivingActivity extends AppCompatActivity {
                 tempModel2.deleteAll();
                 break;
         }
-    }
+    }*/
 }

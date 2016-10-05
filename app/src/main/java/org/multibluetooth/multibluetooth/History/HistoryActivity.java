@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
@@ -109,14 +110,22 @@ public class HistoryActivity extends AppCompatActivity {
 
     private void seletedDelete() {
         // 선택된 아이템 삭제
+        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+        DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
+        ArrayList<Integer> driveIds = new ArrayList<>();
         ArrayList<Boolean> selectedItems = new ArrayList<>(historyListAdapter.getSelectedItems());
         for (int i=selectedItems.size()-1; i >= 0; i--) {
             if (selectedItems.get(i)) {
-                // TODO DB에서 삭제 작업
-                // 리스트의 아래부터 삭제
-                historyList.remove(i);
+                // 리스트의 아래부터 삭제, 삭제할 id 목록에 저장
+                driveIds.add(historyList.remove(i).getDriveId());
             }
         }
+
+        // TODO DB에서 삭제 작업
+        Log.d(TAG, ""+driveIds.size());
+        driveInfoModel.deleteByDriveIds(driveIds);
+        Log.d(TAG, ""+driveIds.size());
+        safeScoreModel.deleteByIds(driveIds);
 
         historyListAdapter = new HistoryListAdapter(HistoryActivity.this, historyList);
         recyclerView.setAdapter(historyListAdapter);
