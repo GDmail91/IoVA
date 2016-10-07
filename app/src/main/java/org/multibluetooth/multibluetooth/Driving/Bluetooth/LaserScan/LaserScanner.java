@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
@@ -27,6 +26,9 @@ public class LaserScanner extends BluetoothConnection {
 
     public LaserScanner(Context context) {
         super(context);
+
+        // To receive bt connect message in anytime
+        mChatService.start();
     }
 
     @Override
@@ -40,13 +42,12 @@ public class LaserScanner extends BluetoothConnection {
             // TODO sendMessage() 를 할 컴포넌트 연결
             // ex) sendMessage(message);
             //setupChat(context);
-            setupService();
+            setupConnect();
         }
     }
 
     @Override
-    protected void setupService() {
-        mChatService = new BluetoothLaserService(mContext, mHandler);
+    protected void setupConnect() {
         mOutStringBuffer = new StringBuffer("");
 
         // Launch the DeviceListActivity to see devices and do scan

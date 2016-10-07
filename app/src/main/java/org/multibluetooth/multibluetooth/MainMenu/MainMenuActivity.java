@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.facebook.FacebookSdk;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
@@ -50,6 +51,7 @@ public class MainMenuActivity extends AppCompatActivity {
 		btDeviceName = (TextView) findViewById(R.id.bt_device_name);
 		btconnectSign = (ImageView) findViewById(R.id.bt_connect_sign);
 
+		btLaserCon = new LaserScanner(this);
 	}
 
 	public void onMenuClick(View v) {
@@ -115,6 +117,11 @@ public class MainMenuActivity extends AppCompatActivity {
 			btLaserCon = new LaserScanner(this);
 			btLaserCon.conn();
 		} else if (connectDevice == BLUETOOTH_OBD_CONNECT) {
+			SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+			SharedPreferences.Editor prefEdit = pref.edit();
+			prefEdit.putString(DeviceListActivity.EXTRA_DEVICE_ADDRESS, "");
+			prefEdit.apply();
+
 			btOBDCon = new OBDScanner(this);
 			btOBDCon.conn();
 		}
@@ -136,6 +143,7 @@ public class MainMenuActivity extends AppCompatActivity {
 				break;
 			case LaserScanner.REQUEST_ENABLE_BT_BY_LASER:
 				btLaserCon.onActivityResult(BluetoothConnection.REQUEST_ENABLE_BT, resultCode, data);
+				Log.d(TAG, "이떄 연결됬는지 확인?");
 				break;
 			case OBDScanner.REQUEST_CONNECT_DEVICE_SECURE_BY_OBD:
 				btOBDCon.onActivityResult(BluetoothConnection.REQUEST_CONNECT_DEVICE_SECURE, resultCode, data);
@@ -153,6 +161,14 @@ public class MainMenuActivity extends AppCompatActivity {
 	}
 
 	public void setBtConnectSign() {
+		if (btLaserCon != null
+				&& btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED
+				&& (btOBDCon == null || btOBDCon.getConnectionStatus() != BluetoothLaserService.STATE_CONNECTED)) {
+			btOBDCon = new OBDScanner(this);
+			Log.d(TAG, "OBD 연결 실행");
+			btOBDCon.conn();
+			Log.d(TAG, "OBD 연결 실행2");
+		}
 		if (btLaserCon != null && btOBDCon != null
 				&& btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED
 				&& btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED) {

@@ -32,6 +32,11 @@ public class BluetoothConnection {
     public static final int REQUEST_ENABLE_BT = 3;
 
     /**
+     * Bluetooth Device ID
+     */
+    protected static BluetoothDevice mBTDevice;
+
+    /**
      * Safe Score calculator
      */
     protected ScoreCalculator mScoreCalculator;
@@ -66,6 +71,8 @@ public class BluetoothConnection {
 
     public int init(Context context) {
         mContext = context;
+        setupService();
+
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -92,7 +99,7 @@ public class BluetoothConnection {
             // TODO sendMessage() 를 할 컴포넌트 연결
             // ex) sendMessage(message);
             //setupChat(context);
-            setupService();
+            setupConnect();
         }
     }
 
@@ -119,9 +126,16 @@ public class BluetoothConnection {
         }
     }
 
-    protected void setupService() {
+    /**
+     * Service init
+     */
+    public void setupService() {
         mChatService = new BluetoothLaserService(mContext, mHandler);
+    }
+
+    protected void setupConnect() {
         mOutStringBuffer = new StringBuffer("");
+
 
         // Launch the DeviceListActivity to see devices and do scan
         Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
@@ -138,7 +152,7 @@ public class BluetoothConnection {
      * @param data   An {@link Intent} with {@link DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
      * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
-    private void connectDevice(Intent data, boolean secure) {
+    public void connectDevice(Intent data, boolean secure) {
         Log.d(TAG, "커넥 디바이스 실행");
         // Get the device MAC address
         String address = data.getExtras()
@@ -254,10 +268,10 @@ public class BluetoothConnection {
                     Log.d(TAG, mConnectedDeviceName);
                     break;
                 case Constants.MESSAGE_TOAST:
-                    /*if (null != activity) {
-                        Toast.makeText(activity, msg.getData().getString(Constants.TOAST),
+                    if (null != mContext) {
+                        Toast.makeText(mContext, msg.getData().getString(Constants.TOAST),
                                 Toast.LENGTH_SHORT).show();
-                    }*/
+                    }
                     Log.d(TAG, Constants.TOAST);
                     break;
             }
@@ -285,7 +299,7 @@ public class BluetoothConnection {
                 if (resultCode == Activity.RESULT_OK) {
                     // Bluetooth is now enabled, so set up a chat session
                     if (mChatService == null)
-                        setupService();
+                        setupConnect();
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");

@@ -38,7 +38,6 @@ import java.io.OutputStream;
  */
 public class BluetoothLaserService extends BluetoothService {
     private static final String TAG = "BluetoothLaserService";
-
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
@@ -98,11 +97,12 @@ public class BluetoothLaserService extends BluetoothService {
             mSecureAcceptThread.cancel();
             mSecureAcceptThread = null;
         }
-        if (mInsecureAcceptThread != null) {
+        // remove insecure accept
+        /*if (mInsecureAcceptThread != null) {
             Log.d(TAG, "inSecAcTh");
             mInsecureAcceptThread.cancel();
             mInsecureAcceptThread = null;
-        }
+        }*/
 
         setState(STATE_CONNECTED);
 

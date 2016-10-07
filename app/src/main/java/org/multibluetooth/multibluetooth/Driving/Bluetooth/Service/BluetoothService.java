@@ -45,7 +45,6 @@ public abstract class BluetoothService {
     protected final BluetoothAdapter mAdapter;
     protected final Handler mHandler;
     protected AcceptThread mSecureAcceptThread;
-    protected AcceptThread mInsecureAcceptThread;
     protected ConnectThread mConnectThread;
     protected ConnectedThread mConnectedThread;
     protected int mState;
@@ -116,10 +115,11 @@ public abstract class BluetoothService {
             mSecureAcceptThread = new AcceptThread(true);
             mSecureAcceptThread.start();
         }
-        if (mInsecureAcceptThread == null) {
+        // remove insecure accept
+        /*if (mInsecureAcceptThread == null) {
             mInsecureAcceptThread = new AcceptThread(false);
             mInsecureAcceptThread.start();
-        }
+        }*/
     }
 
     /**
@@ -181,10 +181,12 @@ public abstract class BluetoothService {
             mSecureAcceptThread = null;
         }
 
+        // remove insecure accept
+        /*
         if (mInsecureAcceptThread != null) {
             mInsecureAcceptThread.cancel();
             mInsecureAcceptThread = null;
-        }
+        }*/
         setState(STATE_NONE);
     }
 
