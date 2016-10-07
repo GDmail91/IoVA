@@ -35,6 +35,7 @@ public class OBDScanner extends BluetoothConnection {
 
     public OBDScanner(Context context) {
         super(context);
+        setupService();
         Log.d(TAG, "OBD Scanner 생성");
     }
 
@@ -56,6 +57,13 @@ public class OBDScanner extends BluetoothConnection {
             //setupChat(context);
             setupConnect();
         }
+    }
+
+    /**
+     * Service init
+     */
+    public void setupService() {
+        mChatService = new BluetoothOBDService(mContext, mHandler);
     }
 
     @Override

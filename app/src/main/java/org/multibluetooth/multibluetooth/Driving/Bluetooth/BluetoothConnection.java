@@ -71,7 +71,6 @@ public class BluetoothConnection {
 
     public int init(Context context) {
         mContext = context;
-        setupService();
 
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -126,12 +125,6 @@ public class BluetoothConnection {
         }
     }
 
-    /**
-     * Service init
-     */
-    public void setupService() {
-        mChatService = new BluetoothLaserService(mContext, mHandler);
-    }
 
     protected void setupConnect() {
         mOutStringBuffer = new StringBuffer("");
