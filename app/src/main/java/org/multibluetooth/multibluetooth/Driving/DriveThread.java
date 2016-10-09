@@ -83,7 +83,13 @@ public class DriveThread extends Thread {
 
                     // 1초간 슬립
                     sleep(1000);
-                    if (i > 100) break;
+                    if (i > 100) {
+                        Message endMessage = new Message();
+                        endMessage.what = Constants.MESSAGE_READ;
+                        endMessage.arg1 = DrivingActivity.DRIVE_STOP_FLAG;
+                        mHandler.sendMessage(endMessage);
+                        break;
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
+import org.multibluetooth.multibluetooth.Driving.TopActivity.DrivingOnTopService;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
@@ -30,8 +31,8 @@ public class DrivingActivity extends AppCompatActivity {
 
     private DriveThread driveThread;
 
-    private static final int DRIVE_START_FLAG = 1;
-    private static final int DRIVE_STOP_FLAG = 2;
+    public static final int DRIVE_START_FLAG = 1;
+    public static final int DRIVE_STOP_FLAG = 2;
     public static final int FORWARD_MESSAGE = 100;
     public static final int BACK_MESSAGE = 101;
     public static final int OBD_MESSAGE = 102;
@@ -115,17 +116,39 @@ public class DrivingActivity extends AppCompatActivity {
                             Bundle obdBundle = msg.getData();
                             setChangeText(obdBundle.getString("message"));
                             break;
+                        case DRIVE_STOP_FLAG:
+                            onDrivingStop();
+                            break;
                     }
                     break;
             }
         }
     };
 
-    public void onDrivingStop(View v) {
-        onDrivingStop();
+    public void onOptionClick(View v) {
+        switch(v.getId()) {
+            case R.id.driving_stop:
+                onDrivingStop();
+                break;
+            case R.id.floating_btn:
+                onFloatingView();
+                break;
+        }
+    }
+
+    public void onFloatingView() {
+        startService(new Intent(this, DrivingOnTopService.class));	//서비스 시작
+    }
+
+    public void onCloseFloatingView() {
+        startService(new Intent(this, DrivingOnTopService.class));	//서비스 시작
     }
 
     public void onDrivingStop() {
+        // 플로팅 뷰 닫음
+        onCloseFloatingView();
+
+        // 반복 쓰레드 생성
         int driveId = driveThread.stopRequest();
         SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
         SafeScore safeScore = safeScoreModel.getData(driveId);

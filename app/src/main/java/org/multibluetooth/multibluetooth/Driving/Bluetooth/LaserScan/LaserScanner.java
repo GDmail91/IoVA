@@ -27,10 +27,6 @@ public class LaserScanner extends BluetoothConnection {
 
     public LaserScanner(Context context) {
         super(context);
-
-        setupService();
-        // To receive bt connect message in anytime
-        mChatService.start();
     }
 
     @Override
@@ -52,7 +48,16 @@ public class LaserScanner extends BluetoothConnection {
      * Service init
      */
     public void setupService() {
-        mChatService = new BluetoothLaserService(mContext, mHandler);
+        // If BT is not on, request that it be enabled.
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
+        } else {
+            mChatService = new BluetoothLaserService(mContext, mHandler);
+
+            // To receive bt connect message in anytime
+            mChatService.start();
+        }
     }
 
     @Override

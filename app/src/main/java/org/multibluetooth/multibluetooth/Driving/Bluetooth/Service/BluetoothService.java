@@ -239,6 +239,7 @@ public abstract class BluetoothService {
         private String mSocketType;
 
         public AcceptThread(boolean secure) {
+            Log.d(TAG, mAdapter.toString());
             BluetoothServerSocket tmp = null;
             mSocketType = secure ? "Secure" : "Insecure";
 

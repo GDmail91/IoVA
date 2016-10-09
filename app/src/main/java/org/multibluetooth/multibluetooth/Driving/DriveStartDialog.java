@@ -24,7 +24,7 @@ public class DriveStartDialog extends Activity {
 
     public void onStart(View v) {
         Intent laserIntent = new Intent();
-        setResult(1, laserIntent);
+        setResult(DrivingActivity.DRIVE_START_FLAG, laserIntent);
         finish();
     }
 }

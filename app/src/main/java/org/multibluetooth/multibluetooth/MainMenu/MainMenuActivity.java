@@ -54,6 +54,13 @@ public class MainMenuActivity extends AppCompatActivity {
 		btLaserCon = new LaserScanner(this);
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		((LaserScanner) btLaserCon).setupService();
+	}
+
 	public void onMenuClick(View v) {
 		Log.d(TAG, v.toString());
 
@@ -137,9 +144,6 @@ public class MainMenuActivity extends AppCompatActivity {
 		switch (requestCode) {
 			case LaserScanner.REQUEST_CONNECT_DEVICE_SECURE_BY_LASER:
 				btLaserCon.onActivityResult(BluetoothConnection.REQUEST_CONNECT_DEVICE_SECURE, resultCode, data);
-				break;
-			case BluetoothConnection.REQUEST_CONNECT_DEVICE_INSECURE:
-				btLaserCon.onActivityResult(BluetoothConnection.REQUEST_CONNECT_DEVICE_INSECURE, resultCode, data);
 				break;
 			case LaserScanner.REQUEST_ENABLE_BT_BY_LASER:
 				btLaserCon.onActivityResult(BluetoothConnection.REQUEST_ENABLE_BT, resultCode, data);
