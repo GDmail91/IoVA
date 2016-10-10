@@ -19,7 +19,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/iova_icon3"
+        android:icon="@drawable/iova_icon5"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
@@ -57,6 +57,16 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="장치를 선택하세요"
             android:theme="@android:style/Theme.Holo.Dialog"/>
+
+        <!-- 최상위 뷰 -->
+        <service
+            android:name=".Driving.TopActivity.DrivingOnTopService"
+            android:enabled="true"
+            android:exported="false"> <!-- 퍼미션 중요 -->
+            <intent-filter >
+                <action android:name="org.multiBluetooth.OnTop"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

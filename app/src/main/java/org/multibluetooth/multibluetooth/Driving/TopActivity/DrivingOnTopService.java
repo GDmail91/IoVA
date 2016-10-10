@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -27,6 +28,10 @@ public class DrivingOnTopService extends Service {
     private float START_X, START_Y;							//움직이기 위해 터치한 시작 점
     private int PREV_X, PREV_Y;								//움직이기 이전에 뷰가 위치한 점
     private int MAX_X = -1, MAX_Y = -1;					//뷰의 위치 최대 값
+
+    private String forwardDistance = "";
+    private String backDistance = "";
+
 
     private View.OnTouchListener mViewTouchListener = new View.OnTouchListener() {
         @Override public boolean onTouch(View v, MotionEvent event) {
@@ -56,18 +61,29 @@ public class DrivingOnTopService extends Service {
         }
     };
 
+    public class LocalBinder extends Binder {
+        public DrivingOnTopService getService() {
+            return DrivingOnTopService.this;
+        }
+    }
+
+    // This is the object that receives interactions from clients.  See
+    // RemoteService for a more complete example.
+    private final IBinder mBinder = new LocalBinder();
+
     @Override
-    public IBinder onBind(Intent arg0) { return null; }
+        public IBinder onBind(Intent arg0) { return mBinder; }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mPopupView = new TextView(this);																//뷰 생성
-        mPopupView.setText("이 뷰는 항상 위에 있다.\n갤럭시 & 옵티머스 팝업 뷰와 같음");	//텍스트 설정
-        mPopupView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);								//텍스트 크기 18sp
-        mPopupView.setTextColor(Color.BLUE);															//글자 색상
-        mPopupView.setBackgroundColor(Color.argb(127, 0, 255, 255));								//텍스트뷰 배경 색
+        mPopupView.setText("0\n0");                             	//텍스트 설정
+        mPopupView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);								//텍스트 크기 18sp
+        mPopupView.setTextColor(Color.WHITE);															//글자 색상
+        mPopupView.setBackgroundColor(Color.argb(255, 0, 0, 0));								//텍스트뷰 배경 색
+        mPopupView.setPadding(20,10,20,10);
 
         mPopupView.setOnTouchListener(mViewTouchListener);										//팝업뷰에 터치 리스너 등록
 
@@ -84,7 +100,7 @@ public class DrivingOnTopService extends Service {
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);	//윈도우 매니저 불러옴.
         mWindowManager.addView(mPopupView, mParams);		//최상위 윈도우에 뷰 넣기. *중요 : 여기에 permission을 미리 설정해 두어야 한다. 매니페스트에
 
-        addOpacityController();		//팝업 뷰의 투명도 조절하는 컨트롤러 추가
+        // addOpacityController();		//팝업 뷰의 투명도 조절하는 컨트롤러 추가
     }
 
     /**
@@ -107,6 +123,15 @@ public class DrivingOnTopService extends Service {
         if(mParams.y > MAX_Y) mParams.y = MAX_Y;
         if(mParams.x < 0) mParams.x = 0;
         if(mParams.y < 0) mParams.y = 0;
+    }
+
+    public void setForwardText(String message) {
+        forwardDistance = message;
+        mPopupView.setText(forwardDistance + "\n" + backDistance);
+    }
+    public void setBackText(String message) {
+        backDistance = message;
+        mPopupView.setText(forwardDistance + "\n" + backDistance);
     }
 
     /**

@@ -51,13 +51,16 @@ public class MainMenuActivity extends AppCompatActivity {
 		btDeviceName = (TextView) findViewById(R.id.bt_device_name);
 		btconnectSign = (ImageView) findViewById(R.id.bt_connect_sign);
 
-		btLaserCon = new LaserScanner(this);
+		// Bluetooth connection check
+		setBtConnectSign();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		if (btLaserCon == null) {
+			btLaserCon = new LaserScanner(this);
+		}
 		((LaserScanner) btLaserCon).setupService();
 	}
 

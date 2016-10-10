@@ -53,10 +53,14 @@ public class LaserScanner extends BluetoothConnection {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
         } else {
-            mChatService = new BluetoothLaserService(mContext, mHandler);
-
-            // To receive bt connect message in anytime
-            mChatService.start();
+            if (mChatService == null) {
+                mChatService = new BluetoothLaserService(mContext, mHandler);
+                // Only if the state is STATE_NONE, do we know that we haven't started already
+                if (mChatService.getState() == BluetoothLaserService.STATE_NONE) {
+                    // Start the Bluetooth chat services
+                    mChatService.start();
+                }
+            }
         }
     }
 
