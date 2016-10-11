@@ -11,6 +11,7 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
+import org.multibluetooth.multibluetooth.Driving.TTS.DrivingTextToSpeach;
 
 import java.util.LinkedList;
 
@@ -101,6 +102,9 @@ public class LaserScanner extends BluetoothConnection {
                 switch (msgMode) {
                     case "01":
                         ((DrivingActivity) mContext).setChangeText("\n\nmode: "+msgMode+"\nbody: "+msgBody);
+                        DrivingTextToSpeach drTTS = DrivingTextToSpeach.getInstance(mContext);
+                        drTTS.speechingSentence("테스트 음성입니다.");
+                        drTTS.onDestroy();
                         break;
                     case "02":
                         ((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
