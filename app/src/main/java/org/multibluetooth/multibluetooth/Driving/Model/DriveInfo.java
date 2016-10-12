@@ -37,6 +37,10 @@ public class DriveInfo {
         this.vehicle_speed = vehicle_speed;
     }
 
+    public void setFrontDistance(int _id, int distance) {
+        this._id = _id;
+        this.front_distance = distance;
+    }
     public String toString() {
         return "ID: "+_id + ", DR_ID: "+drive_id+", VS: "+vehicle_speed+", FD: "+front_distance+", BD: "+back_distance +", MT: "+measure_time;
     }

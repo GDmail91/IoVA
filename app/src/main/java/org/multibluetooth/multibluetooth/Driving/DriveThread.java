@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDCommandList;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
@@ -46,6 +47,10 @@ public class DriveThread extends Thread {
         if (MainMenuActivity.btOBDCon != null) {
             MainMenuActivity.btOBDCon.queueInit(topDriveNumber);
         }
+        if (MainMenuActivity.btLaserCon!= null) {
+            MainMenuActivity.btLaserCon.queueInit(topDriveNumber);
+        }
+
         while (request) {
             if (MainMenuActivity.btOBDCon != null) {
                 // TODO && MainMenuActivity.btLaserCon != null) {
@@ -60,14 +65,15 @@ public class DriveThread extends Thread {
                     driveInfoModel.close();
 
                     // 앞쪽 센서 데이터 출력
-                    Message fMessage = new Message();
+                    ((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
+                    /*Message fMessage = new Message();
                     fMessage.what = Constants.MESSAGE_READ;
                     fMessage.arg1 = DrivingActivity.FORWARD_MESSAGE;
 
                     Bundle fBundle = new Bundle();
                     fBundle.putString("message", "앞" + i);
                     fMessage.setData(fBundle);
-                    mHandler.sendMessage(fMessage);
+                    mHandler.sendMessage(fMessage);*/
 
                     // 뒷쪽 센서 데이터 출력
                     Message bMessage = new Message();

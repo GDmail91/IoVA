@@ -39,7 +39,7 @@ public class BluetoothConnection {
     /**
      * Safe Score calculator
      */
-    protected ScoreCalculator mScoreCalculator;
+    protected static ScoreCalculator mScoreCalculator;
 
     protected Context mContext;
     /**
@@ -85,7 +85,9 @@ public class BluetoothConnection {
 
     public void queueInit(int topNumber) {
         // make score calculate queue
-        mScoreCalculator = new ScoreCalculator(mContext, topNumber);
+        if (mScoreCalculator == null) {
+            mScoreCalculator = new ScoreCalculator(mContext, topNumber);
+        }
     }
 
     public void conn() {
@@ -125,10 +127,12 @@ public class BluetoothConnection {
         }
     }
 
+    protected void setupStringBuffer() {
+        mOutStringBuffer = new StringBuffer("");
+    }
 
     protected void setupConnect() {
-        mOutStringBuffer = new StringBuffer("");
-
+        setupStringBuffer();
 
         // Launch the DeviceListActivity to see devices and do scan
         Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
@@ -196,7 +200,7 @@ public class BluetoothConnection {
             mChatService.write(send);
 
             // Reset out string buffer to zero and clear the edit text field
-            mOutStringBuffer.setLength(0);
+            //mOutStringBuffer.setLength(0);
             Log.d(TAG, "write: "+message);
         }
     }

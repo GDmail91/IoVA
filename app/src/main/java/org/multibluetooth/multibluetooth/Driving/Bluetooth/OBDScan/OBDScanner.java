@@ -19,6 +19,7 @@ import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.R;
+import org.multibluetooth.multibluetooth.SafeScore.ScoreCalculator;
 
 import java.util.LinkedList;
 
@@ -126,7 +127,7 @@ public class OBDScanner extends BluetoothConnection {
         // Get the message bytes and tell the BluetoothLaserService to write
         Bundle out = new Bundle();
         out.putInt("sensing_id", id);
-        out.putInt("out", BluetoothOBDService.REQUEST_SENSOR_DATA);
+        out.putInt("out", BluetoothService.REQUEST_OBD_SENSOR_DATA);
         mChatService.write(out);
 
         // Reset out string buffer to zero and clear the edit text field
@@ -155,7 +156,7 @@ public class OBDScanner extends BluetoothConnection {
                     int sensingId = bundle.getInt("sensing_id");
                     DriveInfo driveInfo = new DriveInfo();
                     driveInfo.setOBDSensor(sensingId, Integer.valueOf(parsedMessage));
-                    mScoreCalculator.putOBDData(driveInfo);
+                    mScoreCalculator.putData(ScoreCalculator.OBD_DATA, driveInfo);
 
                     DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
                     driveInfoModel.updateOBD(driveInfo);

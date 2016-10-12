@@ -25,6 +25,7 @@ import android.os.Message;
 import android.util.Log;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -132,6 +133,10 @@ public class BluetoothLaserService extends BluetoothService {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
+        private boolean requestLaser = false;
+        private boolean requestScan = false;
+        private int sensingId = 0;
+
         public ConnectedChatThread(BluetoothSocket socket, String socketType) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
             mmSocket = socket;
@@ -159,22 +164,52 @@ public class BluetoothLaserService extends BluetoothService {
             // Keep listening to the InputStream while connected
             while (mState == STATE_CONNECTED) {
                 try {
-                    // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
-                    toMessageStack(new String(buffer, 0, bytes));
+                    if (requestLaser) {
+                        // Read from the InputStream
+                        bytes = mmInStream.read(buffer);
+                        toMessageStack(new String(buffer, 0, bytes));
 
-                    String message = "";
-                    while(messageStack.size() >= 10) {
-                        message += messageCheck();
+                        String message = "";
+                        while (messageStack.size() >= 10) {
+                            message += messageCheck();
+                        }
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString(Constants.DEVICE_NAME, deviceName);
+                        bundle.putString("MESSAGE", message);
+                        // 명령마다 구분
+                        bundle.putString("CATEGORY", "Laser");
+                        bundle.putInt("sensing_id", sensingId);
+
+                        // Send the obtained bytes to the UI Activity
+                        mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
+                                .sendToTarget();
+
+                        requestLaser = false;
                     }
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString(Constants.DEVICE_NAME, deviceName);
-                    bundle.putString("MESSAGE", message);
+                    if (requestScan) {
+                        // Read from the InputStream
+                        bytes = mmInStream.read(buffer);
+                        toMessageStack(new String(buffer, 0, bytes));
 
-                    // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
-                            .sendToTarget();
+                        String message = "";
+                        while (messageStack.size() >= 10) {
+                            message += messageCheck();
+                        }
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString(Constants.DEVICE_NAME, deviceName);
+                        bundle.putString("MESSAGE", message);
+                        // 명령마다 구분
+                        bundle.putString("CATEGORY", "Laser");
+                        bundle.putInt("sensing_id", sensingId);
+
+                        // Send the obtained bytes to the UI Activity
+                        mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
+                                .sendToTarget();
+                        requestScan = false;
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -223,16 +258,34 @@ public class BluetoothLaserService extends BluetoothService {
          * @param cmdInfo The bytes to write
          */
         public void write(Bundle cmdInfo) {
-            Log.d(TAG, cmdInfo.toString());
-            try {
-                byte[] buffer = cmdInfo.getByteArray("out");
-                mmOutStream.write(buffer);
+            switch (cmdInfo.getInt("out")) {
+                case REQUEST_LASER_SENSOR_DATA:
+                    sensingId = cmdInfo.getInt("sensing_id");
+                    try {
+                        byte[] buffer = LaserCommand.getDistance();
+                        mmOutStream.write(buffer);
 
-                // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
-                        .sendToTarget();
-            } catch (IOException e) {
-                Log.e(TAG, "Exception during write", e);
+                        // Share the sent message back to the UI Activity
+                        mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
+                                .sendToTarget();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Exception during write", e);
+                    }
+                    requestLaser = true;
+                    break;
+                case REQUEST_SCAN_SENSOR_DATA:
+                    try {
+                        byte[] buffer = LaserCommand.getScan();
+                        mmOutStream.write(buffer);
+
+                        // Share the sent message back to the UI Activity
+                        mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
+                                .sendToTarget();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Exception during write", e);
+                    }
+                    requestScan = true;
+                    break;
             }
         }
 

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
+import org.multibluetooth.multibluetooth.Driving.TTS.DrivingTextToSpeach;
 import org.multibluetooth.multibluetooth.Driving.TopActivity.DrivingOnTopService;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
@@ -40,6 +41,10 @@ public class DrivingActivity extends AppCompatActivity {
     public static final int FORWARD_MESSAGE = 100;
     public static final int BACK_MESSAGE = 101;
     public static final int OBD_MESSAGE = 102;
+    public static final int DISTANCE_DANGER = 112;
+
+    // Speech 모듈
+    private static DrivingTextToSpeach drTTS;
 
     // binding with service
     private boolean mIsBound = false;
@@ -85,6 +90,8 @@ public class DrivingActivity extends AppCompatActivity {
         if (MainMenuActivity.btOBDCon != null)
             MainMenuActivity.btOBDCon.setChangeContext(this);
 
+        // Speech 모듈 생성
+        drTTS = DrivingTextToSpeach.getInstance(this);
     }
 
     @Override
@@ -100,6 +107,7 @@ public class DrivingActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         doUnbindService();
+        drTTS.onDestroy();
     }
 
     // 디바이스 메세지 전달
@@ -107,8 +115,17 @@ public class DrivingActivity extends AppCompatActivity {
         btDeviceName.setText(message);
     }
 
+    public static void onAlert(int mode) {
+        switch (mode) {
+            case DISTANCE_DANGER:
+                drTTS.speechingSentence("거리가 가깝습니다. 안전거리를 유지해주세요.");
+                break;
+        }
+    }
+
     // 전방 데이터 전달
     public void setForwardText(String message) {
+        // View 반영
         forwardDistance.setText(message);
         if (mBoundService != null)
             mBoundService.setForwardText(message);
@@ -143,8 +160,8 @@ public class DrivingActivity extends AppCompatActivity {
                 case Constants.MESSAGE_READ:
                     switch (msg.arg1) {
                         case FORWARD_MESSAGE:
-                            Bundle fBundle = msg.getData();
-                            setForwardText(fBundle.getString("message"));
+                            /*Bundle fBundle = msg.getData();
+                            setForwardText(fBundle.getString("message"));*/
                             break;
                         case BACK_MESSAGE:
                             Bundle bBundle = msg.getData();
@@ -206,7 +223,7 @@ public class DrivingActivity extends AppCompatActivity {
         // 플로팅 뷰 닫음
         onCloseFloatingView();
 
-        // 반복 쓰레드 생성
+        // 반복 쓰레드 종료
         int driveId = driveThread.stopRequest();
         SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
         SafeScore safeScore = safeScoreModel.getData(driveId);

@@ -44,7 +44,7 @@ public class BluetoothOBDService extends BluetoothService {
 
     private static final LinkedList<String> sendingQueue = new LinkedList<>();
 
-    public static final int REQUEST_SENSOR_DATA = 500;  // OBD 센서 데이터 요청
+    //public static final int REQUEST_SENSOR_DATA = 500;  // OBD 센서 데이터 요청
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
@@ -282,8 +282,8 @@ public class BluetoothOBDService extends BluetoothService {
          */
         public void write(Bundle cmdInfo) {
             if (cmdInfo.getBoolean("test")) {
-                byte[] buffer = cmdInfo.getByteArray("out");
                 try {
+                    byte[] buffer = cmdInfo.getByteArray("out");
                     mmOutStream.write(buffer);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -292,7 +292,7 @@ public class BluetoothOBDService extends BluetoothService {
                 testOBD = true;
             } else {
                 switch (cmdInfo.getInt("out")) {
-                    case REQUEST_SENSOR_DATA:
+                    case REQUEST_OBD_SENSOR_DATA:
                         sensingId = cmdInfo.getInt("sensing_id");
                         requestOBD = true;
                         break;

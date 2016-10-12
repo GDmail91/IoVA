@@ -15,7 +15,7 @@ import java.util.Calendar;
 public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
-    protected static final int DB_VERSION = 7;
+    protected static final int DB_VERSION = 8;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -199,6 +199,25 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         String sql = "UPDATE DriveInfo SET " +
                 "front_distance='" + driveInfo.getFrontDistance() + "', " +
                 "back_distance='" + driveInfo.getBackDistance() + "' " +
+                "WHERE _id='"+driveInfo.getId()+"' ;";
+
+        // DB 작업 실행
+        dbW.beginTransaction();
+        try {
+            dbW.execSQL(sql);
+            dbW.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
+        }
+
+        return driveInfo.getId();
+    }
+
+    public int updateFrontLaser(DriveInfo driveInfo) {
+        String sql = "UPDATE DriveInfo SET " +
+                "front_distance='" + driveInfo.getFrontDistance() + "' " +
                 "WHERE _id='"+driveInfo.getId()+"' ;";
 
         // DB 작업 실행

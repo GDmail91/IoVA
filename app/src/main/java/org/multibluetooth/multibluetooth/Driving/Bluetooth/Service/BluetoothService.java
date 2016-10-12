@@ -57,6 +57,9 @@ public abstract class BluetoothService {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
+    public static final int REQUEST_OBD_SENSOR_DATA = 500;  // OBD 센서 데이터 요청
+    public static final int REQUEST_LASER_SENSOR_DATA = 501;  // Laser 센서 데이터 요청
+    public static final int REQUEST_SCAN_SENSOR_DATA = 502;  // Scann 센서 데이터 요청
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *

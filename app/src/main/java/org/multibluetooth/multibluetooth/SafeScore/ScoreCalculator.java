@@ -3,7 +3,9 @@ package org.multibluetooth.multibluetooth.SafeScore;
 import android.content.Context;
 import android.util.Log;
 
+import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 
@@ -20,15 +22,20 @@ import java.util.LinkedList;
     private boolean SLOW_FLAG = false;
     private boolean START_FLAG = false;
     private boolean STOP_FLAG = false;
+    private static int CLOSE_COUNT = 0;
     private static int FAST_COUNT = 0;
     private static int SLOW_COUNT = 0;
     private static int START_COUNT = 0;
     private static int STOP_COUNT = 0;
     private static int SPEEDING_COUNT = 0;
+    public static final int OBD_DATA = 1;
+    public static final int LASER_DATA = 2;
 
     private static int queueLength = 0;
     private static LinkedList<DriveInfo> mQueue = new LinkedList<>();
+    private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
     private SafeScore safeScore;
+    private SafeScore safeDistance;
     private SafeScoreModel safeScoreModel;
 
     private Context mContext;
@@ -45,6 +52,7 @@ import java.util.LinkedList;
         START_COUNT = 0;
         STOP_COUNT = 0;
         SPEEDING_COUNT = 0;
+        CLOSE_COUNT = 0;
 
         FAST_FLAG = false;
         SLOW_FLAG = false;
@@ -59,25 +67,42 @@ import java.util.LinkedList;
     }
 
     // 데이터 RECIVE 프로세스
-    public void putOBDData(DriveInfo driveInfo) {
-        Log.d(TAG, driveInfo.toString());
-        mQueue.add(driveInfo);
+    public void putData(int device, DriveInfo driveInfo) {
+        switch (device) {
+            case OBD_DATA:
+                Log.d(TAG, driveInfo.toString());
+                mQueue.add(driveInfo);
 
-        // 큐가 5개 이상일시 부터 운행안전정보 기록
-        if(mQueue.size() >= 5) {
-            // 안전점수 계산
-            safeScore = doCalculateScore(mQueue);
-            // 점수 DB 삽입
-            safeScoreModel.update(safeScore);
+                // 큐가 5개 이상일시 부터 운행안전정보 기록
+                if (mQueue.size() >= 5) {
+                    // 안전점수 계산
+                    safeScore = doCalculateScore(mQueue);
+                    // 점수 DB 삽입
+                    safeScoreModel.update(safeScore);
 
-            // dequeue
-            mQueue.removeFirst();
+                    // dequeue
+                    mQueue.removeFirst();
+                }
+                break;
+            case LASER_DATA:
+                laserQueue.add(driveInfo);
+
+                // 거리측정 정확도를 높이기 위해 3개의 기록으로 비교
+                if (laserQueue.size() >= 3) {
+                    // 안전거리 계산
+                    safeDistance = doCalculateDistance(laserQueue);
+                    // 점수 DB에 안전거리 삽입
+                    safeScoreModel.updateDistance(safeDistance);
+
+                    // dequeue
+                    laserQueue.removeFirst();
+                }
+                break;
         }
     }
 
     public SafeScore doCalculateScore(LinkedList<DriveInfo> mQueue) {
         queueLength = mQueue.size() - 1;
-        int safeDistanceCount = getSafeDistance(mQueue);
         int speedingCount = getSpeedingCount(mQueue);
         int fastAccCount = getFastAccCount(mQueue);
         int fastBreakCount = getFastBreakCount(mQueue);
@@ -87,26 +112,49 @@ import java.util.LinkedList;
         return new SafeScore(drive_id, speedingCount, fastAccCount, fastBreakCount, suddenStartCount, suddenStopCount,"","");
     }
 
+    public SafeScore doCalculateDistance(LinkedList<DriveInfo> mQueue) {
+        queueLength = mQueue.size() - 1;
+        int safeDistanceCount = getSafeDistance(mQueue);
+
+        return new SafeScore(drive_id, safeDistanceCount);
+    }
+
     /**
      * Safe Distance calculator
      * @param driveData
      * @return safe distance
      */
     public int getSafeDistance(LinkedList<DriveInfo> driveData) {
-        int speed = driveData.get(queueLength).getFrontDistance();
+        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+        int avgSpeed = 0;
+        int avgDistance = 0;
+        for (DriveInfo eachDrive : driveData) {
+            avgSpeed += driveInfoModel.getData(eachDrive.getId()).getVehicleSpeed();
+            avgDistance += eachDrive.getFrontDistance();
+        }
+        avgSpeed = avgSpeed / driveData.size();
+        avgDistance = avgDistance / driveData.size();
 
         // TODO 날씨정보 포함시킬것
+        // TODO Alert이 한번 울렸을경우 잠깐의 (약 1분)시간을 줄것
         // 안전거리 계산
         // 도로교통공단 기준 80 km/h 미만일 경우 현재속도 - 15
         // 80 km/h 이상 또는 고속도로일 경우 현재속도로 한다.
         // 여기에 날씨정보를 포함하여
         // 비가올경우 x1.5
         // 눈이올경우 x3 을한다.
-        if (speed < 80) {
-            return speed - 15;
+        if (avgSpeed < 80) {
+            if (avgDistance < avgSpeed - 15) {
+                DrivingActivity.onAlert(DrivingActivity.DISTANCE_DANGER);
+                return ++CLOSE_COUNT;
+            }
         } else {
-            return speed;
+            if (avgDistance < avgSpeed) {
+                DrivingActivity.onAlert(DrivingActivity.DISTANCE_DANGER);
+                return ++CLOSE_COUNT;
+            }
         }
+        return CLOSE_COUNT;
     }
 
     // 급 가속 횟수
