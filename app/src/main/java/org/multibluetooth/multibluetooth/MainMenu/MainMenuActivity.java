@@ -169,9 +169,6 @@ public class MainMenuActivity extends AppCompatActivity {
 	}
 
 	public void setBtConnectSign() {
-		if (btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)
-			Toast.makeText(this, "Laser 연결됨", Toast.LENGTH_SHORT).show();
-
 		if (btLaserCon != null
 				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
 				&& (btOBDCon == null || btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED)) {
