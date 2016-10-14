@@ -30,6 +30,7 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserComman
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
 
 /**
  * This class does all the work for setting up and managing Bluetooth
@@ -39,6 +40,11 @@ import java.io.OutputStream;
  */
 public class BluetoothLaserService extends BluetoothService {
     private static final String TAG = "BluetoothLaserService";
+
+    protected static final LinkedList<Character> messageStack = new LinkedList<>();
+    protected static String inputeMessage = "";
+    protected static String distance = "";
+
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
@@ -118,6 +124,12 @@ public class BluetoothLaserService extends BluetoothService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
+        Message msg2 = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+        Bundle bundle2 = new Bundle();
+        bundle2.putString(Constants.TOAST, "Laser 연결됨");
+        msg2.setData(bundle2);
+        mHandler.sendMessage(msg2);
+
         // Set device name
         deviceName = device.getName();
 
@@ -164,51 +176,25 @@ public class BluetoothLaserService extends BluetoothService {
             // Keep listening to the InputStream while connected
             while (mState == STATE_CONNECTED) {
                 try {
-                    if (requestLaser) {
+                    if (requestLaser || requestScan) {
                         // Read from the InputStream
                         bytes = mmInStream.read(buffer);
                         toMessageStack(new String(buffer, 0, bytes));
 
-                        String message = "";
-                        while (messageStack.size() >= 10) {
-                            message += messageCheck();
+                        if (!msgCheck().equals("")) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString(Constants.DEVICE_NAME, deviceName);
+                            bundle.putString("MESSAGE", inputeMessage);
+                            // 명령마다 구분
+                            bundle.putString("CATEGORY", "Laser");
+                            bundle.putInt("sensing_id", sensingId);
+
+                            // Send the obtained bytes to the UI Activity
+                            mHandler.obtainMessage(Constants.MESSAGE_READ, inputeMessage.length(), -1, bundle)
+                                    .sendToTarget();
+                            requestLaser = false;
+                            requestScan = false;
                         }
-
-                        Bundle bundle = new Bundle();
-                        bundle.putString(Constants.DEVICE_NAME, deviceName);
-                        bundle.putString("MESSAGE", message);
-                        // 명령마다 구분
-                        bundle.putString("CATEGORY", "Laser");
-                        bundle.putInt("sensing_id", sensingId);
-
-                        // Send the obtained bytes to the UI Activity
-                        mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
-                                .sendToTarget();
-
-                        requestLaser = false;
-                    }
-
-                    if (requestScan) {
-                        // Read from the InputStream
-                        bytes = mmInStream.read(buffer);
-                        toMessageStack(new String(buffer, 0, bytes));
-
-                        String message = "";
-                        while (messageStack.size() >= 10) {
-                            message += messageCheck();
-                        }
-
-                        Bundle bundle = new Bundle();
-                        bundle.putString(Constants.DEVICE_NAME, deviceName);
-                        bundle.putString("MESSAGE", message);
-                        // 명령마다 구분
-                        bundle.putString("CATEGORY", "Laser");
-                        bundle.putInt("sensing_id", sensingId);
-
-                        // Send the obtained bytes to the UI Activity
-                        mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
-                                .sendToTarget();
-                        requestScan = false;
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
@@ -229,7 +215,7 @@ public class BluetoothLaserService extends BluetoothService {
                 messageStack.add(c);
             }
         }
-        protected String messageCheck() {
+        /*protected String messageCheck() {
             char msgFirst = messageStack.removeFirst();
             char msgSecond = messageStack.removeFirst();
             String msgMode = "";
@@ -250,6 +236,41 @@ public class BluetoothLaserService extends BluetoothService {
                 Log.d(TAG, "쓰레기값");
                 return "";
             }
+        }*/
+
+        protected String msgCheck() {
+            inputeMessage = "";
+            while (messageStack.size() > 0) {
+                char c = messageStack.removeFirst();
+
+                switch (c) {
+                    case '{':
+                    case '(':
+                    case '[':
+                        distance = "";
+                        break;
+                    case '}':
+                        while (distance.length() < 6)
+                            distance = "0"+distance;
+                        inputeMessage += "AA01" + distance;
+                        break;
+                    case ')':
+                        while (distance.length() < 6)
+                            distance = "0"+distance;
+                        inputeMessage += "AA02" + distance;
+                        break;
+                    case ']':
+                        while (distance.length() < 6)
+                            distance = "0"+distance;
+                        inputeMessage += "AA03" + distance;
+                        break;
+                    default:
+                        distance += c;
+                        break;
+                }
+            }
+
+            return inputeMessage;
         }
 
         /**

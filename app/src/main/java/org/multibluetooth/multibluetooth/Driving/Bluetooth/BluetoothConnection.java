@@ -87,6 +87,8 @@ public class BluetoothConnection {
         // make score calculate queue
         if (mScoreCalculator == null) {
             mScoreCalculator = new ScoreCalculator(mContext, topNumber);
+        } else {
+            mScoreCalculator.init(topNumber);
         }
     }
 
@@ -215,17 +217,16 @@ public class BluetoothConnection {
             switch (msg.what) {
                 case Constants.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
-                        case BluetoothLaserService.STATE_CONNECTED:
+                        case BluetoothService.STATE_CONNECTED:
                             // String Resource 값 변경
                             setStatus(mContext.getString(R.string.title_connected_to, mConnectedDeviceName));
-                            Toast.makeText(mContext, "OBD 연결됨", Toast.LENGTH_LONG).show();
                             ((MainMenuActivity) mContext).setBtConnectSign();
                             break;
-                        case BluetoothLaserService.STATE_CONNECTING:
+                        case BluetoothService.STATE_CONNECTING:
                             setStatus(R.string.title_connecting);
                             break;
-                        case BluetoothLaserService.STATE_LISTEN:
-                        case BluetoothLaserService.STATE_NONE:
+                        case BluetoothService.STATE_LISTEN:
+                        case BluetoothService.STATE_NONE:
                             setStatus(R.string.title_not_connected);
                             break;
                     }

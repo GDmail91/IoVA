@@ -44,12 +44,12 @@ import java.util.LinkedList;
     private Context mContext;
 
     public ScoreCalculator(Context mContext, int drive_id) {
-        this.drive_id = drive_id;
         this.mContext = mContext;
-        init();
+        init(drive_id);
     }
 
-    public void init() {
+    public void init(int drive_id) {
+        this.drive_id = drive_id;
         FAST_COUNT = 0;
         SLOW_COUNT = 0;
         START_COUNT = 0;
@@ -61,6 +61,7 @@ import java.util.LinkedList;
         SLOW_FLAG = false;
         START_FLAG = false;
         STOP_FLAG = false;
+        DISTANCE_ALERT_WAIT = false;
 
         queueLength = 0;
         mQueue.clear();

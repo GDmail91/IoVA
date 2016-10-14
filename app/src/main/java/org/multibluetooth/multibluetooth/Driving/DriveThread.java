@@ -47,7 +47,7 @@ public class DriveThread extends Thread {
         if (MainMenuActivity.btOBDCon != null) {
             MainMenuActivity.btOBDCon.queueInit(topDriveNumber);
         }
-        if (MainMenuActivity.btLaserCon!= null) {
+        if (MainMenuActivity.btLaserCon != null) {
             MainMenuActivity.btLaserCon.queueInit(topDriveNumber);
         }
 

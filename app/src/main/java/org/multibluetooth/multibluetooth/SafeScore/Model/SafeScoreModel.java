@@ -56,29 +56,37 @@ public class SafeScoreModel extends SQLiteOpenHelper {
      * @return topNumber
      */
     public int insert(SafeScore safeScore) {
-        String sql = "INSERT INTO SafeScore (_id, safe_distance_count, speeding_count, fast_acc_count, fast_break_count, sudden_start_count, sudden_stop_count, drive_start) " +
-                "VALUES(" +
-                "'" + safeScore.getDriveId() + "', " +
-                "'" + safeScore.getSafeDistanceCount() + "', " +
-                "'" + safeScore.getSpeedingCount() + "', " +
-                "'" + safeScore.getFastAccCount() + "', " +
-                "'" + safeScore.getFastBreakCount() + "', " +
-                "'" + safeScore.getSuddenStartCount() + "', " +
-                "'" + safeScore.getSuddenStopCount() + "', " +
-                "'" + String.valueOf(System.currentTimeMillis()) + "') ;";
+        String selectSql = "SELECT _id FROM SafeScore WHERE _id ='"+safeScore.getDriveId()+"' ;";
+        Cursor cursor = dbR.rawQuery(selectSql, null);
+
+        if(cursor.moveToNext()) {
+            return cursor.getInt(0);
+        } else {
+
+            String sql = "INSERT INTO SafeScore (_id, safe_distance_count, speeding_count, fast_acc_count, fast_break_count, sudden_start_count, sudden_stop_count, drive_start) " +
+                    "VALUES(" +
+                    "'" + safeScore.getDriveId() + "', " +
+                    "'" + safeScore.getSafeDistanceCount() + "', " +
+                    "'" + safeScore.getSpeedingCount() + "', " +
+                    "'" + safeScore.getFastAccCount() + "', " +
+                    "'" + safeScore.getFastBreakCount() + "', " +
+                    "'" + safeScore.getSuddenStartCount() + "', " +
+                    "'" + safeScore.getSuddenStopCount() + "', " +
+                    "'" + String.valueOf(System.currentTimeMillis()) + "') ;";
 
 
-        // DB 작업 실행
-        dbW.beginTransaction();
-        try {
-            dbW.execSQL(sql);
-            dbW.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
+            // DB 작업 실행
+            dbW.beginTransaction();
+            try {
+                dbW.execSQL(sql);
+                dbW.setTransactionSuccessful();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
+            }
+            return safeScore.getDriveId();
         }
-        return safeScore.getDriveId();
     }
 
     /** 수정 SQL

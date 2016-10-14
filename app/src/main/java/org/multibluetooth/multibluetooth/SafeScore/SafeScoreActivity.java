@@ -41,15 +41,24 @@ public class SafeScoreActivity extends AppCompatActivity {
         suddenStartScore = (TextView) findViewById(R.id.sudden_start_score);
         suddenStopScore = (TextView) findViewById(R.id.sudden_stop_score);
 
+        Intent temp = getIntent();
+        Log.d(TAG, "temp: "+temp.toString());
         Bundle bundle = getIntent().getExtras();
+        Log.d(TAG, "bundle: "+bundle.toString());
         SafeScore safeScore;
         if (bundle == null) {
 
             // 안전점수 가져와서 뿌려줌
             SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
             safeScore = safeScoreModel.getScoreData();
+            safeScoreModel.close();
+            Log.d(TAG, "bundle 없음");
+            Log.d(TAG, "가져온 것: "+safeScore.toString());
+
         } else {
             safeScore = (SafeScore) bundle.getSerializable("drive_item");
+            Log.d(TAG, "bundle 있음");
+            Log.d(TAG, "넘어온 것: "+safeScore.toString());
         }
         Log.d(TAG, "Drive ID: "+safeScore.getDriveId());
 

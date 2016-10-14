@@ -17,6 +17,7 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Facebook.FacebookLogin;
 import org.multibluetooth.multibluetooth.History.HistoryActivity;
@@ -168,17 +169,20 @@ public class MainMenuActivity extends AppCompatActivity {
 	}
 
 	public void setBtConnectSign() {
+		if (btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)
+			Toast.makeText(this, "Laser 연결됨", Toast.LENGTH_SHORT).show();
+
 		if (btLaserCon != null
-				&& btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED
-				&& (btOBDCon == null || btOBDCon.getConnectionStatus() != BluetoothLaserService.STATE_CONNECTED)) {
+				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
+				&& (btOBDCon == null || btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED)) {
 			btOBDCon = new OBDScanner(this);
 			Log.d(TAG, "OBD 연결 실행");
 			btOBDCon.conn();
 			Log.d(TAG, "OBD 연결 실행2");
 		}
 		if (btLaserCon != null && btOBDCon != null
-				&& btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED
-				&& btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED) {
+				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
+				&& btOBDCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED) {
 			btconnectSign.setImageResource(R.drawable.green_dot);
 		}
 	}

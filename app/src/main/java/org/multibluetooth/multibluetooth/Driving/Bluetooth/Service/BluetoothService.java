@@ -49,8 +49,6 @@ public abstract class BluetoothService {
     protected ConnectedThread mConnectedThread;
     protected int mState;
 
-    protected static final LinkedList<Character> messageStack = new LinkedList<>();
-
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections

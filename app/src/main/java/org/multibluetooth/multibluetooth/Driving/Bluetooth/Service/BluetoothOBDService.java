@@ -140,6 +140,12 @@ public class BluetoothOBDService extends BluetoothService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
+        Message msg2 = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+        Bundle bundle2 = new Bundle();
+        bundle2.putString(Constants.TOAST, "OBD 연결됨");
+        msg2.setData(bundle2);
+        mHandler.sendMessage(msg2);
+
         // Set device name
         deviceName = device.getName();
 

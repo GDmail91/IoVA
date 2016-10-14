@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -253,6 +254,9 @@ public class DrivingActivity extends AppCompatActivity {
         driveThread.stopRequest();
         SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
         SafeScore safeScore = safeScoreModel.getData(driveId);
+        safeScoreModel.close();
+        Log.d("TEST","액티비티가 가지고있는 ID:"+driveId);
+        Log.d("TEST","safeScore: "+safeScore.toString());
         // 해당 ID의 운행정보 가져옴
         Intent intent = new Intent(DrivingActivity.this, SafeScoreActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
