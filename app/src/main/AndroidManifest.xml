@@ -61,6 +61,7 @@
         <!-- 최상위 뷰 -->
         <service
             android:name=".Driving.TopActivity.DrivingOnTopService"
+            android:permission="android.permission.SYSTEM_ALERT_WINDOW" >
             android:enabled="true"
             android:exported="false"> <!-- 퍼미션 중요 -->
             <intent-filter >

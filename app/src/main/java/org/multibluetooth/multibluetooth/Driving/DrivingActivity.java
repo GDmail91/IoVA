@@ -4,10 +4,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -33,6 +36,7 @@ public class DrivingActivity extends AppCompatActivity {
     private TextView btDeviceName;
 
     double mySpeed, maxSpeed;
+    int driveId;
 
     private DriveThread driveThread;
 
@@ -41,7 +45,9 @@ public class DrivingActivity extends AppCompatActivity {
     public static final int FORWARD_MESSAGE = 100;
     public static final int BACK_MESSAGE = 101;
     public static final int OBD_MESSAGE = 102;
-    public static final int DISTANCE_DANGER = 112;
+    public static final int DISTANCE_WARNING = 112;
+    public static final int DISTANCE_DANGER = 119;
+    public static final int PERMISSION_GRANTED = 1234;
 
     // Speech 모듈
     private static DrivingTextToSpeach drTTS;
@@ -120,6 +126,9 @@ public class DrivingActivity extends AppCompatActivity {
             case DISTANCE_DANGER:
                 drTTS.speechingSentence("거리가 가깝습니다. 안전거리를 유지해주세요.");
                 break;
+            case DISTANCE_WARNING:
+                drTTS.speechingSentence("안전거리 위반입니다. 사고에 주의하세요.");
+                break;
         }
     }
 
@@ -144,10 +153,14 @@ public class DrivingActivity extends AppCompatActivity {
             case DRIVE_START_FLAG:
                 // 운행 시작
                 DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
-                int topNumber = driveInfoModel.getTopNumber();
+                driveId = driveInfoModel.getTopNumber();
                 driveInfoModel.close();
-                driveThread = new DriveThread(this, mHandler, topNumber);
+                driveThread = new DriveThread(this, mHandler, driveId);
                 driveThread.start();
+                break;
+            case PERMISSION_GRANTED:
+                // 최상위뷰 연결
+                doBindService();
                 break;
         }
     }
@@ -192,7 +205,20 @@ public class DrivingActivity extends AppCompatActivity {
     }
 
     public void onFloatingView() {
-        doBindService();
+        // 마시멜로우 버전이상부터는 PERMISSION 승인이 따로 필요함
+        if(Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, PERMISSION_GRANTED);
+            } else {
+                // 최상위뷰 연결
+                doBindService();
+            }
+        } else {
+            // 최상위뷰 연결
+            doBindService();
+        }
         //bindService(new Intent(DrivingActivity.this, DrivingOnTopService.class), mConnection, Context.BIND_AUTO_CREATE);
         //startService(new Intent(this, DrivingOnTopService.class));	//서비스 시작
     }
@@ -224,7 +250,7 @@ public class DrivingActivity extends AppCompatActivity {
         onCloseFloatingView();
 
         // 반복 쓰레드 종료
-        int driveId = driveThread.stopRequest();
+        driveThread.stopRequest();
         SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
         SafeScore safeScore = safeScoreModel.getData(driveId);
         // 해당 ID의 운행정보 가져옴

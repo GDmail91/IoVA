@@ -22,6 +22,8 @@ import java.util.LinkedList;
     private boolean SLOW_FLAG = false;
     private boolean START_FLAG = false;
     private boolean STOP_FLAG = false;
+    private boolean DISTANCE_ALERT_WAIT = false;
+
     private static int CLOSE_COUNT = 0;
     private static int FAST_COUNT = 0;
     private static int SLOW_COUNT = 0;
@@ -32,8 +34,9 @@ import java.util.LinkedList;
     public static final int LASER_DATA = 2;
 
     private static int queueLength = 0;
+    private static long alertTime;
     private static LinkedList<DriveInfo> mQueue = new LinkedList<>();
-    private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
+    //private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
     private SafeScore safeScore;
     private SafeScore safeDistance;
     private SafeScoreModel safeScoreModel;
@@ -85,18 +88,11 @@ import java.util.LinkedList;
                 }
                 break;
             case LASER_DATA:
-                laserQueue.add(driveInfo);
+                // 안전거리 계산
+                safeDistance = doCalculateDistance(driveInfo);
+                // 점수 DB에 안전거리 삽입
+                safeScoreModel.updateDistance(safeDistance);
 
-                // 거리측정 정확도를 높이기 위해 3개의 기록으로 비교
-                if (laserQueue.size() >= 3) {
-                    // 안전거리 계산
-                    safeDistance = doCalculateDistance(laserQueue);
-                    // 점수 DB에 안전거리 삽입
-                    safeScoreModel.updateDistance(safeDistance);
-
-                    // dequeue
-                    laserQueue.removeFirst();
-                }
                 break;
         }
     }
@@ -112,31 +108,37 @@ import java.util.LinkedList;
         return new SafeScore(drive_id, speedingCount, fastAccCount, fastBreakCount, suddenStartCount, suddenStopCount,"","");
     }
 
-    public SafeScore doCalculateDistance(LinkedList<DriveInfo> mQueue) {
-        queueLength = mQueue.size() - 1;
-        int safeDistanceCount = getSafeDistance(mQueue);
+    public SafeScore doCalculateDistance(DriveInfo driveInfo) {
+        int safeDistanceCount = getSafeDistance(driveInfo);
 
         return new SafeScore(drive_id, safeDistanceCount);
     }
 
     /**
      * Safe Distance calculator
-     * @param driveData
+     * @param driveInfo
      * @return safe distance
      */
-    public int getSafeDistance(LinkedList<DriveInfo> driveData) {
+    public int getSafeDistance(DriveInfo driveInfo) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
         int avgSpeed = 0;
         int avgDistance = 0;
-        for (DriveInfo eachDrive : driveData) {
-            avgSpeed += driveInfoModel.getData(eachDrive.getId()).getVehicleSpeed();
-            avgDistance += eachDrive.getFrontDistance();
+        for (int i=1; i<3; i++) {
+            DriveInfo tempInfo = driveInfoModel.getData(driveInfo.getId() - i);
+            avgSpeed += tempInfo.getVehicleSpeed();
+            avgDistance += tempInfo.getFrontDistance();
         }
-        avgSpeed = avgSpeed / driveData.size();
-        avgDistance = avgDistance / driveData.size();
+        avgSpeed += driveInfoModel.getData(driveInfo.getId()).getVehicleSpeed();
+        avgDistance += driveInfo.getFrontDistance();
+        driveInfoModel.close();
+
+        avgSpeed = avgSpeed / 3;
+        avgDistance = avgDistance / 3;
+        Log.d(TAG, "평균 속도: "+avgSpeed);
+        Log.d(TAG, "평균 거리: "+avgDistance);
 
         // TODO 날씨정보 포함시킬것
-        // TODO Alert이 한번 울렸을경우 잠깐의 (약 1분)시간을 줄것
+        // Alert이 한번 울렸을경우 잠깐의 (약 1분)시간을 줌
         // 안전거리 계산
         // 도로교통공단 기준 80 km/h 미만일 경우 현재속도 - 15
         // 80 km/h 이상 또는 고속도로일 경우 현재속도로 한다.
@@ -144,17 +146,63 @@ import java.util.LinkedList;
         // 비가올경우 x1.5
         // 눈이올경우 x3 을한다.
         if (avgSpeed < 80) {
-            if (avgDistance < avgSpeed - 15) {
-                DrivingActivity.onAlert(DrivingActivity.DISTANCE_DANGER);
-                return ++CLOSE_COUNT;
-            }
+            // 시속 80키로 이내에서 거리가 가까울 경우
+            if (isDistanceClose(avgDistance, avgSpeed - 15)) return ++CLOSE_COUNT;
         } else {
-            if (avgDistance < avgSpeed) {
-                DrivingActivity.onAlert(DrivingActivity.DISTANCE_DANGER);
-                return ++CLOSE_COUNT;
-            }
+            // 시속 80키로 이상에서 거리가 가까울 경우
+            if (isDistanceClose(avgDistance, avgSpeed)) return ++CLOSE_COUNT;
         }
         return CLOSE_COUNT;
+    }
+
+    /**
+     * 경고음 발생 함수
+     * @param curDistance : 현재 거리간격
+     * @param safeDistance : 안전거리
+     * @return 위험 상황이였는지 반환
+     */
+    public boolean isDistanceClose(int curDistance, int safeDistance) {
+        boolean isClose;
+
+        // 분모가 0이 되지 않기 위해
+        if (safeDistance <= 0) safeDistance = 1;
+
+        // 현재 안전 % 값
+        double curSafePercent = curDistance/safeDistance;
+
+        if (curSafePercent < 0.5) {
+            // 조금 가까운 경우
+            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING);
+            isClose = true;
+        } else if (curSafePercent <= 1) {
+            // 너무 가까운경우
+            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER);
+            isClose = true;
+        } else {
+            // 거리가 멀어졌는데
+            if (DISTANCE_ALERT_WAIT) {
+                // 알람 대기상태인 경우
+                if (System.currentTimeMillis() - alertTime >= 30000) {
+                    // 30초가 지낫으면 다시울리도록
+                    DISTANCE_ALERT_WAIT = false;
+                }
+            }
+            isClose = false;
+        }
+
+        return isClose;
+    }
+
+    public void onDistanceAlertBySpeak(int type) {
+        if (!DISTANCE_ALERT_WAIT) {
+            // 알람을 안울렸으면 경보음 발생
+            DrivingActivity.onAlert(type);
+            DISTANCE_ALERT_WAIT = true;
+            alertTime = System.currentTimeMillis();     // 시간 기록
+        } else if (System.currentTimeMillis() - alertTime >= 60000) {
+            // 알람을 울렸을 경우 60초 이후 초기화 (가까우면 다시 울리도록)
+            DISTANCE_ALERT_WAIT = false;
+        }
     }
 
     // 급 가속 횟수
