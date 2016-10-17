@@ -31,6 +31,7 @@ public class OBDScanner extends BluetoothConnection {
 
     public static final int REQUEST_CONNECT_DEVICE_SECURE_BY_OBD = 3001;
     public static final int REQUEST_ENABLE_BT_BY_OBD = 3003;
+    public boolean AUTO_CONN = true;
 
     private static final LinkedList<Character> buffer = new LinkedList<>();
 
@@ -38,6 +39,10 @@ public class OBDScanner extends BluetoothConnection {
         super(context);
         setupService();
         Log.d(TAG, "OBD Scanner 생성");
+    }
+
+    public void connMode(boolean autoMode) {
+        AUTO_CONN = autoMode;
     }
 
     @Override
@@ -76,7 +81,7 @@ public class OBDScanner extends BluetoothConnection {
         SharedPreferences pref = mContext.getSharedPreferences("pref", mContext.MODE_PRIVATE);
         String address = pref.getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS_OBD, "");
         Log.d(TAG, "뭘가지고 있나: "+address);
-        if ("".equals(address)) {
+        if ("".equals(address) || !AUTO_CONN) {
             // Launch the DeviceListActivity to see devices and do scan
             Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
             ((AppCompatActivity) mContext).startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE_BY_OBD);

@@ -87,6 +87,8 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         return topNumber;
     }
 
+    //public int
+
     /** 삽입 SQL
      *
      * @return topNumber

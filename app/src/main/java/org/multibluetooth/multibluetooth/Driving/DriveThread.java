@@ -64,8 +64,6 @@ public class DriveThread extends Thread {
                     int id = driveInfoModel.createIndex(topDriveNumber);
                     driveInfoModel.close();
 
-                    // 앞쪽 센서 데이터 출력
-                    ((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
                     /*Message fMessage = new Message();
                     fMessage.what = Constants.MESSAGE_READ;
                     fMessage.arg1 = DrivingActivity.FORWARD_MESSAGE;
@@ -86,6 +84,9 @@ public class DriveThread extends Thread {
 
                     // OBD 데이터 출력
                     ((OBDScanner) MainMenuActivity.btOBDCon).sendMessage(id);
+
+                    // 앞쪽 센서 데이터 출력
+                    ((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
 
                     // 1초간 슬립
                     sleep(1000);

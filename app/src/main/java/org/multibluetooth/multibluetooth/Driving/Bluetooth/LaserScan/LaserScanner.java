@@ -107,7 +107,7 @@ public class LaserScanner extends BluetoothConnection {
 
     @Override
     protected String messageParse(String message) {
-        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
 
         message = message.toUpperCase();
 
@@ -161,8 +161,9 @@ public class LaserScanner extends BluetoothConnection {
                     Log.d(TAG, "Laser 저장");
                     // Laser 센싱된 데이터 DB에 저장
                     int sensingId = bundle.getInt("sensing_id");
+                    float distance = Float.valueOf(parsedMessage);
                     DriveInfo driveInfo = new DriveInfo();
-                    driveInfo.setFrontDistance(sensingId, Integer.valueOf(parsedMessage));
+                    driveInfo.setFrontDistance(sensingId, distance);
                     mScoreCalculator.putData(ScoreCalculator.LASER_DATA, driveInfo);
 
                     DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);

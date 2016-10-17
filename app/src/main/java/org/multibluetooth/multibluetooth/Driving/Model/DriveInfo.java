@@ -7,8 +7,8 @@ public class DriveInfo {
     private int _id = 0;
     private int drive_id;
     private int vehicle_speed;
-    private int front_distance;
-    private int back_distance;
+    private float front_distance;
+    private float back_distance;
     private String measure_time;
 
     public DriveInfo() {}
@@ -28,16 +28,29 @@ public class DriveInfo {
 
     public int getVehicleSpeed() { return vehicle_speed; }
 
-    public int getFrontDistance() { return front_distance; }
+    public float getFrontDistance() { return front_distance; }
 
-    public int getBackDistance() { return back_distance; }
+    public float getBackDistance() { return back_distance; }
 
     public void setOBDSensor(int _id, int vehicle_speed) {
         this._id = _id;
         this.vehicle_speed = vehicle_speed;
     }
 
-    public void setFrontDistance(int _id, int distance) {
+    public void setOBDSensor(DriveInfo driveInfo) {
+        this._id = driveInfo.getId();
+        this.drive_id = driveInfo.getDriveId();
+        this.vehicle_speed = driveInfo.getVehicleSpeed();
+    }
+
+    public void setLaserSensor(DriveInfo driveInfo) {
+        this._id = driveInfo.getId();
+        this.drive_id = driveInfo.getDriveId();
+        this.front_distance = driveInfo.getFrontDistance();
+        this.back_distance = driveInfo.getBackDistance();
+    }
+
+    public void setFrontDistance(int _id, float distance) {
         this._id = _id;
         this.front_distance = distance;
     }

@@ -5,7 +5,6 @@ import android.util.Log;
 
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
-import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 
@@ -37,9 +36,11 @@ import java.util.LinkedList;
     private static long alertTime;
     private static LinkedList<DriveInfo> mQueue = new LinkedList<>();
     //private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
+
     private SafeScore safeScore;
     private SafeScore safeDistance;
     private SafeScoreModel safeScoreModel;
+    private ScorePool scorePool = ScorePool.getInstance();
 
     private Context mContext;
 
@@ -65,6 +66,8 @@ import java.util.LinkedList;
 
         queueLength = 0;
         mQueue.clear();
+        scorePool.init();
+
         // TODO 반드시 close하고 끝내도록 짤것
         safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
         safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0,"",""));
@@ -86,13 +89,36 @@ import java.util.LinkedList;
 
                     // dequeue
                     mQueue.removeFirst();
+
                 }
+
+                // 풀에 같은 Sensing ID값 존재하는지 확인
+                int laserIndex = scorePool.searchPool(driveInfo.getId(), mContext);
+                if (laserIndex >= 0) {
+                    // Laser 에서 먼저 넣은게 있다면 꺼내서 측정값 표시
+                    driveInfo.setLaserSensor(scorePool.getDriveInfo(laserIndex));
+                    // TODO safe distance 측정
+                } else {
+                    // 없다면 풀에 삽입
+                    scorePool.intoPool(driveInfo);
+                }
+
                 break;
             case LASER_DATA:
-                // 안전거리 계산
-                safeDistance = doCalculateDistance(driveInfo);
-                // 점수 DB에 안전거리 삽입
-                safeScoreModel.updateDistance(safeDistance);
+                // 풀에 같은 Drive ID값 존재하는지 확인
+                int obdIndex = scorePool.searchPool(driveInfo.getId(), mContext);
+                if (obdIndex >= 0) {
+                    // OBD 에서 먼저 넣은게 있다면 꺼내서 측정값 표시
+                    driveInfo.setOBDSensor(scorePool.getDriveInfo(obdIndex));
+                    // TODO safe distance 측정
+                    // 안전거리 계산
+                    safeDistance = doCalculateDistance(driveInfo);
+                    // 점수 DB에 안전거리 삽입
+                    safeScoreModel.updateDistance(safeDistance);
+                } else {
+                    // 없다면 풀에 삽입
+                    scorePool.intoPool(driveInfo);
+                }
 
                 break;
         }
@@ -121,20 +147,21 @@ import java.util.LinkedList;
      * @return safe distance
      */
     public int getSafeDistance(DriveInfo driveInfo) {
-        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+        //DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
         int avgSpeed = 0;
-        int avgDistance = 0;
-        for (int i=1; i<3; i++) {
+        float avgDistance = 0;
+        /*for (int i=1; i<3; i++) {
             DriveInfo tempInfo = driveInfoModel.getData(driveInfo.getId() - i);
             avgSpeed += tempInfo.getVehicleSpeed();
             avgDistance += tempInfo.getFrontDistance();
-        }
-        avgSpeed += driveInfoModel.getData(driveInfo.getId()).getVehicleSpeed();
+        }*/
+        //avgSpeed += driveInfoModel.getData(driveInfo.getId()).getVehicleSpeed();
+        avgSpeed += driveInfo.getVehicleSpeed();
         avgDistance += driveInfo.getFrontDistance();
-        driveInfoModel.close();
-
+        //driveInfoModel.close();
+/*
         avgSpeed = avgSpeed / 3;
-        avgDistance = avgDistance / 3;
+        avgDistance = avgDistance / 3;*/
         Log.d(TAG, "평균 속도: "+avgSpeed);
         Log.d(TAG, "평균 거리: "+avgDistance);
 
@@ -162,7 +189,7 @@ import java.util.LinkedList;
      * @param safeDistance : 안전거리
      * @return 위험 상황이였는지 반환
      */
-    public boolean isDistanceClose(int curDistance, int safeDistance) {
+    public boolean isDistanceClose(float curDistance, int safeDistance) {
         boolean isClose;
 
         // 분모가 0이 되지 않기 위해
