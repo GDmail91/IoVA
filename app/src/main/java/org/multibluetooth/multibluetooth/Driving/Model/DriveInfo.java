@@ -50,10 +50,20 @@ public class DriveInfo {
         this.back_distance = driveInfo.getBackDistance();
     }
 
-    public void setFrontDistance(int _id, float distance) {
+    public void setDistance(int _id, float front_distance, float back_distance) {
         this._id = _id;
-        this.front_distance = distance;
+        this.front_distance = front_distance;
+        this.back_distance = back_distance;
     }
+
+    // TODO 옆차선 스캔
+    public void setDistance(int _id, float front_distance, float back_distance, float side_distance) {
+        this._id = _id;
+        this.front_distance = front_distance;
+        this.back_distance = back_distance;
+        // this.side_distance = side_distance;
+    }
+
     public String toString() {
         return "ID: "+_id + ", DR_ID: "+drive_id+", VS: "+vehicle_speed+", FD: "+front_distance+", BD: "+back_distance +", MT: "+measure_time;
     }

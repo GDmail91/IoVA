@@ -43,6 +43,9 @@ public class BluetoothLaserService extends BluetoothService {
 
     protected static final LinkedList<Character> messageStack = new LinkedList<>();
     protected static String inputeMessage = "";
+    protected static String frontInputMessage = "";
+    protected static String backInputMessage = "";
+    protected static String scanInputMessage = "";
     protected static String distance = "";
 
     /**
@@ -184,7 +187,10 @@ public class BluetoothLaserService extends BluetoothService {
                         if (!msgCheck().equals("")) {
                             Bundle bundle = new Bundle();
                             bundle.putString(Constants.DEVICE_NAME, deviceName);
-                            bundle.putString("MESSAGE", inputeMessage);
+                            bundle.putString("MESSAGE1", inputeMessage);
+                            //bundle.putString("MESSAGE2", backInputMessage);
+                            //bundle.putString("MESSAGE3", scanInputMessage);
+
                             // 명령마다 구분
                             bundle.putString("CATEGORY", "Laser");
                             bundle.putInt("sensing_id", sensingId);
@@ -239,39 +245,45 @@ public class BluetoothLaserService extends BluetoothService {
         }*/
 
         protected String msgCheck() {
+            // 전체를 줘야한다면 inputMessage 사용
             inputeMessage = "";
+
+            // 각각을 구분해야한다면 아래 사용
+            frontInputMessage = "";
+            backInputMessage = "";
+            scanInputMessage = "";
             while (messageStack.size() > 0) {
                 char c = messageStack.removeFirst();
 
                 switch (c) {
                     case '{':
-                    //case '(':
-                    //case '[':
+                    case '(':
+                    case '[':
                         distance = "";
                         break;
                     case '}':
                         distance = distance.trim();
                         while (distance.length() < 6)
                             distance = "0"+distance;
-                        inputeMessage += "AA01" + distance;
+                        frontInputMessage += "AA01" + distance;
                         break;
-                    /*case ')':
+                    case ')':
                         while (distance.length() < 6)
                             distance = "0"+distance;
-                        inputeMessage += "AA02" + distance;
+                        backInputMessage += "AA02" + distance;
                         break;
                     case ']':
                         while (distance.length() < 6)
                             distance = "0"+distance;
-                        inputeMessage += "AA03" + distance;
-                        break;*/
+                        scanInputMessage += "AA03" + distance;
+                        break;
                     default:
                         distance += c;
                         break;
                 }
             }
 
-            return inputeMessage;
+            return inputeMessage = frontInputMessage + backInputMessage + scanInputMessage;
         }
 
         /**

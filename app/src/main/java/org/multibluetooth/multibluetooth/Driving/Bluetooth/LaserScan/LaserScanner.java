@@ -105,6 +105,7 @@ public class LaserScanner extends BluetoothConnection {
         mOutStringBuffer.setLength(0);
     }
 
+    @Deprecated
     @Override
     protected String messageParse(String message) {
         // Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
@@ -116,7 +117,7 @@ public class LaserScanner extends BluetoothConnection {
             buffer.add(c);
         }
 
-        if (buffer.size() >= 10) {
+        while (buffer.size() >= 10) {
             String msgStart = buffer.removeFirst().toString() + buffer.removeFirst().toString();
             String msgMode = "";
             String msgBody = "";
@@ -130,17 +131,22 @@ public class LaserScanner extends BluetoothConnection {
                     }
                 }
 
+                // 모드에 따라서 Driving Activity에 다르게 표시
                 switch (msgMode) {
                     case "01":
-                        //((DrivingActivity) mContext).setChangeText("\n\nmode: "+msgMode+"\nbody: "+msgBody);
+                        // 전방 측정
                         ((DrivingActivity) mContext).setChangeText(msgBody);
                         ((DrivingActivity) mContext).setForwardText(Float.valueOf(msgBody));
                         // TODO 삭제 전시회용
                         ((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
                         break;
                     case "02":
+                        // 후방 측정
                         //((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
                         //((DrivingActivity) mContext).setBackText(msgBody);
+                        break;
+                    case "03":
+                        // 옆차선 측정
                         break;
                 }
             } else {
@@ -151,11 +157,65 @@ public class LaserScanner extends BluetoothConnection {
         return message;
     }
 
+    protected LaserScanData laserMessageParse(String message) {
+        // Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+
+        message = message.toUpperCase();
+        LaserScanData laserScanData = new LaserScanData();
+
+        for(char c : message.toCharArray()) {
+            Log.d(TAG, ""+c);
+            buffer.add(c);
+        }
+
+        while (buffer.size() >= 10) {
+            String msgStart = buffer.removeFirst().toString() + buffer.removeFirst().toString();
+            String msgMode = "";
+            String msgBody = "";
+
+            if (msgStart.equals("AA")) {
+                for (int i=0; i<8; i++) {
+                    if (i<2) {
+                        msgMode += buffer.removeFirst();
+                    } else {
+                        msgBody += buffer.removeFirst();
+                    }
+                }
+
+                // 모드에 따라서 Driving Activity에 다르게 표시
+                switch (msgMode) {
+                    case "01":
+                        // 전방 측정
+                        laserScanData.setFrontDistance(Float.valueOf(msgBody));
+                        ((DrivingActivity) mContext).setChangeText(msgBody);
+                        ((DrivingActivity) mContext).setForwardText(Float.valueOf(msgBody));
+                        // TODO 삭제 전시회용
+                        ((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
+                        break;
+                    case "02":
+                        // 후방 측정
+                        laserScanData.setBackDistance(Float.valueOf(msgBody));
+                        //((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
+                        //((DrivingActivity) mContext).setBackText(msgBody);
+                        break;
+                    case "03":
+                        // 옆차선 측정
+                        laserScanData.setSideDistance(Float.valueOf(msgBody));
+                        break;
+                }
+            } else {
+                Log.d(TAG, "쓰레기값");
+            }
+        }
+        return laserScanData;
+    }
+
     @Override
     protected String updateData(Bundle bundle) {
-        String parsedMessage = messageParse(bundle.getString("MESSAGE"));
+        LaserScanData parsedMessage = laserMessageParse(bundle.getString("MESSAGE1"));
 
-        Log.d(TAG, parsedMessage);
+        Log.d(TAG, "전방측정:"+parsedMessage.getFrontDistance());
+        Log.d(TAG, "후방측정:"+parsedMessage.getBackDistance());
         String category = bundle.getString("CATEGORY");
         Log.d(TAG, category);
         try {
@@ -165,10 +225,18 @@ public class LaserScanner extends BluetoothConnection {
                     Log.d(TAG, "Laser 저장");
                     // Laser 센싱된 데이터 DB에 저장
                     int sensingId = bundle.getInt("sensing_id");
-                    float distance = Float.valueOf(parsedMessage);
 
                     DriveInfo driveInfo = new DriveInfo();
-                    driveInfo.setFrontDistance(sensingId, distance);
+                    if (parsedMessage.getSideDistance() == 0) {
+                        driveInfo.setDistance(sensingId,
+                                parsedMessage.getFrontDistance(),
+                                parsedMessage.getBackDistance());
+                    } else {
+                        driveInfo.setDistance(sensingId,
+                                parsedMessage.getFrontDistance(),
+                                parsedMessage.getBackDistance(),
+                                parsedMessage.getSideDistance());
+                    }
                     mScoreCalculator.putData(ScoreCalculator.LASER_DATA, driveInfo);
 
                     DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
@@ -179,6 +247,6 @@ public class LaserScanner extends BluetoothConnection {
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        return parsedMessage;
+        return parsedMessage.toString();
     }
 }
