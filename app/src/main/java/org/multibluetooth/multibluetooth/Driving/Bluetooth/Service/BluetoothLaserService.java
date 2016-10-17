@@ -250,6 +250,7 @@ public class BluetoothLaserService extends BluetoothService {
                         distance = "";
                         break;
                     case '}':
+                        distance = distance.trim();
                         while (distance.length() < 6)
                             distance = "0"+distance;
                         inputeMessage += "AA01" + distance;
