@@ -245,8 +245,8 @@ public class BluetoothLaserService extends BluetoothService {
 
                 switch (c) {
                     case '{':
-                    case '(':
-                    case '[':
+                    //case '(':
+                    //case '[':
                         distance = "";
                         break;
                     case '}':
@@ -254,7 +254,7 @@ public class BluetoothLaserService extends BluetoothService {
                             distance = "0"+distance;
                         inputeMessage += "AA01" + distance;
                         break;
-                    case ')':
+                    /*case ')':
                         while (distance.length() < 6)
                             distance = "0"+distance;
                         inputeMessage += "AA02" + distance;
@@ -263,7 +263,7 @@ public class BluetoothLaserService extends BluetoothService {
                         while (distance.length() < 6)
                             distance = "0"+distance;
                         inputeMessage += "AA03" + distance;
-                        break;
+                        break;*/
                     default:
                         distance += c;
                         break;

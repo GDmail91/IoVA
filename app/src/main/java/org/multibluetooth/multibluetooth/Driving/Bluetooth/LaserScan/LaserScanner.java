@@ -134,9 +134,13 @@ public class LaserScanner extends BluetoothConnection {
                     case "01":
                         //((DrivingActivity) mContext).setChangeText("\n\nmode: "+msgMode+"\nbody: "+msgBody);
                         ((DrivingActivity) mContext).setChangeText(msgBody);
+                        ((DrivingActivity) mContext).setForwardText(Float.valueOf(msgBody));
+                        // TODO 삭제 전시회용
+                        ((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
                         break;
                     case "02":
-                        ((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
+                        //((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
+                        //((DrivingActivity) mContext).setBackText(msgBody);
                         break;
                 }
             } else {
@@ -162,6 +166,7 @@ public class LaserScanner extends BluetoothConnection {
                     // Laser 센싱된 데이터 DB에 저장
                     int sensingId = bundle.getInt("sensing_id");
                     float distance = Float.valueOf(parsedMessage);
+
                     DriveInfo driveInfo = new DriveInfo();
                     driveInfo.setFrontDistance(sensingId, distance);
                     mScoreCalculator.putData(ScoreCalculator.LASER_DATA, driveInfo);

@@ -1,11 +1,8 @@
 package org.multibluetooth.multibluetooth.Driving;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDCommandList;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
@@ -74,13 +71,13 @@ public class DriveThread extends Thread {
                     mHandler.sendMessage(fMessage);*/
 
                     // 뒷쪽 센서 데이터 출력
-                    Message bMessage = new Message();
+                    /*Message bMessage = new Message();
                     bMessage.what = Constants.MESSAGE_READ;
                     bMessage.arg1 = DrivingActivity.BACK_MESSAGE;
                     Bundle bBundle = new Bundle();
                     bBundle.putString("message", "뒤" + i);
                     bMessage.setData(bBundle);
-                    mHandler.sendMessage(bMessage);
+                    mHandler.sendMessage(bMessage);*/
 
                     // OBD 데이터 출력
                     ((OBDScanner) MainMenuActivity.btOBDCon).sendMessage(id);
@@ -88,15 +85,19 @@ public class DriveThread extends Thread {
                     // 앞쪽 센서 데이터 출력
                     ((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
 
+                    // TODO 뒷쪽 데이터 출력
+
                     // 1초간 슬립
                     sleep(1000);
-                    if (i > 100) {
+
+                    // 자동 종료가 필요하다면 추가
+                    /*if (i > 100) {
                         Message endMessage = new Message();
                         endMessage.what = Constants.MESSAGE_READ;
                         endMessage.arg1 = DrivingActivity.DRIVE_STOP_FLAG;
                         mHandler.sendMessage(endMessage);
                         break;
-                    }
+                    }*/
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

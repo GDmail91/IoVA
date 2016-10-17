@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:iova="http://schemas.android.com/apk/res-auto">
+
+    <!-- 팝업 버튼 -->
+    <item android:id="@+id/floating_btn"
+        android:title="띄우기"
+        android:showAsAction="ifRoom"
+        iova:showAsAction="ifRoom"/>
+
+    <!-- 운행종료 -->
+    <item android:id="@+id/driving_stop"
+        android:title="운행종료"
+        android:showAsAction="ifRoom"
+        iova:showAsAction="ifRoom" />
+
+</menu>

@@ -42,9 +42,9 @@ public class SafeScoreActivity extends AppCompatActivity {
         suddenStopScore = (TextView) findViewById(R.id.sudden_stop_score);
 
         Intent temp = getIntent();
-        Log.d(TAG, "temp: "+temp.toString());
+//        Log.d(TAG, "temp: "+temp.toString());
         Bundle bundle = getIntent().getExtras();
-        Log.d(TAG, "bundle: "+bundle.toString());
+//        Log.d(TAG, "bundle: "+bundle.toString());
         SafeScore safeScore;
         if (bundle == null) {
 

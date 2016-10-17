@@ -13,6 +13,9 @@ import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -47,6 +50,7 @@ public class DrivingActivity extends AppCompatActivity {
     public static final int BACK_MESSAGE = 101;
     public static final int OBD_MESSAGE = 102;
     public static final int DISTANCE_WARNING = 112;
+    public static final int DISTANCE_NORMAL = 114;
     public static final int DISTANCE_DANGER = 119;
     public static final int PERMISSION_GRANTED = 1234;
 
@@ -122,13 +126,15 @@ public class DrivingActivity extends AppCompatActivity {
         btDeviceName.setText(message);
     }
 
-    public static void onAlert(int mode) {
+    public void onAlert(int mode) {
         switch (mode) {
             case DISTANCE_DANGER:
                 drTTS.speechingSentence("거리가 가깝습니다. 안전거리를 유지해주세요.");
+                setForwardBackgroud(DISTANCE_DANGER);
                 break;
             case DISTANCE_WARNING:
                 drTTS.speechingSentence("안전거리 위반입니다. 사고에 주의하세요.");
+                setForwardBackgroud(DISTANCE_WARNING);
                 break;
         }
     }
@@ -141,11 +147,41 @@ public class DrivingActivity extends AppCompatActivity {
             mBoundService.setForwardText(message);
     }
 
+    // 전방 데이터 전달
+    public void setForwardText(float distance) {
+        // View 반영
+        forwardDistance.setText("앞차간격\n"+distance+" m");
+        if (mBoundService != null)
+            mBoundService.setForwardText("앞 "+distance);
+    }
+
+    public void setForwardBackgroud(int color) {
+        switch (color) {
+            case DISTANCE_WARNING:
+                forwardDistance.setBackgroundResource(R.color.warning);
+                break;
+            case DISTANCE_DANGER:
+                forwardDistance.setBackgroundResource(R.color.danger);
+                break;
+            case DISTANCE_NORMAL:
+                forwardDistance.setBackgroundResource(R.color.black);
+                break;
+        }
+    }
+
     // 후방 데이터 전달010C410C0FA0
     public void setBackText(String message) {
+        // View 반영
         backDistance.setText(message);
         if (mBoundService != null)
-            mBoundService.setBackText(message);
+            mBoundService.setBackText("뒤 "+message);
+    }
+
+    public void setBackText(float distance) {
+        // View 반영
+        backDistance.setText(distance+" m"+"\n앞차간격");
+        if (mBoundService != null)
+            mBoundService.setBackText("뒤 "+distance);
     }
 
     // 운행 시작 버튼 클릭
@@ -268,6 +304,29 @@ public class DrivingActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         onDrivingStop();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.driving_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.driving_stop:
+                onDrivingStop();
+                return true;
+            case R.id.floating_btn:
+                onFloatingView();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 /*
     public void sendTest(View v) {

@@ -24,7 +24,7 @@
         android:text="db데이터보기"
         android:onClick="sendTest"/>-->
 
-    <Button
+    <!--<Button
         android:id="@+id/floating_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:text="운행종료"
-        android:onClick="onOptionClick"/>
+        android:onClick="onOptionClick"/>-->
 
 
     <TextView
@@ -51,39 +51,44 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/driving_stop"
         android:text="-"
         android:textColor="#ffffff"/>
 
-    <TextView
-        android:id="@+id/forward_distance"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/half_divider"
-        android:gravity="center"
-        android:text="앞차간격"
-        android:textColor="#ffffff"
-        android:textSize="30dp" />
-
     <LinearLayout
-        android:id="@+id/half_divider"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_centerVertical="true"
-        android:orientation="horizontal"
-        android:background="#ffffff"/>
-
-    <TextView
-        android:id="@+id/back_distance"
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/half_divider"
-        android:gravity="center"
-        android:text="뒷차간격"
-        android:textColor="#ffffff"
-        android:textSize="30dp" />
+        android:orientation="vertical"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/forward_distance"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="앞차간격"
+            android:textColor="#ffffff"
+            android:textSize="30dp" />
+
+        <LinearLayout
+            android:id="@+id/half_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:background="#ffffff"/>
+
+        <TextView
+            android:id="@+id/back_distance"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="뒷차간격"
+            android:textColor="#ffffff"
+            android:textSize="30dp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/scan_btn"

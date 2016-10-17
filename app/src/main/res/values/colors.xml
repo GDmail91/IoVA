@@ -5,4 +5,7 @@
     <color name="colorAccent">#FFFF00</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="danger">#FF0000</color>
+    <color name="warning">#FFCC33</color>
 </resources>
