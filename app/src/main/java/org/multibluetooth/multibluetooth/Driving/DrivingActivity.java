@@ -49,9 +49,14 @@ public class DrivingActivity extends AppCompatActivity {
     public static final int FORWARD_MESSAGE = 100;
     public static final int BACK_MESSAGE = 101;
     public static final int OBD_MESSAGE = 102;
-    public static final int DISTANCE_WARNING = 112;
-    public static final int DISTANCE_NORMAL = 114;
-    public static final int DISTANCE_DANGER = 119;
+    public static final int SAFE_SPEED_WARNING = 110;
+    public static final int SUDDEN_FAST_WARNING = 111;
+    public static final int SUDDEN_SLOW_WARNING = 112;
+    public static final int SUDDEN_START_WARNING = 113;
+    public static final int SUDDEN_STOP_WARNING = 114;
+    public static final int DISTANCE_WARNING = 115;
+    public static final int DISTANCE_NORMAL = 116;
+    public static final int DISTANCE_DANGER = 117;
     public static final int PERMISSION_GRANTED = 1234;
 
     // Speech 모듈
@@ -135,6 +140,21 @@ public class DrivingActivity extends AppCompatActivity {
             case DISTANCE_WARNING:
                 drTTS.speechingSentence("안전거리 위반입니다. 사고에 주의하세요.");
                 setForwardBackgroud(DISTANCE_WARNING);
+                break;
+            case SAFE_SPEED_WARNING:
+                drTTS.speechingSentence("과속 주행중입니다. 속도를 줄여주세요.");
+                break;
+            case SUDDEN_FAST_WARNING:
+                drTTS.speechingSentence("급가속 하였습니다. 안전운전 해주세요.");
+                break;
+            case SUDDEN_SLOW_WARNING:
+                drTTS.speechingSentence("급감속 하였습니다. 안전운전 해주세요.");
+                break;
+            case SUDDEN_START_WARNING:
+                drTTS.speechingSentence("급출발 하였습니다. 안전운전 해주세요.");
+                break;
+            case SUDDEN_STOP_WARNING:
+                drTTS.speechingSentence("급정거 하였습니다. 안전운전 해주세요.");
                 break;
         }
     }

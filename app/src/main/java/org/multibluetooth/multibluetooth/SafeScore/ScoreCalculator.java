@@ -22,6 +22,7 @@ import java.util.LinkedList;
     private boolean START_FLAG = false;
     private boolean STOP_FLAG = false;
     private boolean DISTANCE_ALERT_WAIT = false;
+    private boolean SAFE_ALERT_WAIT = false;
 
     private static int CLOSE_COUNT = 0;
     private static int FAST_COUNT = 0;
@@ -33,7 +34,8 @@ import java.util.LinkedList;
     public static final int LASER_DATA = 2;
 
     private static int queueLength = 0;
-    private static long alertTime;
+    private static long distanceAlertTime;
+    private static long safeAlertTime;
     private static LinkedList<DriveInfo> mQueue = new LinkedList<>();
     //private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
 
@@ -220,7 +222,7 @@ import java.util.LinkedList;
             // 거리가 멀어졌는데
             if (DISTANCE_ALERT_WAIT) {
                 // 알람 대기상태인 경우
-                if (System.currentTimeMillis() - alertTime >= 30000) {
+                if (System.currentTimeMillis() - distanceAlertTime >= 30000) {
                     // 30초가 지낫으면 다시울리도록
                     DISTANCE_ALERT_WAIT = false;
                 }
@@ -233,15 +235,29 @@ import java.util.LinkedList;
         return isClose;
     }
 
+    // 안전거리 알람
     public void onDistanceAlertBySpeak(int type) {
         if (!DISTANCE_ALERT_WAIT) {
             // 알람을 안울렸으면 경보음 발생
             ((DrivingActivity) mContext).onAlert(type);
             DISTANCE_ALERT_WAIT = true;
-            alertTime = System.currentTimeMillis();     // 시간 기록
-        } else if (System.currentTimeMillis() - alertTime >= 60000) {
+            distanceAlertTime = System.currentTimeMillis();     // 시간 기록
+        } else if (System.currentTimeMillis() - distanceAlertTime >= 60000) {
             // 알람을 울렸을 경우 60초 이후 초기화 (가까우면 다시 울리도록)
             DISTANCE_ALERT_WAIT = false;
+        }
+    }
+
+    // 안전점수 알람
+    public void onSafeDriveAlertBySpeak(int type) {
+        if (!SAFE_ALERT_WAIT) {
+            // 알람을 안울렸으면 경보음 발생
+            ((DrivingActivity) mContext).onAlert(type);
+            SAFE_ALERT_WAIT = true;
+            safeAlertTime = System.currentTimeMillis();     // 시간 기록
+        } else if (System.currentTimeMillis() - safeAlertTime >= 30000) {
+            // 알람을 울렸을 경우 30초 이후 초기화 (가까우면 다시 울리도록)
+            SAFE_ALERT_WAIT = false;
         }
     }
 
@@ -254,6 +270,7 @@ import java.util.LinkedList;
             if (!FAST_FLAG) {
                 FAST_FLAG = true;
                 FAST_COUNT++;
+                onSafeDriveAlertBySpeak(DrivingActivity.SUDDEN_FAST_WARNING);
             }
 
             return FAST_COUNT;
@@ -273,6 +290,7 @@ import java.util.LinkedList;
             if (!SLOW_FLAG) {
                 SLOW_FLAG = true;
                 SLOW_COUNT++;
+                onSafeDriveAlertBySpeak(DrivingActivity.SUDDEN_SLOW_WARNING);
             }
 
             return SLOW_COUNT;
@@ -294,6 +312,7 @@ import java.util.LinkedList;
             if (!START_FLAG) {
                 START_FLAG = true;
                 START_COUNT++;
+                onSafeDriveAlertBySpeak(DrivingActivity.SUDDEN_START_WARNING);
             }
 
             return START_COUNT;
@@ -315,6 +334,7 @@ import java.util.LinkedList;
             if (!STOP_FLAG) {
                 STOP_FLAG = true;
                 STOP_COUNT++;
+                onSafeDriveAlertBySpeak(DrivingActivity.SUDDEN_STOP_WARNING);
             }
 
             return STOP_COUNT;
@@ -332,6 +352,7 @@ import java.util.LinkedList;
         // 속도가 120 이상으로 달린 초
         if (driveData.get(queueLength).getVehicleSpeed() > 120) {
             SPEEDING_COUNT++;
+            onSafeDriveAlertBySpeak(DrivingActivity.SAFE_SPEED_WARNING);
         }
 
         return SPEEDING_COUNT;
