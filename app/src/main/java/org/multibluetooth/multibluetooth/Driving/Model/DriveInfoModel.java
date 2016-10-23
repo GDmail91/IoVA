@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                 "vehicle_speed INTEGER DEFAULT 0, " +
                 "front_distance INTEGER DEFAULT 0, " +
                 "back_distance INTEGER DEFAULT 0, " +
+                "gps_latitude REAL DEFAULT 0, " +
+                "gps_longitude REAL DEFAULT 0, " +
                 "measure_time DATETIME DEFAULT CURRENT_TIMESTAMP);");
 
     }
@@ -236,6 +239,24 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         return driveInfo.getId();
     }
 
+    public void updateGps(int id, Location location) {
+        String sql = "UPDATE DriveInfo SET " +
+                "gps_latitude = '" + location.getLatitude() + "', " +
+                "gps_longitude = '" + location.getLongitude() + "' " +
+                "WHERE _id='"+ id +"' ;";
+
+        // DB 작업 실행
+        dbW.beginTransaction();
+        try {
+            dbW.execSQL(sql);
+            dbW.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbW.endTransaction(); //트랜잭션을 끝내는 메소드.
+        }
+    }
+
     public void update(String _query) {
         dbW.execSQL(_query);
     }
@@ -308,7 +329,9 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                     cursor.getInt(2),
                     cursor.getInt(3),
                     cursor.getInt(4),
-                    cursor.getString(5));
+                    cursor.getDouble(5),
+                    cursor.getDouble(6),
+                    cursor.getString(7));
 
             allData.add(i++, tempData);
         }
@@ -331,7 +354,9 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                     cursor.getInt(2),
                     cursor.getInt(3),
                     cursor.getInt(4),
-                    cursor.getString(5)
+                    cursor.getDouble(5),
+                    cursor.getDouble(6),
+                    cursor.getString(7)
             );
         }
 

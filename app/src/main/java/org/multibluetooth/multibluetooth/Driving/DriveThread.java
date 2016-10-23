@@ -3,9 +3,9 @@ package org.multibluetooth.multibluetooth.Driving;
 import android.content.Context;
 import android.os.Handler;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDCommandList;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDCommandList;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
@@ -22,10 +22,14 @@ public class DriveThread extends Thread {
     private int i=0;
     OBDCommandList message = new OBDCommandList();
 
+    // GpsInfo 객체를 얻어온다
+    GpsInfo gpsInfo;
+
     public DriveThread(Context context, Handler handler, int topDriveNumber) {
         this.mContext = context;
         this.mHandler = handler;
         this.topDriveNumber = topDriveNumber;
+        this.gpsInfo = new GpsInfo(context);
     }
 
     public void setRequest(boolean request) {
@@ -48,6 +52,10 @@ public class DriveThread extends Thread {
             MainMenuActivity.btLaserCon.queueInit(topDriveNumber);
         }
 
+        if (gpsInfo.isGetLocation()) {
+            gpsInfo.showSettingsAlert();
+        }
+
         while (request) {
             if (MainMenuActivity.btOBDCon != null) {
                 // TODO && MainMenuActivity.btLaserCon != null) {
@@ -59,6 +67,7 @@ public class DriveThread extends Thread {
                     // TODO 센서 ID 가져와야함
                     DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
                     int id = driveInfoModel.createIndex(topDriveNumber);
+                    driveInfoModel.updateGps(id, gpsInfo.getLocation());    // GPS 위치 저장
                     driveInfoModel.close();
 
                     /*Message fMessage = new Message();

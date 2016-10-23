@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan;
+package org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan;
 
 /**
  * Created by YS on 2016-09-26.

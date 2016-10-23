@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan;
+package org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothOBDService;

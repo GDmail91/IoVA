@@ -12,10 +12,10 @@ import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserScanner;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDScanner;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;

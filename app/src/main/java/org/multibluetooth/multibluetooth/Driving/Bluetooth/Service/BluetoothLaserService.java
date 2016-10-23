@@ -25,7 +25,7 @@ import android.os.Message;
 import android.util.Log;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan.LaserCommand;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserCommand;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan;
+package org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan;
 
 import org.multibluetooth.multibluetooth.Obd.ObdCommand;
 import org.multibluetooth.multibluetooth.Obd.SpeedCommand;

@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.Bluetooth.LaserScan;
+package org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;

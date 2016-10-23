@@ -25,7 +25,7 @@ import android.os.Message;
 import android.util.Log;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.OBDScan.OBDCommandList;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDCommandList;
 
 import java.io.IOException;
 import java.io.InputStream;

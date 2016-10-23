@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.Bluetooth;
+package org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -13,6 +13,8 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
