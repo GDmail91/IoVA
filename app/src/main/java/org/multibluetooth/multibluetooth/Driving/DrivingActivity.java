@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
+import org.multibluetooth.multibluetooth.Driving.ServerConnection.RealtimeConnection;
 import org.multibluetooth.multibluetooth.Driving.TTS.DrivingTextToSpeach;
 import org.multibluetooth.multibluetooth.Driving.TopActivity.DrivingOnTopService;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
@@ -43,6 +45,7 @@ public class DrivingActivity extends AppCompatActivity {
     int driveId;
 
     private DriveThread driveThread;
+    private RealtimeConnection realtimeSocket;
 
     public static final int DRIVE_START_FLAG = 1;
     public static final int DRIVE_STOP_FLAG = 2;
@@ -108,6 +111,29 @@ public class DrivingActivity extends AppCompatActivity {
 
         // Speech 모듈 생성
         drTTS = DrivingTextToSpeach.getInstance(this);
+
+        // Server socket 연결 쓰레드 생성
+        Handler mHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message inputMessage) {
+                switch(inputMessage.what){
+                    case RealtimeConnection.MessageTypeClass.SIMSOCK_DATA :
+                        String msg = (String) inputMessage.obj;
+                        Log.d("OUT",  msg);
+                        // do something with UI
+                        break;
+
+                    case RealtimeConnection.MessageTypeClass.SIMSOCK_CONNECTED :
+                        // do something with UI
+                        break;
+
+                    case RealtimeConnection.MessageTypeClass.SIMSOCK_DISCONNECTED :
+                        // do something with UI
+                        break;
+
+                }
+            }
+        };
     }
 
     @Override
@@ -214,6 +240,9 @@ public class DrivingActivity extends AppCompatActivity {
                 driveInfoModel.close();
                 driveThread = new DriveThread(this, mHandler, driveId);
                 driveThread.start();
+
+                realtimeSocket = new RealtimeConnection("128.199.69.84", 8107, mHandler);
+                realtimeSocket.start();
                 break;
             case PERMISSION_GRANTED:
                 // 최상위뷰 연결

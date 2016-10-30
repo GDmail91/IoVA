@@ -69,6 +69,11 @@
                 <action android:name="org.multiBluetooth.OnTop"/>
             </intent-filter>
         </service>
+
+        <!-- 서버 통신 -->
+        <service
+            android:name=".Driving.ServerConnection.RealtimeConnection"
+            android:enabled="true"/>
     </application>
 
 </manifest>
