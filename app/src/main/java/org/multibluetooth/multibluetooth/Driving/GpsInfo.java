@@ -1,5 +1,6 @@
 package org.multibluetooth.multibluetooth.Driving;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -13,7 +14,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 /**
  * Created by YS on 2016-10-24.
@@ -45,15 +48,11 @@ public class GpsInfo extends Service implements LocationListener {
 
     public GpsInfo(Context context) {
         this.mContext = context;
-        getLocation();
+        checkGrantedPermission();
     }
 
-    public Location getLocation() {
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return null;
-        }
+    public void startLocation() {
+        checkGrantedPermission();
 
         try {
             locationManager = (LocationManager) mContext
@@ -66,7 +65,7 @@ public class GpsInfo extends Service implements LocationListener {
             // 현재 네트워크 상태 값 알아오기
             isNetworkEnabled = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
+            Log.d("TEST", "gps enable:"+isGPSEnabled+" net enable:"+isNetworkEnabled);
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // GPS 와 네트워크사용이 가능하지 않을때 소스 구현
             } else {
@@ -90,15 +89,19 @@ public class GpsInfo extends Service implements LocationListener {
                 }
 
                 if (isGPSEnabled) {
+                    Log.d("TEST", "gps 켜짐");
                     if (location == null) {
+                        Log.d("TEST", "location null");
                         locationManager.requestLocationUpdates(
                                 LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         if (locationManager != null) {
+                            Log.d("TEST", "manager null이 아니여야함");
                             location = locationManager
                                     .getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             if (location != null) {
+                                Log.d("TEST", "location 생성됨");
                                 lat = location.getLatitude();
                                 lon = location.getLongitude();
                             }
@@ -110,7 +113,6 @@ public class GpsInfo extends Service implements LocationListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return location;
     }
 
     /**
@@ -126,6 +128,13 @@ public class GpsInfo extends Service implements LocationListener {
         if(locationManager != null){
             locationManager.removeUpdates(GpsInfo.this);
         }
+    }
+
+    /**
+     * Location을 가져옵니다.
+     */
+    public Location getLocation() {
+        return location;
     }
 
     /**
@@ -182,6 +191,17 @@ public class GpsInfo extends Service implements LocationListener {
                 });
 
         alertDialog.show();
+    }
+
+    public void checkGrantedPermission() {
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((DrivingActivity) mContext,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION},
+                            1);
+        }
     }
 
     @Override

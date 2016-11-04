@@ -70,8 +70,9 @@ public class MainMenuActivity extends AppCompatActivity {
 
 		switch (v.getId()) {
 			case R.id.driving_btn:	// 운전하기
-				if ((btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)
-				|| (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
+				// TODO edit for laser test
+				if ((btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
+				//|| (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
 					Intent drivingIntent = new Intent(MainMenuActivity.this, DrivingActivity.class);
 					startActivity(drivingIntent);
 				} else {

@@ -129,7 +129,8 @@ import retrofit2.Retrofit;
 
                 break;
             case LASER_DATA:
-                // 풀에 같은 Drive ID값 존재하는지 확인
+                // TODO edit for laser test
+                /*// 풀에 같은 Drive ID값 존재하는지 확인
                 int obdIndex = scorePool.searchPool(driveInfo.getId(), mContext);
                 if (obdIndex >= 0) {
                     // OBD 에서 먼저 넣은게 있다면 꺼내서 측정값 표시
@@ -142,7 +143,10 @@ import retrofit2.Retrofit;
                 } else {
                     // 없다면 풀에 삽입
                     scorePool.intoPool(driveInfo);
-                }
+                }*/
+                safeDistance = doCalculateDistance(driveInfo);
+                // 점수 DB에 안전거리 삽입
+                safeScoreModel.updateDistance(safeDistance);
 
                 break;
         }
@@ -175,13 +179,14 @@ import retrofit2.Retrofit;
         int avgSpeed = 0;
         float avgFrontDistance = 0;
         float avgBackDistance = 0;
-        /*for (int i=1; i<3; i++) {
+        /*for (int i=1; i<3; i++) { 
             DriveInfo tempInfo = driveInfoModel.getData(driveInfo.getId() - i);
             avgSpeed += tempInfo.getVehicleSpeed();
             avgDistance += tempInfo.getFrontDistance();
         }*/
         //avgSpeed += driveInfoModel.getData(driveInfo.getId()).getVehicleSpeed();
-        avgSpeed += driveInfo.getVehicleSpeed();
+        // TODO edit for laser test
+        avgSpeed += 25;
         avgFrontDistance += driveInfo.getFrontDistance();
         // TODO 후방 거리 계산 추가
         avgBackDistance += driveInfo.getBackDistance();
@@ -230,15 +235,15 @@ import retrofit2.Retrofit;
         double curSafePercent = curDistance/safeDistance;
         Log.d(TAG, "안전 %값 :" +curSafePercent);
 
-        if (curSafePercent < 0.5) {
-            // 조금 가까운 경우
-            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING);
-            ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_WARNING);
-            isClose = true;
-        } else if (curSafePercent <= 1) {
+        if (curSafePercent <= 0.5) {
             // 너무 가까운경우
             onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER);
             ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_DANGER);
+            isClose = true;
+        } else if (curSafePercent <= 1) {
+            // 조금 가까운 경우
+            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING);
+            ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_WARNING);
             isClose = true;
         } else {
             // 거리가 멀어졌는데

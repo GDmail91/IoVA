@@ -1,9 +1,11 @@
 package org.multibluetooth.multibluetooth.Driving;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +14,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -19,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
@@ -46,6 +51,7 @@ public class DrivingActivity extends AppCompatActivity {
 
     private DriveThread driveThread;
     private RealtimeConnection realtimeSocket;
+    public GpsInfo gpsInfo;
 
     public static final int DRIVE_START_FLAG = 1;
     public static final int DRIVE_STOP_FLAG = 2;
@@ -226,7 +232,7 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
-    // 후방 데이터 전달010C410C0FA0
+    // 후방 데이터 전달
     public void setBackText(String message) {
         // View 반영
         backDistance.setText(message);
@@ -245,21 +251,49 @@ public class DrivingActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case DRIVE_START_FLAG:
-                // 운행 시작
-                DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
-                driveId = driveInfoModel.getTopNumber();
-                driveInfoModel.close();
-                driveThread = new DriveThread(this, mHandler, driveId);
-                driveThread.start();
+                gpsInfo = new GpsInfo(this);
+                //gpsInfo.showSettingsAlert();
+                if ( Build.VERSION.SDK_INT >= 23 &&
+                        ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                                    Manifest.permission.ACCESS_FINE_LOCATION},
+                                    1);
+                } else {
+                    startDriving();
+                }
 
-                realtimeSocket = new RealtimeConnection("128.199.69.84", 8107, mHandler);
-                realtimeSocket.start();
                 break;
             case PERMISSION_GRANTED:
                 // 최상위뷰 연결
                 doBindService();
                 break;
         }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            //  gps functionality
+            startDriving();
+        } else {
+            Toast.makeText(this, "GPS 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    // 운행시작 함수
+    private void startDriving() {
+        // 운행 시작
+        DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
+        driveId = driveInfoModel.getTopNumber();
+        driveInfoModel.close();
+        driveThread = new DriveThread(this, mHandler, driveId, gpsInfo);
+        driveThread.start();
+
+        //realtimeSocket = new RealtimeConnection("128.199.69.84", 8107, mHandler);
+        //realtimeSocket.start();
     }
 
     // 운행 쓰레드에서 Message를 받기위한 핸들러
