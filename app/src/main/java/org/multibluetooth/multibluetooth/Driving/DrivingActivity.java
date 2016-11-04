@@ -60,6 +60,9 @@ public class DrivingActivity extends AppCompatActivity {
     public static final int DISTANCE_WARNING = 115;
     public static final int DISTANCE_NORMAL = 116;
     public static final int DISTANCE_DANGER = 117;
+    public static final int DANGER_LOCATION_IN_MIDDLE = 301;
+    public static final int DANGER_LOCATION_IN_WARNING = 302;
+    public static final int DANGER_LOCATION_IN_CRITICAL = 303;
     public static final int PERMISSION_GRANTED = 1234;
 
     // Speech 모듈
@@ -76,7 +79,6 @@ public class DrivingActivity extends AppCompatActivity {
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             mBoundService = ((DrivingOnTopService.LocalBinder)service).getService();
-
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -181,6 +183,15 @@ public class DrivingActivity extends AppCompatActivity {
                 break;
             case SUDDEN_STOP_WARNING:
                 drTTS.speechingSentence("급정거 하였습니다. 안전운전 해주세요.");
+                break;
+            case DANGER_LOCATION_IN_MIDDLE:
+                drTTS.speechingSentence("사고유발 지역입니다. 운전에 주의하세요.");
+                break;
+            case DANGER_LOCATION_IN_WARNING:
+                drTTS.speechingSentence("위험행동 다발지역입니다. 방어운전을 해야합니다.");
+                break;
+            case DANGER_LOCATION_IN_CRITICAL:
+                drTTS.speechingSentence("위험한 지역입니다. 주변를 잘살피세요.");
                 break;
         }
     }

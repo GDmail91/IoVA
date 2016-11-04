@@ -12,7 +12,7 @@ public class ZoneNameFinder {
     static final double KoFarNorth = 38.27; // 북위
     static final double KoFarSouth = 33.06; // 북위
 
-    public String getKoZNF(Location location) {
+    public static String getKoZNF(Location location) {
         // TODO validation
         // TODO 현재 위치가 FarWest 부터 FarEast 안에 있는지
         // TODO 현재 위치가 FarNorth 부터 FarSouth 안에 있는지
@@ -33,13 +33,13 @@ public class ZoneNameFinder {
         return "";
     }
 
-    private double latToKilometer(double cLat){
+    private static double latToKilometer(double cLat){
         // 위도는 어디에서 계산하든 1도의 길이는 111km 이다
 
         return cLat * 111;
     }
 
-    private double lonToKilometer(double cLon, double cLat){
+    private static double lonToKilometer(double cLon, double cLat){
         // 해당 위도(X)에서 경도 1도의 길이는 2πr cos X × 1/360
 
         return cLon * (2 * 3.14 * 6400 * Math.cos(cLat) * 1/360);

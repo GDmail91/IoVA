@@ -2,13 +2,25 @@ package org.multibluetooth.multibluetooth.Driving;
 
 import android.content.Context;
 import android.os.Handler;
+import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDCommandList;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
+import org.multibluetooth.multibluetooth.Driving.ServerConnection.ZoneNameFinder;
+import org.multibluetooth.multibluetooth.Driving.retrofit.RetrofitService;
+import org.multibluetooth.multibluetooth.Driving.retrofit.format.DTOdangerLocation;
+import org.multibluetooth.multibluetooth.Driving.retrofit.format.DTOdangerLocationData;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
+import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * Created by YS on 2016-09-23.
@@ -20,6 +32,7 @@ public class DriveThread extends Thread {
     private int topDriveNumber;
     private boolean request = true;
     private int i=0;
+    private String mZoneName = "";
     OBDCommandList message = new OBDCommandList();
 
     // GpsInfo 객체를 얻어온다
@@ -96,6 +109,13 @@ public class DriveThread extends Thread {
 
                     // TODO 뒷쪽 데이터 출력
 
+                    // 현재 위치(zone) 확인
+                    String tempZoneName = ZoneNameFinder.getKoZNF(gpsInfo.getLocation());
+                    if (!mZoneName.equals(tempZoneName)) {
+                        mZoneName = tempZoneName;
+                        loadDangerLevel(tempZoneName);
+                    }
+
                     // 1초간 슬립
                     sleep(1000);
 
@@ -121,5 +141,44 @@ public class DriveThread extends Thread {
         SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
         safeScoreModel.updateEndOfDrive(topDriveNumber);
         safeScoreModel.close();
+    }
+
+    private void loadDangerLevel(String zoneName) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(mContext.getResources().getString(R.string.baseURL))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RetrofitService service = retrofit.create(RetrofitService.class);
+
+        Call<DTOdangerLocation> call = service.getDangerLevel(zoneName);
+        call.enqueue(new Callback<DTOdangerLocation>() {
+            @Override
+            public void onResponse(Response<DTOdangerLocation> response) {
+                if (response.isSuccess() && response.body() != null) {
+
+                    DTOdangerLocation responseBody= response.body();
+                    DTOdangerLocationData dangerLocation = responseBody.getData();
+
+                    // TODO level 변화
+                    switch (dangerLocation.getLevel()) {
+                        case 1:
+                            ((DrivingActivity) mContext).onAlert(DrivingActivity.DANGER_LOCATION_IN_MIDDLE);
+                            break;
+                        case 2:
+                            ((DrivingActivity) mContext).onAlert(DrivingActivity.DANGER_LOCATION_IN_WARNING);
+                            break;
+                        case 3:
+                            ((DrivingActivity) mContext).onAlert(DrivingActivity.DANGER_LOCATION_IN_CRITICAL);
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Toast.makeText(mContext.getApplicationContext(), "서버 연결 실패", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

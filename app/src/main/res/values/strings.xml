@@ -28,4 +28,5 @@
     <string name="notification_action">Tap to open OBD-Reader</string>
     <string name="service_started">OBD connection has started.</string>
 
+    <string name="baseURL">http://128.199.69.84:3030</string>
 </resources>

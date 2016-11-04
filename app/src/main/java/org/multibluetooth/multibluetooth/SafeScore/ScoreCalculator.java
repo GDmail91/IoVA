@@ -1,14 +1,27 @@
 package org.multibluetooth.multibluetooth.SafeScore;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
+import org.multibluetooth.multibluetooth.Driving.GpsInfo;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
+import org.multibluetooth.multibluetooth.Driving.ServerConnection.ZoneNameFinder;
+import org.multibluetooth.multibluetooth.Driving.retrofit.RetrofitService;
+import org.multibluetooth.multibluetooth.Driving.retrofit.format.DTOdangerLocation;
+import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 
 import java.util.LinkedList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * Created by YS on 2016-09-19.
@@ -45,6 +58,8 @@ import java.util.LinkedList;
     private ScorePool scorePool = ScorePool.getInstance();
 
     private Context mContext;
+    // GpsInfo 객체를 얻어온다
+    GpsInfo gpsInfo;
 
     public ScoreCalculator(Context mContext, int drive_id) {
         this.mContext = mContext;
@@ -73,10 +88,17 @@ import java.util.LinkedList;
         // TODO 반드시 close하고 끝내도록 짤것
         safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
         safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0,"",""));
+
+        this.gpsInfo = new GpsInfo(mContext);
     }
 
     // 데이터 RECIVE 프로세스
     public void putData(int device, DriveInfo driveInfo) {
+
+        if (gpsInfo.isGetLocation()) {
+            gpsInfo.showSettingsAlert();
+        }
+
         switch (device) {
             case OBD_DATA:
                 Log.d(TAG, driveInfo.toString());
@@ -250,6 +272,7 @@ import java.util.LinkedList;
 
     // 안전점수 알람
     public void onSafeDriveAlertBySpeak(int type) {
+        sendDangerBehavior(ZoneNameFinder.getKoZNF(gpsInfo.getLocation()), gpsInfo.getLocation(), type);
         if (!SAFE_ALERT_WAIT) {
             // 알람을 안울렸으면 경보음 발생
             ((DrivingActivity) mContext).onAlert(type);
@@ -360,5 +383,54 @@ import java.util.LinkedList;
 
     public void clearQueue() {
         mQueue.clear();
+    }
+
+
+    private void sendDangerBehavior(String zoneName, Location location, int type) {
+        if (type == DrivingActivity.DISTANCE_WARNING) return;
+
+        String behavior = "";
+        switch (type) {
+            case DrivingActivity.DISTANCE_DANGER:
+                behavior = "distance_danger";
+                break;
+            case DrivingActivity.SAFE_SPEED_WARNING:
+                behavior = "speeding";
+                break;
+            case DrivingActivity.SUDDEN_FAST_WARNING:
+                behavior = "sudden_fast";
+                break;
+            case DrivingActivity.SUDDEN_SLOW_WARNING:
+                behavior = "sudden_slow";
+                break;
+            case DrivingActivity.SUDDEN_START_WARNING:
+                behavior = "sudden_start";
+                break;
+            case DrivingActivity.SUDDEN_STOP_WARNING:
+                behavior = "sudden_stop";
+                break;
+        }
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(mContext.getResources().getString(R.string.baseURL))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RetrofitService service = retrofit.create(RetrofitService.class);
+
+        Call<DTOdangerLocation> call = service.postDangerLocation("", zoneName, location.getLatitude(), location.getLongitude(), behavior);
+        call.enqueue(new Callback<DTOdangerLocation>() {
+            @Override
+            public void onResponse(Response<DTOdangerLocation> response) {
+                if (response.isSuccess() && response.body() != null) {
+                    Toast.makeText(mContext.getApplicationContext(), "위험행동 저장", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Toast.makeText(mContext.getApplicationContext(), "서버 연결 실패", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

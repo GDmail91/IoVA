@@ -19,6 +19,12 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://repo.eclipse.org/content/repositories/paho-snapshots/"
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.facebook.android:facebook-android-sdk:[4,6)'
@@ -29,4 +35,12 @@ dependencies {
 
     compile 'org.roboguice:roboguice:3.+'
     compile 'com.github.pires:obd-java-api:1.0-RC16'
+
+    //compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
+    //compile 'org.eclipse.paho:org.eclipse.paho.android.service:1.0.2'
+
+    compile 'com.google.code.gson:gson:2.6.1'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
+    compile 'com.squareup.okhttp3:okhttp:3.0.0-RC1'
 }
