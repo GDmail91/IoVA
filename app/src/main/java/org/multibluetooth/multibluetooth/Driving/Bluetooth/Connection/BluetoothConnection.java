@@ -110,6 +110,8 @@ public class BluetoothConnection {
 
     public void setChangeContext(Context context) {
         this.mContext = context;
+        if (mScoreCalculator != null)
+            mScoreCalculator.setChangeContext(context);
     }
 
     public void serviceConn() {

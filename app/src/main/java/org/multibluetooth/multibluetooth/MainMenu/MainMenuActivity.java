@@ -74,6 +74,7 @@ public class MainMenuActivity extends AppCompatActivity {
 				if ((btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
 				//|| (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
 					Intent drivingIntent = new Intent(MainMenuActivity.this, DrivingActivity.class);
+					drivingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					startActivity(drivingIntent);
 				} else {
 					Toast.makeText(getApplicationContext(), "OBD 연결이 필요합니다.", Toast.LENGTH_LONG).show();

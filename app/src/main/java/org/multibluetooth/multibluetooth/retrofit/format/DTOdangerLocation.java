@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.retrofit.format;
+package org.multibluetooth.multibluetooth.retrofit.format;
 
 import com.google.gson.annotations.SerializedName;
 

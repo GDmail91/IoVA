@@ -1,6 +1,7 @@
 package org.multibluetooth.multibluetooth.SafeScore;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
@@ -8,12 +9,13 @@ import android.widget.Toast;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Driving.GpsInfo;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfo;
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.Driving.ServerConnection.ZoneNameFinder;
-import org.multibluetooth.multibluetooth.Driving.retrofit.RetrofitService;
-import org.multibluetooth.multibluetooth.Driving.retrofit.format.DTOdangerLocation;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScore;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
+import org.multibluetooth.multibluetooth.retrofit.RetrofitService;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocation;
 
 import java.util.LinkedList;
 
@@ -90,6 +92,10 @@ import retrofit2.Retrofit;
         safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0,"",""));
 
         this.gpsInfo = new GpsInfo(mContext);
+    }
+
+    public void setChangeContext(Context context) {
+        this.mContext = context;
     }
 
     // 데이터 RECIVE 프로세스
@@ -179,7 +185,7 @@ import retrofit2.Retrofit;
         int avgSpeed = 0;
         float avgFrontDistance = 0;
         float avgBackDistance = 0;
-        /*for (int i=1; i<3; i++) { 
+        /*for (int i=1; i<3; i++) {
             DriveInfo tempInfo = driveInfoModel.getData(driveInfo.getId() - i);
             avgSpeed += tempInfo.getVehicleSpeed();
             avgDistance += tempInfo.getFrontDistance();
@@ -207,12 +213,12 @@ import retrofit2.Retrofit;
         // 눈이올경우 x3 을한다.
         if (avgSpeed < 80) {
             // 시속 80키로 이내에서 거리가 가까울 경우
-            if (isDistanceClose(avgFrontDistance, avgSpeed - 15)) ++CLOSE_COUNT;
+            if (isDistanceClose(avgFrontDistance, avgSpeed - 15, driveInfo.getId())) ++CLOSE_COUNT;
             // TODO 후방 거리 계산 추가
             //if (isDistanceClose(avgBackDistance, avgSpeed - 15)) ++CLOSE_COUNT;
         } else {
             // 시속 80키로 이상에서 거리가 가까울 경우
-            if (isDistanceClose(avgFrontDistance, avgSpeed)) ++CLOSE_COUNT;
+            if (isDistanceClose(avgFrontDistance, avgSpeed, driveInfo.getId())) ++CLOSE_COUNT;
             // TODO 후방 거리 계산 추가
             //if (isDistanceClose(avgBackDistance, avgSpeed)) ++CLOSE_COUNT;
         }
@@ -225,7 +231,7 @@ import retrofit2.Retrofit;
      * @param safeDistance : 안전거리
      * @return 위험 상황이였는지 반환
      */
-    public boolean isDistanceClose(float curDistance, int safeDistance) {
+    public boolean isDistanceClose(float curDistance, int safeDistance, int requestId) {
         boolean isClose;
 
         // 분모가 0이 되지 않기 위해
@@ -237,12 +243,12 @@ import retrofit2.Retrofit;
 
         if (curSafePercent <= 0.5) {
             // 너무 가까운경우
-            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER);
+            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER, requestId);
             ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_DANGER);
             isClose = true;
         } else if (curSafePercent <= 1) {
             // 조금 가까운 경우
-            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING);
+            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING, requestId);
             ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_WARNING);
             isClose = true;
         } else {
@@ -263,7 +269,13 @@ import retrofit2.Retrofit;
     }
 
     // 안전거리 알람
-    public void onDistanceAlertBySpeak(int type) {
+    public void onDistanceAlertBySpeak(int type, int requestId) {
+        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+        DriveInfo driveInfo = driveInfoModel.getData(requestId);
+        Location location = new Location("gps");
+        location.setLatitude(driveInfo.getGpsLatitude());
+        location.setLongitude(driveInfo.getGpsLongitude());
+        sendDangerBehavior(ZoneNameFinder.getKoZNF(location), location, type);
         if (!DISTANCE_ALERT_WAIT) {
             // 알람을 안울렸으면 경보음 발생
             ((DrivingActivity) mContext).onAlert(type);
@@ -423,7 +435,13 @@ import retrofit2.Retrofit;
 
         RetrofitService service = retrofit.create(RetrofitService.class);
 
-        Call<DTOdangerLocation> call = service.postDangerLocation("", zoneName, location.getLatitude(), location.getLongitude(), behavior);
+        SharedPreferences pref = mContext.getSharedPreferences("pref", Context.MODE_PRIVATE);
+        Call<DTOdangerLocation> call = service.postDangerLocation(
+                pref.getString("access_token", ""),
+                zoneName,
+                location.getLatitude(),
+                location.getLongitude(),
+                behavior);
         call.enqueue(new Callback<DTOdangerLocation>() {
             @Override
             public void onResponse(Response<DTOdangerLocation> response) {

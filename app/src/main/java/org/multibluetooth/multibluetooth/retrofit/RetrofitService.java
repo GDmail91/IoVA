@@ -1,6 +1,7 @@
-package org.multibluetooth.multibluetooth.Driving.retrofit;
+package org.multibluetooth.multibluetooth.retrofit;
 
-import org.multibluetooth.multibluetooth.Driving.retrofit.format.DTOdangerLocation;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOFacebookLogin;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocation;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -14,13 +15,11 @@ import retrofit2.http.Path;
  * Created by YS on 2016-07-15.
  */
 public interface RetrofitService {
-    /*@FormUrlEncoded
     @POST("/users")
     Call<DTOFacebookLogin> setUserInfo(
-            @Header("access-token") String access_token,
-            @Field("username") String username
+            @Header("access-token") String access_token
     );
-*/
+
     @GET("/danger_location/{zone_name}")
     Call<DTOdangerLocation> getDangerLevel(
             @Path("zone_name") String zone_name

@@ -25,6 +25,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
+import org.multibluetooth.multibluetooth.retrofit.RetrofitService;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOFacebookLogin;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * Created by YS on 2016-09-18.
@@ -117,27 +125,11 @@ public class FacebookLogin extends AppCompatActivity {
                                     public void onCompleted(
                                             JSONObject object,
                                             GraphResponse response) {
-                                        /*try {
-                                            setUserInfo(accessToken.getToken(), object.getString("name"), "01012341234", SnsName.Facebook);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }*/
-                                        // 사용자 토큰 저장
-                                        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = pref.edit();
-                                        // TODO 사용자 토큰 저장
                                         try {
-                                            editor.putString("access_token", "something");
-                                            editor.putString("user_name", object.getString("name"));
-                                            editor.apply();
+                                            setUserInfo(accessToken.getToken(), object.getString("name"));
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
-                                        // 정보 저장후 메인으로 이동
-                                        Intent intent = new Intent(FacebookLogin.this, MainMenuActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
                                     }
                                 });
                         Bundle parameters = new Bundle();
@@ -159,6 +151,46 @@ public class FacebookLogin extends AppCompatActivity {
                     }
                 });
     }
+
+    // 사용자 정보 저장 프로세스
+    void setUserInfo(final String token, final String username) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getResources().getString(R.string.baseURL))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RetrofitService service = retrofit.create(RetrofitService.class);
+
+        Call<DTOFacebookLogin> call = service.setUserInfo(accessToken.getToken());
+        call.enqueue(new Callback<DTOFacebookLogin>() {
+            @Override
+            public void onResponse(Response<DTOFacebookLogin> response) {
+                if (response.isSuccess() && response.body() != null) {
+                    // 사용자 토큰 저장
+                    SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("access_token", token);
+                    editor.putString("user_name", username);
+                    editor.apply();
+
+                    // 정보 저장후 메인으로 이동
+                    Intent intent = new Intent(FacebookLogin.this, MainMenuActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+
+                    Toast.makeText(getApplicationContext(), "등록완료", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                finish();
+                Toast.makeText(getApplicationContext(), "사용자 등록 실패", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 /*
     // 사용자 정보 저장 프로세스
     void setUserInfo(final String token, final String username, String phone, String sns) {

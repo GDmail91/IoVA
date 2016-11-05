@@ -10,9 +10,9 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDCommandList;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.Driving.ServerConnection.ZoneNameFinder;
-import org.multibluetooth.multibluetooth.Driving.retrofit.RetrofitService;
-import org.multibluetooth.multibluetooth.Driving.retrofit.format.DTOdangerLocation;
-import org.multibluetooth.multibluetooth.Driving.retrofit.format.DTOdangerLocationData;
+import org.multibluetooth.multibluetooth.retrofit.RetrofitService;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocation;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocationData;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;

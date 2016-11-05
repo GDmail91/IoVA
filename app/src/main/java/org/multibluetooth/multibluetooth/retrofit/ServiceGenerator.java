@@ -1,4 +1,4 @@
-package org.multibluetooth.multibluetooth.Driving.retrofit;
+package org.multibluetooth.multibluetooth.retrofit;
 
 import okhttp3.OkHttpClient;
 import retrofit2.GsonConverterFactory;
