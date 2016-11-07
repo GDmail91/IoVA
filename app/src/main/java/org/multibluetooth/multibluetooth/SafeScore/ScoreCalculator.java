@@ -88,7 +88,7 @@ import retrofit2.Retrofit;
         scorePool.init();
 
         // TODO 반드시 close하고 끝내도록 짤것
-        safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
+        safeScoreModel = new SafeScoreModel(mContext, "SafeScore.db", null);
         safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0,"",""));
 
         this.gpsInfo = new GpsInfo(mContext);
@@ -135,8 +135,7 @@ import retrofit2.Retrofit;
 
                 break;
             case LASER_DATA:
-                // TODO edit for laser test
-                /*// 풀에 같은 Drive ID값 존재하는지 확인
+                // 풀에 같은 Drive ID값 존재하는지 확인
                 int obdIndex = scorePool.searchPool(driveInfo.getId(), mContext);
                 if (obdIndex >= 0) {
                     // OBD 에서 먼저 넣은게 있다면 꺼내서 측정값 표시
@@ -149,7 +148,7 @@ import retrofit2.Retrofit;
                 } else {
                     // 없다면 풀에 삽입
                     scorePool.intoPool(driveInfo);
-                }*/
+                }
                 safeDistance = doCalculateDistance(driveInfo);
                 // 점수 DB에 안전거리 삽입
                 safeScoreModel.updateDistance(safeDistance);
@@ -191,8 +190,7 @@ import retrofit2.Retrofit;
             avgDistance += tempInfo.getFrontDistance();
         }*/
         //avgSpeed += driveInfoModel.getData(driveInfo.getId()).getVehicleSpeed();
-        // TODO edit for laser test
-        avgSpeed += 25;
+        avgSpeed += driveInfo.getVehicleSpeed();
         avgFrontDistance += driveInfo.getFrontDistance();
         // TODO 후방 거리 계산 추가
         avgBackDistance += driveInfo.getBackDistance();

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:visibility="invisible">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/end_scan_btn"
+        android:orientation="vertical"
+        android:weightSum="2">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/side_safe_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="11m"
+                android:textSize="40sp"
+                android:textColor="@color/white"/>
+            <TextView
+                android:id="@+id/side_safe_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="60km/h"
+                android:textSize="30sp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/side_safe_msg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="출력 메세지"
+            android:textSize="40sp"
+            android:textColor="@color/white"
+            android:background="@color/danger"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/end_scan_btn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="5dp"
+        android:layout_alignParentBottom="true"
+        android:text="스캐닝 종료"
+        android:onClick="onScan"/>
+</RelativeLayout>

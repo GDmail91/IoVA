@@ -57,7 +57,10 @@ public abstract class BluetoothService {
 
     public static final int REQUEST_OBD_SENSOR_DATA = 500;  // OBD 센서 데이터 요청
     public static final int REQUEST_LASER_SENSOR_DATA = 501;  // Laser 센서 데이터 요청
-    public static final int REQUEST_SCAN_SENSOR_DATA = 502;  // Scann 센서 데이터 요청
+    public static final int REQUEST_SCAN_LEFT_SENSOR_DATA = 502;  // 왼쪽 Scan 센서 데이터 요청
+    public static final int REQUEST_SCAN_RIGHT_SENSOR_DATA = 503;  // 오른쪽 Scan 센서 데이터 요청
+    public static final int REQUEST_SCAN_STOP = 504; // Scan Stop
+
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *

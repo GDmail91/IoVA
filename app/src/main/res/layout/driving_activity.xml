@@ -99,16 +99,23 @@
         android:weightSum="2">
 
         <Button
+            android:id="@+id/left_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="왼쪽스캔"/>
+            android:text="왼쪽스캔"
+            android:onClick="onScan"/>
 
         <Button
+            android:id="@+id/right_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="오른쪽스캔"/>
+            android:text="오른쪽스캔"
+            android:onClick="onScan"/>
     </LinearLayout>
 
+    <include
+        android:id="@+id/side_scan_activity"
+        layout="@layout/side_scan_activity"/>
 </RelativeLayout>

@@ -6,16 +6,16 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDCommandList;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.Driving.ServerConnection.ZoneNameFinder;
-import org.multibluetooth.multibluetooth.retrofit.RetrofitService;
-import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocation;
-import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocationData;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
 import org.multibluetooth.multibluetooth.R;
 import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
+import org.multibluetooth.multibluetooth.retrofit.RetrofitService;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocation;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOdangerLocationData;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -68,9 +68,8 @@ public class DriveThread extends Thread {
         }
 
         while (request) {
-            // TODO edit for laser test
-            if (MainMenuActivity.btLaserCon != null) {
-                // TODO && MainMenuActivity.btOBDCon != null) {
+            if (MainMenuActivity.btOBDCon != null) {
+                // TODO && MainMenuActivity.btLaserCon != null) {
                 try {
                     if (gpsInfo.getLocation() != null) {
                         i += 1;
@@ -85,30 +84,29 @@ public class DriveThread extends Thread {
                         driveInfoModel.updateGps(id, temp);    // GPS 위치 저장
                         driveInfoModel.close();
 
-                    /*Message fMessage = new Message();
-                    fMessage.what = Constants.MESSAGE_READ;
-                    fMessage.arg1 = DrivingActivity.FORWARD_MESSAGE;
+                        /*Message fMessage = new Message();
+                        fMessage.what = Constants.MESSAGE_READ;
+                        fMessage.arg1 = DrivingActivity.FORWARD_MESSAGE;
 
-                    Bundle fBundle = new Bundle();
-                    fBundle.putString("message", "앞" + i);
-                    fMessage.setData(fBundle);
-                    mHandler.sendMessage(fMessage);*/
+                        Bundle fBundle = new Bundle();
+                        fBundle.putString("message", "앞" + i);
+                        fMessage.setData(fBundle);
+                        mHandler.sendMessage(fMessage);*/
 
-                            // 뒷쪽 센서 데이터 출력
-                    /*Message bMessage = new Message();
-                    bMessage.what = Constants.MESSAGE_READ;
-                    bMessage.arg1 = DrivingActivity.BACK_MESSAGE;
-                    Bundle bBundle = new Bundle();
-                    bBundle.putString("message", "뒤" + i);
-                    bMessage.setData(bBundle);
-                    mHandler.sendMessage(bMessage);*/
+                                // 뒷쪽 센서 데이터 출력
+                        /*Message bMessage = new Message();
+                        bMessage.what = Constants.MESSAGE_READ;
+                        bMessage.arg1 = DrivingActivity.BACK_MESSAGE;
+                        Bundle bBundle = new Bundle();
+                        bBundle.putString("message", "뒤" + i);
+                        bMessage.setData(bBundle);
+                        mHandler.sendMessage(bMessage);*/
 
                         // OBD 데이터 출력
-                        // TODO edit for laser test
-                        //((OBDScanner) MainMenuActivity.btOBDCon).sendMessage(id);
+                        ((OBDScanner) MainMenuActivity.btOBDCon).sendMessage(id);
 
                         // 앞쪽 센서 데이터 출력
-                        ((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
+                        //((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
 
                         // TODO 뒷쪽 데이터 출력
 
@@ -116,21 +114,20 @@ public class DriveThread extends Thread {
                         String tempZoneName = ZoneNameFinder.getKoZNF(gpsInfo.getLocation());
                         if (!mZoneName.equals(tempZoneName)) {
                             mZoneName = tempZoneName;
-                            // TODO edit for laser test
-                            //loadDangerLevel(tempZoneName);
+                            loadDangerLevel(tempZoneName);
                         }
                     }
                     // 1초간 슬립
                     sleep(1000);
 
                     // 자동 종료가 필요하다면 추가
-                /*if (i > 100) {
-                    Message endMessage = new Message();
-                    endMessage.what = Constants.MESSAGE_READ;
-                    endMessage.arg1 = DrivingActivity.DRIVE_STOP_FLAG;
-                    mHandler.sendMessage(endMessage);
-                    break;
-                }*/
+                    /*if (i > 100) {
+                        Message endMessage = new Message();
+                        endMessage.what = Constants.MESSAGE_READ;
+                        endMessage.arg1 = DrivingActivity.DRIVE_STOP_FLAG;
+                        mHandler.sendMessage(endMessage);
+                        break;
+                    }*/
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

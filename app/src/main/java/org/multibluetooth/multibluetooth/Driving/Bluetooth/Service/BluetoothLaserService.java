@@ -307,9 +307,9 @@ public class BluetoothLaserService extends BluetoothService {
                     }
                     requestLaser = true;
                     break;
-                case REQUEST_SCAN_SENSOR_DATA:
+                case REQUEST_SCAN_LEFT_SENSOR_DATA:
                     try {
-                        byte[] buffer = LaserCommand.getScan();
+                        byte[] buffer = LaserCommand.getLeftScan();
                         mmOutStream.write(buffer);
 
                         // Share the sent message back to the UI Activity
@@ -320,6 +320,34 @@ public class BluetoothLaserService extends BluetoothService {
                     }
                     requestScan = true;
                     break;
+
+                case REQUEST_SCAN_RIGHT_SENSOR_DATA:
+                    try {
+                        byte[] buffer = LaserCommand.getRightScan();
+                        mmOutStream.write(buffer);
+
+                        // Share the sent message back to the UI Activity
+                        mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
+                                .sendToTarget();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Exception during write", e);
+                    }
+                    requestScan = true;
+                    break;
+                case REQUEST_SCAN_STOP:
+                    try {
+                        byte[] buffer = LaserCommand.stopScan();
+                        mmOutStream.write(buffer);
+
+                        // Share the sent message back to the UI Activity
+                        mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
+                                .sendToTarget();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Exception during write", e);
+                    }
+                    requestScan = true;
+                    break;
+
             }
         }
 

@@ -28,6 +28,9 @@ public class LaserScanner extends BluetoothConnection {
 
     public static final int REQUEST_CONNECT_DEVICE_SECURE_BY_LASER = 2001;
     public static final int REQUEST_ENABLE_BT_BY_LASER = 2003;
+    public static final int SCAN_LEFT = 3001;
+    public static final int SCAN_RIGHT = 3002;
+    public static final int SCAN_STOP = 3003;
 
     private static final LinkedList<Character> buffer = new LinkedList<>();
 
@@ -83,7 +86,7 @@ public class LaserScanner extends BluetoothConnection {
     }
 
     /**
-     * Sends a message.
+     * Sends a request distance.
      *
      */
     public void sendMessage(int id) {
@@ -99,6 +102,38 @@ public class LaserScanner extends BluetoothConnection {
         Bundle out = new Bundle();
         out.putInt("sensing_id", id);
         out.putInt("out", BluetoothService.REQUEST_LASER_SENSOR_DATA);
+        mChatService.write(out);
+
+        // Reset out string buffer to zero and clear the edit text field
+        mOutStringBuffer.setLength(0);
+    }
+
+    /**
+     * Sends request to scan.
+     *
+     */
+    public void sendScan(int side) {
+        // Check that we're actually connected before trying anything
+        if (mChatService.getState() != BluetoothLaserService.STATE_CONNECTED) {
+            Toast.makeText(mContext, mContext.getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check that there's actually something to send
+        // Get the message bytes and tell the BluetoothLaserService to write
+        Bundle out = new Bundle();
+        out.putInt("side", side);
+        switch (side) {
+            case SCAN_LEFT:
+                out.putInt("out", BluetoothService.REQUEST_SCAN_LEFT_SENSOR_DATA);
+                break;
+            case SCAN_RIGHT:
+                out.putInt("out", BluetoothService.REQUEST_SCAN_RIGHT_SENSOR_DATA);
+                break;
+            case SCAN_STOP:
+                out.putInt("out", BluetoothService.REQUEST_SCAN_STOP);
+                break;
+        }
         mChatService.write(out);
 
         // Reset out string buffer to zero and clear the edit text field
@@ -189,18 +224,17 @@ public class LaserScanner extends BluetoothConnection {
                         laserScanData.setFrontDistance(Float.valueOf(msgBody));
                         ((DrivingActivity) mContext).setChangeText(msgBody);
                         ((DrivingActivity) mContext).setForwardText(Float.valueOf(msgBody));
-                        // TODO 삭제 전시회용
-                        ((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
                         break;
                     case "02":
                         // 후방 측정
                         laserScanData.setBackDistance(Float.valueOf(msgBody));
                         //((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
-                        //((DrivingActivity) mContext).setBackText(msgBody);
+                        ((DrivingActivity) mContext).setBackText(msgBody);
                         break;
                     case "03":
                         // 옆차선 측정
                         laserScanData.setSideDistance(Float.valueOf(msgBody));
+                        ((DrivingActivity) mContext).setSideDistance(Float.valueOf(msgBody));
                         break;
                 }
             } else {

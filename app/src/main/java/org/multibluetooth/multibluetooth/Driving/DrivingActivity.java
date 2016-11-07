@@ -22,9 +22,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.Driving.ServerConnection.RealtimeConnection;
@@ -45,6 +47,10 @@ public class DrivingActivity extends AppCompatActivity {
     private TextView forwardDistance;
     private TextView backDistance;
     private TextView btDeviceName;
+    private RelativeLayout sideScanActivity;
+    private TextView sideSafeDistance;
+    private TextView sideSafeSpeed;
+    private TextView sideSafeMsg;
 
     double mySpeed, maxSpeed;
     int driveId;
@@ -52,6 +58,7 @@ public class DrivingActivity extends AppCompatActivity {
     private DriveThread driveThread;
     private RealtimeConnection realtimeSocket;
     public GpsInfo gpsInfo;
+    private SideScanQueue sideScanQueue = new SideScanQueue();
 
     public static final int DRIVE_START_FLAG = 1;
     public static final int DRIVE_STOP_FLAG = 2;
@@ -109,6 +116,10 @@ public class DrivingActivity extends AppCompatActivity {
         forwardDistance = (TextView) findViewById(R.id.forward_distance);
         backDistance = (TextView) findViewById(R.id.back_distance);
         btDeviceName = (TextView) findViewById(R.id.bt_device_name);
+        sideScanActivity = (RelativeLayout) findViewById(R.id.side_scan_activity);
+        sideSafeDistance = (TextView) findViewById(R.id.side_safe_distance);
+        sideSafeSpeed = (TextView) findViewById(R.id.side_safe_speed);
+        sideSafeMsg = (TextView) findViewById(R.id.side_safe_msg);
 
         maxSpeed = mySpeed = 0;
 
@@ -199,6 +210,51 @@ public class DrivingActivity extends AppCompatActivity {
             case DANGER_LOCATION_IN_CRITICAL:
                 drTTS.speechingSentence("위험한 지역입니다. 주변를 잘살피세요.");
                 break;
+        }
+    }
+
+    // 스캔 관련 버튼 클릭
+    public void onScan(View v) {
+        switch (v.getId()) {
+            case R.id.left_btn:
+                // 왼쪽 스캔 시작
+                sideScanActivity.setVisibility(View.VISIBLE);
+                sideScanQueue.init();
+                ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_LEFT);
+                break;
+            case R.id.right_btn:
+                // 오른쪽 스캔 시작
+                sideScanActivity.setVisibility(View.VISIBLE);
+                sideScanQueue.init();
+                ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_RIGHT);
+                break;
+            case R.id.end_scan_btn:
+                // 스캔 종료
+                sideScanActivity.setVisibility(View.GONE);
+                sideScanQueue.init();
+                ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_STOP);
+                break;
+        }
+    }
+
+    public void setSideDistance(float distance) {
+        sideSafeDistance.setText(distance+"m");
+        // TODO 상대속도 구하는 공식
+        sideScanQueue.enqueue(distance);
+        int index = sideScanQueue.getSize();
+        if (index > 3) {
+            // TODO 상대속도로 비교 (뒷차량의 상대속도가 +몇 인지 파악)
+            // 뒷차량이 3초간 30m 이상인경우
+            if (sideScanQueue.getIndex(0) - sideScanQueue.getIndex(1) < 5) {
+                sideSafeMsg.setBackgroundResource(R.color.danger);
+                sideSafeMsg.setText("위험합니다. \n차선 거리나 속도를 늘려주세요.");
+            } else if (sideScanQueue.getIndex(0) - sideScanQueue.getIndex(1) < 15) {
+                sideSafeMsg.setBackgroundResource(R.color.warning);
+                sideSafeMsg.setText("조금 위험합니다.\n옆차량과 거리가 가깝습니다.");
+            } else {
+                sideSafeMsg.setBackgroundResource(R.color.good);
+                sideSafeMsg.setText("끼어들어도 좋습니다.");
+            }
         }
     }
 
@@ -382,7 +438,7 @@ public class DrivingActivity extends AppCompatActivity {
 
         // 반복 쓰레드 종료
         driveThread.stopRequest();
-        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "SafeScore.db", null);
         SafeScore safeScore = safeScoreModel.getData(driveId);
         safeScoreModel.close();
         Log.d("TEST","액티비티가 가지고있는 ID:"+driveId);

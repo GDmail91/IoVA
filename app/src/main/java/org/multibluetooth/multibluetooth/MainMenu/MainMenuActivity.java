@@ -13,10 +13,9 @@ import android.widget.Toast;
 import com.facebook.FacebookSdk;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.Facebook.FacebookLogin;
@@ -70,13 +69,14 @@ public class MainMenuActivity extends AppCompatActivity {
 
 		switch (v.getId()) {
 			case R.id.driving_btn:	// 운전하기
-				// TODO edit for laser test
-				if ((btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
-				//|| (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothLaserService.STATE_CONNECTED)) {
+				if ((btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)
+				&& (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)) {
 					Intent drivingIntent = new Intent(MainMenuActivity.this, DrivingActivity.class);
 					drivingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					startActivity(drivingIntent);
-				} else {
+				} else if (btLaserCon == null || btLaserCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
+					Toast.makeText(getApplicationContext(), "Laser 연결이 필요합니다.", Toast.LENGTH_LONG).show();
+				} else if (btOBDCon == null || btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
 					Toast.makeText(getApplicationContext(), "OBD 연결이 필요합니다.", Toast.LENGTH_LONG).show();
 				}
 				break;

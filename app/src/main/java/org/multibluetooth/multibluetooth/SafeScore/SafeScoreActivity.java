@@ -49,7 +49,7 @@ public class SafeScoreActivity extends AppCompatActivity {
         if (bundle == null) {
 
             // 안전점수 가져와서 뿌려줌
-            SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+            SafeScoreModel safeScoreModel = new SafeScoreModel(this, "SafeScore.db", null);
             safeScore = safeScoreModel.getScoreData();
             safeScoreModel.close();
             Log.d(TAG, "bundle 없음");

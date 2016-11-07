@@ -8,7 +8,15 @@ public class LaserCommand {
         return "AA01".getBytes();
     }
 
-    public static byte[] getScan() {
-        return "AA02".getBytes();
+    public static byte[] getLeftScan() {
+        return "L".getBytes();
+    }
+
+    public static byte[] getRightScan() {
+        return "R".getBytes();
+    }
+
+    public static byte[] stopScan() {
+        return "S".getBytes();
     }
 }

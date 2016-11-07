@@ -56,7 +56,7 @@ public class HistoryActivity extends AppCompatActivity {
 
 
         // 전체 운행기록 가져옴
-        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "SafeScore.db", null);
         historyList = safeScoreModel.getAllData();
         for(SafeScore dinfo : historyList) {
             Log.d("TEST", dinfo.toString());
@@ -110,7 +110,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     private void seletedDelete() {
         // 선택된 아이템 삭제
-        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "DriveInfo.db", null);
+        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "SafeScore.db", null);
         DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
         ArrayList<Integer> driveIds = new ArrayList<>();
         ArrayList<Boolean> selectedItems = new ArrayList<>(historyListAdapter.getSelectedItems());
