@@ -5,8 +5,10 @@
     <color name="colorAccent">#FFFF00</color>
 
     <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
+    <color name="black">#333333</color>
     <color name="danger">#FF0000</color>
     <color name="warning">#FFCC33</color>
     <color name="good">#00aa00</color>
+
+    <color name="metroBackground">#3c4152</color>
 </resources>

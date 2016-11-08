@@ -16,6 +16,13 @@ public class SafeScore implements Serializable {
     private String drive_start;
     private String drive_stop;
 
+    private static final int StandardDistanceCount = 1000;
+    private static final int StandardSpeedingCount = 300;
+    private static final int StandardFastAccCount = 300;
+    private static final int StandardFastBreakCount = 300;
+    private static final int StandardSuddenStartCount = 300;
+    private static final int StandardSuddenStopCount = 300;
+
     public SafeScore(int drive_id, int safe_distance_count, int speeding_count, int fast_acc_count, int fast_break_count, int sudden_start_count, int sudden_stop_count, String drive_start, String drive_stop) {
         this.drive_id = drive_id;
         this.safe_distance_count = safe_distance_count;
@@ -53,6 +60,30 @@ public class SafeScore implements Serializable {
     public int getSuddenStopCount() {return sudden_stop_count;}
     public String getDriveStart() {return drive_start;}
     public String getDriveStop() {return drive_stop;}
+
+    public float getPercentSafeDistance() {
+        return 100 - ((float)safe_distance_count / StandardDistanceCount) * 100;
+    }
+
+    public float getPercentSpeeding() {
+        return 100 - ((float)speeding_count / StandardSpeedingCount) * 100;
+    }
+
+    public float getPercentFastAcc() {
+        return 100 - ((float)fast_acc_count / StandardFastAccCount) * 100;
+    }
+
+    public float getPercentFastBreak() {
+        return 100 - ((float)fast_break_count / StandardFastBreakCount) * 100;
+    }
+
+    public float getPercentSuddenStart() {
+        return 100 - ((float)sudden_start_count / StandardSuddenStartCount) * 100;
+    }
+
+    public float getPercentSuddenStop() {
+        return 100 - ((float)sudden_stop_count / StandardSuddenStopCount) * 100;
+    }
 
     public int getAvgScore() {
         int avgScore = (safe_distance_count +
