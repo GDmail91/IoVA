@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
-    protected static final int DB_VERSION = 11;
+    protected static final int DB_VERSION = 12;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -38,6 +38,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                 "vehicle_speed INTEGER DEFAULT 0, " +
                 "front_distance INTEGER DEFAULT 0, " +
                 "back_distance INTEGER DEFAULT 0, " +
+                "side_distance INTEGER DEFAULT 0, " +
                 "gps_latitude REAL DEFAULT 0, " +
                 "gps_longitude REAL DEFAULT 0, " +
                 "measure_time DATETIME DEFAULT CURRENT_TIMESTAMP);");
