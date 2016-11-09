@@ -21,14 +21,14 @@
                 android:id="@+id/side_safe_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="11m"
+                android:text="-m"
                 android:textSize="40sp"
                 android:textColor="@color/white"/>
             <TextView
                 android:id="@+id/side_safe_speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="60km/h"
+                android:text="-km/h"
                 android:textSize="30sp"
                 android:textColor="@color/white" />
         </LinearLayout>
@@ -42,8 +42,11 @@
             android:text="출력 메세지"
             android:textSize="40sp"
             android:textColor="@color/white"
-            android:background="@color/danger"/>
+            android:background="@color/black"/>
     </LinearLayout>
+
+    <include layout="@layout/loading_dialog"/>
+
 
     <Button
         android:id="@+id/end_scan_btn"

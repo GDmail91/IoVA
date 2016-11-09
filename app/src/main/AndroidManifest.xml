@@ -21,6 +21,9 @@
     <!-- 브로드캐스트 퍼미션 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- WiFi 연결상태 확인 퍼미션 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/iova_icon5"

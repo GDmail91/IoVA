@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class SafeScoreModel extends SQLiteOpenHelper {
     private static final String TAG = "SafeScoreModel";
 
-    protected static final int DB_VERSION = 10;
+    protected static final int DB_VERSION = 11;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();

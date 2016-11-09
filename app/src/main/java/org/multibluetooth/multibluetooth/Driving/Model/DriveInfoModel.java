@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
-    protected static final int DB_VERSION = 10;
+    protected static final int DB_VERSION = 11;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -327,11 +327,12 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
-                    cursor.getInt(3),
-                    cursor.getInt(4),
-                    cursor.getDouble(5),
+                    cursor.getFloat(3),
+                    cursor.getFloat(4),
+                    cursor.getFloat(5),
                     cursor.getDouble(6),
-                    cursor.getString(7));
+                    cursor.getDouble(7),
+                    cursor.getString(8));
 
             allData.add(i++, tempData);
         }
@@ -352,12 +353,12 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
-                    cursor.getInt(3),
-                    cursor.getInt(4),
-                    cursor.getDouble(5),
+                    cursor.getFloat(3),
+                    cursor.getFloat(4),
+                    cursor.getFloat(5),
                     cursor.getDouble(6),
-                    cursor.getString(7)
-            );
+                    cursor.getDouble(7),
+                    cursor.getString(8));
         }
 
         return data;

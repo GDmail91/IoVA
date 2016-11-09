@@ -37,6 +37,9 @@ import retrofit2.Retrofit;
     private boolean START_FLAG = false;
     private boolean STOP_FLAG = false;
     private boolean DISTANCE_ALERT_WAIT = false;
+    private boolean SIDE_GOOD_ALERT_WAIT = false;
+    private boolean SIDE_WARN_ALERT_WAIT = false;
+    private boolean SIDE_DANGER_ALERT_WAIT = false;
     private boolean SAFE_ALERT_WAIT = false;
 
     private static int CLOSE_COUNT = 0;
@@ -51,8 +54,9 @@ import retrofit2.Retrofit;
     private static int queueLength = 0;
     private static long distanceAlertTime;
     private static long safeAlertTime;
+
     private static LinkedList<DriveInfo> mQueue = new LinkedList<>();
-    //private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
+    private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
 
     private SafeScore safeScore;
     private SafeScore safeDistance;
@@ -85,6 +89,7 @@ import retrofit2.Retrofit;
 
         queueLength = 0;
         mQueue.clear();
+        laserQueue.clear();
         scorePool.init();
 
         // TODO 반드시 close하고 끝내도록 짤것
@@ -127,7 +132,12 @@ import retrofit2.Retrofit;
                 if (laserIndex >= 0) {
                     // Laser 에서 먼저 넣은게 있다면 꺼내서 측정값 표시
                     driveInfo.setLaserSensor(scorePool.getDriveInfo(laserIndex));
-                    // TODO safe distance 측정
+                    // safe distance 측정
+                    laserQueue.add(driveInfo);
+                    // 안전거리 계산
+                    safeDistance = doCalculateDistance(driveInfo);
+                    // 점수 DB에 안전거리 삽입
+                    safeScoreModel.updateDistance(safeDistance);
                 } else {
                     // 없다면 풀에 삽입
                     scorePool.intoPool(driveInfo);
@@ -140,7 +150,8 @@ import retrofit2.Retrofit;
                 if (obdIndex >= 0) {
                     // OBD 에서 먼저 넣은게 있다면 꺼내서 측정값 표시
                     driveInfo.setOBDSensor(scorePool.getDriveInfo(obdIndex));
-                    // TODO safe distance 측정
+                    // safe distance 측정
+                    laserQueue.add(driveInfo);
                     // 안전거리 계산
                     safeDistance = doCalculateDistance(driveInfo);
                     // 점수 DB에 안전거리 삽입
@@ -149,12 +160,11 @@ import retrofit2.Retrofit;
                     // 없다면 풀에 삽입
                     scorePool.intoPool(driveInfo);
                 }
-                safeDistance = doCalculateDistance(driveInfo);
-                // 점수 DB에 안전거리 삽입
-                safeScoreModel.updateDistance(safeDistance);
 
                 break;
         }
+
+        getSideSafeDistance();
     }
 
     public SafeScore doCalculateScore(LinkedList<DriveInfo> mQueue) {
@@ -394,6 +404,39 @@ import retrofit2.Retrofit;
         }
 
         return SPEEDING_COUNT;
+    }
+
+    public void getSideSafeDistance() {
+        if (laserQueue.size() > 2) {
+            // 상대속도 구하는 공식
+            int avgSpeed = (laserQueue.get(0).getVehicleSpeed() + laserQueue.get(1).getVehicleSpeed())/2;
+            float relSpeed = avgSpeed + ((laserQueue.get(0).getSideDistance() - laserQueue.get(1).getSideDistance()) * 3600 / 1000);
+
+            // TODO 상대속도로 비교 (뒷차량의 상대속도가 +몇 인지 파악)
+            // 뒷차량의 속도가 나보다 15km 이상 빠르고 거리가 30m 이하로 가까운경우
+            if (relSpeed - avgSpeed > 15 && laserQueue.get(1).getSideDistance() <= 30) {
+                if (!SIDE_DANGER_ALERT_WAIT) {
+                    ((DrivingActivity) mContext).onAlert(DrivingActivity.SIDE_DISTANCE_DANGER);
+                    SIDE_GOOD_ALERT_WAIT = false;
+                    SIDE_WARN_ALERT_WAIT = false;
+                    SIDE_DANGER_ALERT_WAIT = true;
+                }
+            } else if (relSpeed - avgSpeed > 15 || laserQueue.get(1).getSideDistance() <= 30) {
+                if (!SIDE_WARN_ALERT_WAIT) {
+                    ((DrivingActivity) mContext).onAlert(DrivingActivity.SIDE_DISTANCE_WARNING);
+                    SIDE_GOOD_ALERT_WAIT = false;
+                    SIDE_WARN_ALERT_WAIT = true;
+                    SIDE_DANGER_ALERT_WAIT = false;
+                }
+            } else if (!SIDE_GOOD_ALERT_WAIT) {
+                ((DrivingActivity) mContext).onAlert(DrivingActivity.SIDE_DISTANCE_GOOD);
+                SIDE_GOOD_ALERT_WAIT = true;
+                SIDE_WARN_ALERT_WAIT = false;
+                SIDE_DANGER_ALERT_WAIT = false;
+            }
+
+            laserQueue.removeFirst();
+        }
     }
 
     public void clearQueue() {

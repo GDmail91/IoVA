@@ -5,7 +5,7 @@ package org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan
  */
 public class LaserCommand {
     public static byte[] getDistance() {
-        return "AA01".getBytes();
+        return "S".getBytes();
     }
 
     public static byte[] getLeftScan() {

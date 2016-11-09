@@ -1,7 +1,11 @@
 package org.multibluetooth.multibluetooth.MainMenu;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,6 +38,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
 	public static BluetoothConnection btLaserCon;
 	public static BluetoothConnection btOBDCon;
+	private ConnectivityManager connectivityManager;
+	private BroadcastReceiver receiver;
 
 	private static final int BLUETOOTH_CONNECTING = 1000;
 	public static final int BLUETOOTH_LASER_CONNECT = 1010;
@@ -53,6 +59,33 @@ public class MainMenuActivity extends AppCompatActivity {
 
 		// Bluetooth connection check
 		setBtConnectSign();
+
+		// WiFi 연결 확인
+		connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		receiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)
+				&& connectivityManager.getActiveNetworkInfo() != null){
+					if(connectivityManager.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI
+							&& connectivityManager.getActiveNetworkInfo().isConnected()){
+						// TODO 업로드 시나리오
+						Log.d("TEST", "WIFI 연결됨");
+					}
+
+					if(connectivityManager.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_MOBILE
+							&& connectivityManager.getActiveNetworkInfo().isConnected()){
+						Log.d("TEST", "MOBILE 연결됨");
+					}
+				} else {
+					Log.d("TEST", "network 없음");
+				}
+			}
+		};
+		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+
+		registerReceiver(receiver, filter);
 	}
 
 	@Override
@@ -62,6 +95,12 @@ public class MainMenuActivity extends AppCompatActivity {
 			btLaserCon = new LaserScanner(this);
 		}
 		((LaserScanner) btLaserCon).setupService();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(receiver);
 	}
 
 	public void onMenuClick(View v) {

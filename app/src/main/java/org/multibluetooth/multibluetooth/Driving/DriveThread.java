@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDCommandList;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
@@ -32,6 +33,8 @@ public class DriveThread extends Thread {
     private Handler mHandler;
     private int topDriveNumber;
     private boolean request = true;
+    private boolean leftScan = false;
+    private boolean rightScan = false;
     private int i=0;
     private String mZoneName = "";
     OBDCommandList message = new OBDCommandList();
@@ -105,8 +108,16 @@ public class DriveThread extends Thread {
                         // OBD 데이터 출력
                         ((OBDScanner) MainMenuActivity.btOBDCon).sendMessage(id);
 
-                        // 앞쪽 센서 데이터 출력
-                        //((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
+                        if (leftScan) {
+                            // 앞쪽 센서 데이터 출력
+                            ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_LEFT);
+                        } else if (rightScan) {
+                            // 앞쪽 센서 데이터 출력
+                            ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_RIGHT);
+                        } else {
+                            // 앞쪽 센서 데이터 출력
+                            ((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
+                        }
 
                         // TODO 뒷쪽 데이터 출력
 
@@ -135,6 +146,23 @@ public class DriveThread extends Thread {
                 driveStop();
                 request = false;
             }
+        }
+    }
+
+    public void scanChange(int scanType) {
+        switch (scanType) {
+            case LaserScanner.SCAN_LEFT:
+                leftScan = true;
+                rightScan = false;
+                break;
+            case LaserScanner.SCAN_RIGHT:
+                leftScan = false;
+                rightScan = true;
+                break;
+            case LaserScanner.SCAN_STOP:
+                leftScan = false;
+                rightScan = false;
+                break;
         }
     }
 

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="@color/metroBackground">
 
     <LinearLayout
         android:id="@+id/notice_img"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="블루투스 연결"
-            android:textColor="#ffffff"/>
+            android:textColor="@color/white"/>
 
         <ImageView
             android:id="@+id/bt_connect_sign"
@@ -90,7 +90,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
                     android:text="운전하기"
-                    android:textColor="#555555"
+                    android:textColor="@color/gray"
                     android:textStyle="bold"
                     android:gravity="center"/>
             </LinearLayout>
@@ -113,7 +113,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
                     android:text="안전지수"
-                    android:textColor="#555555"
+                    android:textColor="@color/gray"
                     android:textStyle="bold"
                     android:gravity="center"/>
             </LinearLayout>
@@ -136,7 +136,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
                     android:text="기록보기"
-                    android:textColor="#555555"
+                    android:textColor="@color/gray"
                     android:textStyle="bold"
                     android:gravity="center"/>
             </LinearLayout>
@@ -159,7 +159,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
                     android:text="설정하기"
-                    android:textColor="#555555"
+                    android:textColor="@color/gray"
                     android:textStyle="bold"
                     android:gravity="center"/>
             </LinearLayout>

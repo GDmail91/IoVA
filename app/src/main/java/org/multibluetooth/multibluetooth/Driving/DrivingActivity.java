@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +52,7 @@ public class DrivingActivity extends AppCompatActivity {
     private TextView sideSafeDistance;
     private TextView sideSafeSpeed;
     private TextView sideSafeMsg;
+    private LinearLayout loadingDialog;
 
     double mySpeed, maxSpeed;
     int driveId;
@@ -73,6 +75,9 @@ public class DrivingActivity extends AppCompatActivity {
     public static final int DISTANCE_WARNING = 115;
     public static final int DISTANCE_NORMAL = 116;
     public static final int DISTANCE_DANGER = 117;
+    public static final int SIDE_DISTANCE_WARNING = 118;
+    public static final int SIDE_DISTANCE_GOOD = 119;
+    public static final int SIDE_DISTANCE_DANGER = 120;
     public static final int DANGER_LOCATION_IN_MIDDLE = 301;
     public static final int DANGER_LOCATION_IN_WARNING = 302;
     public static final int DANGER_LOCATION_IN_CRITICAL = 303;
@@ -120,6 +125,7 @@ public class DrivingActivity extends AppCompatActivity {
         sideSafeDistance = (TextView) findViewById(R.id.side_safe_distance);
         sideSafeSpeed = (TextView) findViewById(R.id.side_safe_speed);
         sideSafeMsg = (TextView) findViewById(R.id.side_safe_msg);
+        loadingDialog = (LinearLayout) findViewById(R.id.loading_dialog);
 
         maxSpeed = mySpeed = 0;
 
@@ -180,11 +186,23 @@ public class DrivingActivity extends AppCompatActivity {
         switch (mode) {
             case DISTANCE_DANGER:
                 drTTS.speechingSentence("거리가 가깝습니다. 안전거리를 유지해주세요.");
-                setForwardBackgroud(DISTANCE_DANGER);
+                setForwardBackgroud(mode);
                 break;
             case DISTANCE_WARNING:
                 drTTS.speechingSentence("안전거리 위반입니다. 사고에 주의하세요.");
-                setForwardBackgroud(DISTANCE_WARNING);
+                setForwardBackgroud(mode);
+                break;
+            case SIDE_DISTANCE_DANGER:
+                drTTS.speechingSentence("위험합니다. 차선 거리나 속도를 늘려주세요.");
+                setSideBackground(mode);
+                break;
+            case SIDE_DISTANCE_WARNING:
+                drTTS.speechingSentence("조금 위험합니다. 옆차량과 거리가 가깝습니다.");
+                setSideBackground(mode);
+                break;
+            case SIDE_DISTANCE_GOOD:
+                drTTS.speechingSentence("끼어들어도 좋습니다.");
+                setSideBackground(mode);
                 break;
             case SAFE_SPEED_WARNING:
                 drTTS.speechingSentence("과속 주행중입니다. 속도를 줄여주세요.");
@@ -219,42 +237,46 @@ public class DrivingActivity extends AppCompatActivity {
             case R.id.left_btn:
                 // 왼쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
-                ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_LEFT);
+                driveThread.scanChange(LaserScanner.SCAN_LEFT);
                 break;
             case R.id.right_btn:
                 // 오른쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
-                ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_RIGHT);
+                driveThread.scanChange(LaserScanner.SCAN_RIGHT);
                 break;
             case R.id.end_scan_btn:
                 // 스캔 종료
                 sideScanActivity.setVisibility(View.GONE);
                 sideScanQueue.init();
-                ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_STOP);
+                driveThread.scanChange(LaserScanner.SCAN_STOP);
                 break;
         }
     }
 
     public void setSideDistance(float distance) {
+        loadingDialog.setVisibility(View.INVISIBLE);
         sideSafeDistance.setText(distance+"m");
-        // TODO 상대속도 구하는 공식
-        sideScanQueue.enqueue(distance);
-        int index = sideScanQueue.getSize();
-        if (index > 3) {
-            // TODO 상대속도로 비교 (뒷차량의 상대속도가 +몇 인지 파악)
-            // 뒷차량이 3초간 30m 이상인경우
-            if (sideScanQueue.getIndex(0) - sideScanQueue.getIndex(1) < 5) {
+    }
+
+    public void setSideBackground(int mode) {
+        // 위험 단계에 따른 알림
+        switch (mode) {
+            case SIDE_DISTANCE_DANGER:
                 sideSafeMsg.setBackgroundResource(R.color.danger);
                 sideSafeMsg.setText("위험합니다. \n차선 거리나 속도를 늘려주세요.");
-            } else if (sideScanQueue.getIndex(0) - sideScanQueue.getIndex(1) < 15) {
+                break;
+            case SIDE_DISTANCE_WARNING:
                 sideSafeMsg.setBackgroundResource(R.color.warning);
                 sideSafeMsg.setText("조금 위험합니다.\n옆차량과 거리가 가깝습니다.");
-            } else {
+                break;
+            case SIDE_DISTANCE_GOOD:
                 sideSafeMsg.setBackgroundResource(R.color.good);
                 sideSafeMsg.setText("끼어들어도 좋습니다.");
-            }
+                break;
         }
     }
 
@@ -274,8 +296,8 @@ public class DrivingActivity extends AppCompatActivity {
             mBoundService.setForwardText("앞 "+distance);
     }
 
-    public void setForwardBackgroud(int color) {
-        switch (color) {
+    public void setForwardBackgroud(int mode) {
+        switch (mode) {
             case DISTANCE_WARNING:
                 forwardDistance.setBackgroundResource(R.color.warning);
                 break;

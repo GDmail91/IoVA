@@ -11,18 +11,20 @@ public class DriveInfo {
     private int vehicle_speed;
     private float front_distance;
     private float back_distance;
+    private float side_distance;
     private double gps_latitude;
     private double gps_longitude;
     private String measure_time;
 
     public DriveInfo() {}
 
-    public DriveInfo(int _id, int drive_id, int vehicle_speed, int front_distance, int back_distance, double gps_latitude, double gps_longitude, String measure_time) {
+    public DriveInfo(int _id, int drive_id, int vehicle_speed, float front_distance, float back_distance, float side_distance, double gps_latitude, double gps_longitude, String measure_time) {
         this._id = _id;
         this.drive_id = drive_id;
         this.vehicle_speed = vehicle_speed;
         this.front_distance = front_distance;
         this.back_distance = back_distance;
+        this.side_distance = side_distance;
         this.gps_latitude = gps_latitude;
         this.gps_longitude = gps_longitude;
         this.measure_time = measure_time;
@@ -37,6 +39,8 @@ public class DriveInfo {
     public float getFrontDistance() { return front_distance; }
 
     public float getBackDistance() { return back_distance; }
+
+    public float getSideDistance() { return side_distance; }
 
     public double getGpsLatitude() { return gps_latitude; }
 
@@ -60,18 +64,19 @@ public class DriveInfo {
         this.back_distance = driveInfo.getBackDistance();
     }
 
+    // 평소 스캔
     public void setDistance(int _id, float front_distance, float back_distance) {
         this._id = _id;
         this.front_distance = front_distance;
         this.back_distance = back_distance;
     }
 
-    // TODO 옆차선 스캔
+    // 옆차선 스캔
     public void setDistance(int _id, float front_distance, float back_distance, float side_distance) {
         this._id = _id;
         this.front_distance = front_distance;
         this.back_distance = back_distance;
-        // this.side_distance = side_distance;
+         this.side_distance = side_distance;
     }
 
     public void setLocation(Location location) {
@@ -80,6 +85,6 @@ public class DriveInfo {
     }
 
     public String toString() {
-        return "ID: "+_id + ", DR_ID: "+drive_id+", VS: "+vehicle_speed+", FD: "+front_distance+", BD: "+back_distance +", LAT: "+gps_latitude+", LON: "+gps_longitude+", MT: "+measure_time;
+        return "ID: "+_id + ", DR_ID: "+drive_id+", VS: "+vehicle_speed+", FD: "+front_distance+", BD: "+back_distance + ", SD: " + side_distance +", LAT: "+gps_latitude+", LON: "+gps_longitude+", MT: "+measure_time;
     }
 }
