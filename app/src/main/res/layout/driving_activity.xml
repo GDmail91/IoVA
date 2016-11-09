@@ -60,15 +60,28 @@
         android:orientation="vertical"
         android:weightSum="2">
 
-        <TextView
-            android:id="@+id/forward_distance"
+        <LinearLayout
+            android:id="@+id/forward_distance_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="앞차간격"
-            android:textColor="#ffffff"
-            android:textSize="30dp" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="앞차간격"
+                android:textColor="#ffffff"
+                android:textSize="30dp" />
+            <TextView
+                android:id="@+id/forward_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="- m"
+                android:textColor="#ffffff"
+                android:textSize="30dp" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/half_divider"
@@ -78,15 +91,28 @@
             android:orientation="horizontal"
             android:background="#ffffff"/>
 
-        <TextView
-            android:id="@+id/back_distance"
+        <LinearLayout
+            android:id="@+id/back_distance_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="뒷차간격"
-            android:textColor="#ffffff"
-            android:textSize="30dp" />
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="앞차간격"
+                android:textColor="#ffffff"
+                android:textSize="30dp" />
+            <TextView
+                android:id="@+id/back_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="- m"
+                android:textColor="#ffffff"
+                android:textSize="30dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

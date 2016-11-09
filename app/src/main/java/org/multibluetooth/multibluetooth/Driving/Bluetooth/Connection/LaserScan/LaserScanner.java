@@ -229,7 +229,7 @@ public class LaserScanner extends BluetoothConnection {
                         // 후방 측정
                         laserScanData.setBackDistance(Float.valueOf(msgBody));
                         //((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
-                        ((DrivingActivity) mContext).setBackText(msgBody);
+                        ((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
                         break;
                     case "03":
                         // 옆차선 측정

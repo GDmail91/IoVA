@@ -164,7 +164,8 @@ import retrofit2.Retrofit;
                 break;
         }
 
-        getSideSafeDistance();
+        if (driveInfo.getSideDistance() != 0)
+            getSideSafeDistance();
     }
 
     public SafeScore doCalculateScore(LinkedList<DriveInfo> mQueue) {
@@ -192,6 +193,7 @@ import retrofit2.Retrofit;
     public int getSafeDistance(DriveInfo driveInfo) {
         //DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
         int avgSpeed = 0;
+        float backRelSpeed = 0;
         float avgFrontDistance = 0;
         float avgBackDistance = 0;
         /*for (int i=1; i<3; i++) {
@@ -204,12 +206,15 @@ import retrofit2.Retrofit;
         avgFrontDistance += driveInfo.getFrontDistance();
         // TODO 후방 거리 계산 추가
         avgBackDistance += driveInfo.getBackDistance();
+        backRelSpeed = getRelSpeed(avgBackDistance, avgBackDistance, driveInfo.getVehicleSpeed());
         //driveInfoModel.close();
 /*
         avgSpeed = avgSpeed / 3;
         avgDistance = avgDistance / 3;*/
         Log.d(TAG, "평균 속도: "+avgSpeed);
         Log.d(TAG, "평균 앞 거리: "+avgFrontDistance);
+        Log.d(TAG, "후방 차량 속도: "+avgSpeed);
+        Log.d(TAG, "평균 뒤 거리: "+avgFrontDistance);
 
         // TODO 날씨정보 포함시킬것
         // Alert이 한번 울렸을경우 잠깐의 (약 1분)시간을 줌
@@ -219,16 +224,64 @@ import retrofit2.Retrofit;
         // 여기에 날씨정보를 포함하여
         // 비가올경우 x1.5
         // 눈이올경우 x3 을한다.
+
+        // 전방 거리계산
+        short frontDistance;
         if (avgSpeed < 80) {
             // 시속 80키로 이내에서 거리가 가까울 경우
-            if (isDistanceClose(avgFrontDistance, avgSpeed - 15, driveInfo.getId())) ++CLOSE_COUNT;
-            // TODO 후방 거리 계산 추가
-            //if (isDistanceClose(avgBackDistance, avgSpeed - 15)) ++CLOSE_COUNT;
+            frontDistance = isDistanceClose(avgFrontDistance, avgSpeed - 15);
         } else {
             // 시속 80키로 이상에서 거리가 가까울 경우
-            if (isDistanceClose(avgFrontDistance, avgSpeed, driveInfo.getId())) ++CLOSE_COUNT;
-            // TODO 후방 거리 계산 추가
-            //if (isDistanceClose(avgBackDistance, avgSpeed)) ++CLOSE_COUNT;
+            frontDistance = isDistanceClose(avgFrontDistance, avgSpeed);
+        }
+
+        switch (frontDistance) {
+            case 0:
+                ((DrivingActivity) mContext).setForwardBackground(DrivingActivity.DISTANCE_NORMAL);
+                // 거리가 멀어졌는데
+                if (DISTANCE_ALERT_WAIT) {
+                    // 알람 대기상태인 경우
+                    if (System.currentTimeMillis() - distanceAlertTime >= 30000) {
+                        // 30초가 지낫으면 다시울리도록
+                        DISTANCE_ALERT_WAIT = false;
+                    }
+                }
+                break;
+            case 1:
+                // 조금 가까운 경우
+                onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING, driveInfo.getId());
+                ((DrivingActivity) mContext).setForwardBackground(DrivingActivity.DISTANCE_WARNING);
+                ++CLOSE_COUNT;
+                break;
+            case 2:
+                // 너무 가까운경우
+                onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER, driveInfo.getId());
+                ((DrivingActivity) mContext).setForwardBackground(DrivingActivity.DISTANCE_DANGER);
+                ++CLOSE_COUNT;
+                break;
+        }
+
+
+        // 후방 거리 계산 추가
+        short backDistance;
+        if (backRelSpeed < 80) {
+            // 시속 80키로 이내에서 거리가 가까울 경우
+            backDistance = isDistanceClose(avgBackDistance, (int)backRelSpeed - 15);
+        } else {
+            // 시속 80키로 이상에서 거리가 가까울 경우
+            backDistance = isDistanceClose(avgBackDistance, (int)backRelSpeed);
+        }
+        switch (backDistance) {
+            case 0:
+                ((DrivingActivity) mContext).setBackwardBackground(DrivingActivity.DISTANCE_NORMAL);
+                break;
+            case 1:
+                ((DrivingActivity) mContext).setBackwardBackground(DrivingActivity.DISTANCE_WARNING);
+                break;
+            case 2:
+                ((DrivingActivity) mContext).setBackwardBackground(DrivingActivity.DISTANCE_DANGER);
+                break;
+
         }
         return CLOSE_COUNT;
     }
@@ -239,38 +292,24 @@ import retrofit2.Retrofit;
      * @param safeDistance : 안전거리
      * @return 위험 상황이였는지 반환
      */
-    public boolean isDistanceClose(float curDistance, int safeDistance, int requestId) {
-        boolean isClose;
+    public short isDistanceClose(float curDistance, int safeDistance) {
+        short isClose;
 
         // 분모가 0이 되지 않기 위해
         if (safeDistance <= 0) safeDistance = 1;
 
         // 현재 안전 % 값
         double curSafePercent = curDistance/safeDistance;
-        Log.d(TAG, "안전 %값 :" +curSafePercent);
 
         if (curSafePercent <= 0.5) {
             // 너무 가까운경우
-            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER, requestId);
-            ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_DANGER);
-            isClose = true;
+            isClose = 2;
         } else if (curSafePercent <= 1) {
             // 조금 가까운 경우
-            onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING, requestId);
-            ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_WARNING);
-            isClose = true;
+            isClose = 1;
         } else {
-            // 거리가 멀어졌는데
-            if (DISTANCE_ALERT_WAIT) {
-                // 알람 대기상태인 경우
-                if (System.currentTimeMillis() - distanceAlertTime >= 30000) {
-                    // 30초가 지낫으면 다시울리도록
-                    DISTANCE_ALERT_WAIT = false;
-                }
-            }
-
-            ((DrivingActivity) mContext).setForwardBackgroud(DrivingActivity.DISTANCE_NORMAL);
-            isClose = false;
+            // 거리가 멀어진 경우
+            isClose = 0;
         }
 
         return isClose;
@@ -406,11 +445,16 @@ import retrofit2.Retrofit;
         return SPEEDING_COUNT;
     }
 
+    // 상대방 속도 구하는 공식 (기본 시간단위는 1초 이므로 굳이 계산하지 않음)
+    public float getRelSpeed(float startDistance, float endDistance, int avgSpeed) {
+        return avgSpeed + ((startDistance - endDistance) * 3600 / 1000);
+    }
+
     public void getSideSafeDistance() {
         if (laserQueue.size() > 2) {
             // 상대속도 구하는 공식
             int avgSpeed = (laserQueue.get(0).getVehicleSpeed() + laserQueue.get(1).getVehicleSpeed())/2;
-            float relSpeed = avgSpeed + ((laserQueue.get(0).getSideDistance() - laserQueue.get(1).getSideDistance()) * 3600 / 1000);
+            float relSpeed = getRelSpeed(laserQueue.get(0).getSideDistance(), laserQueue.get(1).getSideDistance(), avgSpeed);
 
             // TODO 상대속도로 비교 (뒷차량의 상대속도가 +몇 인지 파악)
             // 뒷차량의 속도가 나보다 15km 이상 빠르고 거리가 30m 이하로 가까운경우

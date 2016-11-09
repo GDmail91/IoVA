@@ -167,7 +167,7 @@ public class DriveThread extends Thread {
     }
 
     private void driveStop() {
-        SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, "DriveInfo.db", null);
+        SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, "SafeScore.db", null);
         safeScoreModel.updateEndOfDrive(topDriveNumber);
         safeScoreModel.close();
     }

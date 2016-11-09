@@ -45,7 +45,9 @@ import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
 public class DrivingActivity extends AppCompatActivity {
 
     // VIEW
+    private LinearLayout forwardDistanceLayout;
     private TextView forwardDistance;
+    private LinearLayout backDistanceLayout;
     private TextView backDistance;
     private TextView btDeviceName;
     private RelativeLayout sideScanActivity;
@@ -118,7 +120,9 @@ public class DrivingActivity extends AppCompatActivity {
         startActivityForResult(intent, DRIVE_START_FLAG);
 
         // VIEW 연결
+        forwardDistanceLayout = (LinearLayout) findViewById(R.id.forward_distance_layout);
         forwardDistance = (TextView) findViewById(R.id.forward_distance);
+        backDistanceLayout = (LinearLayout) findViewById(R.id.back_distance_layout);
         backDistance = (TextView) findViewById(R.id.back_distance);
         btDeviceName = (TextView) findViewById(R.id.bt_device_name);
         sideScanActivity = (RelativeLayout) findViewById(R.id.side_scan_activity);
@@ -186,11 +190,11 @@ public class DrivingActivity extends AppCompatActivity {
         switch (mode) {
             case DISTANCE_DANGER:
                 drTTS.speechingSentence("거리가 가깝습니다. 안전거리를 유지해주세요.");
-                setForwardBackgroud(mode);
+                setForwardBackground(mode);
                 break;
             case DISTANCE_WARNING:
                 drTTS.speechingSentence("안전거리 위반입니다. 사고에 주의하세요.");
-                setForwardBackgroud(mode);
+                setForwardBackground(mode);
                 break;
             case SIDE_DISTANCE_DANGER:
                 drTTS.speechingSentence("위험합니다. 차선 거리나 속도를 늘려주세요.");
@@ -291,23 +295,26 @@ public class DrivingActivity extends AppCompatActivity {
     // 전방 데이터 전달
     public void setForwardText(float distance) {
         // View 반영
-        forwardDistance.setText("앞차간격\n"+distance+" m");
+        forwardDistance.setText(distance+" m");
         if (mBoundService != null)
             mBoundService.setForwardText("앞 "+distance);
     }
 
-    public void setForwardBackgroud(int mode) {
+    // 전방 배경색 변경
+    public void setForwardBackground(int mode) {
         switch (mode) {
             case DISTANCE_WARNING:
-                forwardDistance.setBackgroundResource(R.color.warning);
+                forwardDistanceLayout.setBackgroundResource(R.color.warning);
                 break;
             case DISTANCE_DANGER:
-                forwardDistance.setBackgroundResource(R.color.danger);
+                forwardDistanceLayout.setBackgroundResource(R.color.danger);
                 break;
             case DISTANCE_NORMAL:
-                forwardDistance.setBackgroundResource(R.color.black);
+                forwardDistanceLayout.setBackgroundResource(R.color.black);
                 break;
         }
+        // TODO 최상위뷰 색 변경
+        // mBoundService.setColor(mode);
     }
 
     // 후방 데이터 전달
@@ -318,11 +325,27 @@ public class DrivingActivity extends AppCompatActivity {
             mBoundService.setBackText("뒤 "+message);
     }
 
+    // 후방 데이터 전달
     public void setBackText(float distance) {
         // View 반영
-        backDistance.setText(distance+" m"+"\n앞차간격");
+        backDistance.setText(distance+" m");
         if (mBoundService != null)
             mBoundService.setBackText("뒤 "+distance);
+    }
+
+    // 후방 배경색 변경
+    public void setBackwardBackground(int mode) {
+        switch (mode) {
+            case DISTANCE_WARNING:
+                backDistanceLayout.setBackgroundResource(R.color.warning);
+                break;
+            case DISTANCE_DANGER:
+                backDistanceLayout.setBackgroundResource(R.color.danger);
+                break;
+            case DISTANCE_NORMAL:
+                backDistanceLayout.setBackgroundResource(R.color.black);
+                break;
+        }
     }
 
     // 운행 시작 버튼 클릭
