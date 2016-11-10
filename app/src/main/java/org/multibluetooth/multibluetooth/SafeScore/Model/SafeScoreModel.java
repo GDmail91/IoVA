@@ -257,7 +257,7 @@ public class SafeScoreModel extends SQLiteOpenHelper {
                     cursor.getString(7),
                     cursor.getString(8));
 
-            allData.add(i++, tempData);
+            allData.push(tempData);
         }
 
         return allData;

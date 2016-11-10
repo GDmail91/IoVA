@@ -277,6 +277,7 @@ public class MainMenuActivity extends AppCompatActivity {
 						safeScoreList = new JSONArray(safeScoreModel.getAfterData(0));
 					}
 
+					Log.d("TEST",safeScoreList.toString());
 					if (driveList.length() > 0) {
 						// 가져온 데이터 임시파일변환
 						File driveFile = generateTempFile("tempDrive", driveList.toString());
@@ -311,7 +312,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
 		Map<String, RequestBody> scoreMap = new HashMap<>();
 		RequestBody scoreFileBody = RequestBody.create(MediaType.parse("json"), scoreFile);
-		scoreMap.put("raw_safe_score\"; filename=\"" + driveFile.getName(), scoreFileBody);
+		scoreMap.put("raw_score_data\"; filename=\"" + scoreFile.getName(), scoreFileBody);
 
 		// 서버 업로드
 		SharedPreferences pref = getSharedPreferences("pref", Context.MODE_PRIVATE);
