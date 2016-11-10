@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class SafeScoreModel extends SQLiteOpenHelper {
     private static final String TAG = "SafeScoreModel";
 
-    protected static final int DB_VERSION = 12;
+    protected static final int DB_VERSION = 13;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -219,6 +219,30 @@ public class SafeScoreModel extends SQLiteOpenHelper {
         ArrayList<SafeScore> allData = new ArrayList<>();
         int i =0;
         Cursor cursor = dbR.rawQuery("SELECT * FROM SafeScore ORDER BY _id DESC", null);
+
+        while(cursor.moveToNext()) {
+            Log.d(TAG, ""+cursor.getInt(0));
+            SafeScore tempData = new SafeScore(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    cursor.getInt(2),
+                    cursor.getInt(3),
+                    cursor.getInt(4),
+                    cursor.getInt(5),
+                    cursor.getInt(6),
+                    cursor.getString(7),
+                    cursor.getString(8));
+
+            allData.add(i++, tempData);
+        }
+
+        return allData;
+    }
+
+    public SafeScoreList getAfterData(int id) {
+        SafeScoreList allData = new SafeScoreList();
+        int i =0;
+        Cursor cursor = dbR.rawQuery("SELECT * FROM SafeScore WHERE _id > '"+id+"' ORDER BY _id DESC", null);
 
         while(cursor.moveToNext()) {
             Log.d(TAG, ""+cursor.getInt(0));

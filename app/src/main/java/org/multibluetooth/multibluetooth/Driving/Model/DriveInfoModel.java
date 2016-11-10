@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
-    protected static final int DB_VERSION = 12;
+    protected static final int DB_VERSION = 13;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -41,7 +41,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                 "side_distance INTEGER DEFAULT 0, " +
                 "gps_latitude REAL DEFAULT 0, " +
                 "gps_longitude REAL DEFAULT 0, " +
-                "measure_time DATETIME DEFAULT CURRENT_TIMESTAMP);");
+                "measure_time TEXT);");
 
     }
 
@@ -100,7 +100,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public int createIndex(int topDriveNumber) {
         int topNumber = 0;
 
-        Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
+        Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo WHERE drive_id >= '"+topDriveNumber+"'ORDER BY _id DESC LIMIT 1", null);
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 topNumber = cursor.getInt(0);
@@ -110,8 +110,8 @@ public class DriveInfoModel extends SQLiteOpenHelper {
 
         topNumber = topNumber+1;
 
-        String sql = "INSERT INTO DriveInfo (_id, drive_id) " +
-                "VALUES('"+ topNumber+"', '"+ topDriveNumber +"');";
+        String sql = "INSERT INTO DriveInfo (_id, drive_id, measure_time) " +
+                "VALUES('"+ topNumber+"', '"+ topDriveNumber +"', '"+System.currentTimeMillis()+"');";
 
 
         // DB 작업 실행
@@ -323,7 +323,29 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo ORDER BY _id DESC", null);
 
         while(cursor.moveToNext()) {
-            Log.d(TAG, ""+cursor.getInt(0));
+            DriveInfo tempData = new DriveInfo(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    cursor.getInt(2),
+                    cursor.getFloat(3),
+                    cursor.getFloat(4),
+                    cursor.getFloat(5),
+                    cursor.getDouble(6),
+                    cursor.getDouble(7),
+                    cursor.getString(8));
+
+            allData.add(i++, tempData);
+        }
+
+        return allData;
+    }
+
+    public DriveInfoList getAfterData(int id, int reqId) {
+        DriveInfoList allData = new DriveInfoList();
+        int i =0;
+        Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo WHERE _id > '"+ reqId +"' AND drive_id >= '"+id+"' ORDER BY _id DESC", null);
+
+        while(cursor.moveToNext()) {
             DriveInfo tempData = new DriveInfo(
                     cursor.getInt(0),
                     cursor.getInt(1),

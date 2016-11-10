@@ -39,6 +39,10 @@ public class SettingActivity extends AppCompatActivity {
         return pref.getString("user_name", "-");
     }
 
+    public void onDataSync(View v) {
+
+    }
+
     public void onLogout(View v) {
         // access_token 초기화
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);

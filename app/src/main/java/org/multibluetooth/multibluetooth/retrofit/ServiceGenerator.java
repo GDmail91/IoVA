@@ -9,7 +9,7 @@ import retrofit2.Retrofit;
  */
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "http://bufy.mooo.com:3000";
+    public static final String API_BASE_URL = "http://128.199.69.84:3030";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 

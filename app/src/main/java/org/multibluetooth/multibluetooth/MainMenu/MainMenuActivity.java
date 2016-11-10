@@ -16,17 +16,37 @@ import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 
+import org.json.JSONArray;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
+import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.Facebook.FacebookLogin;
 import org.multibluetooth.multibluetooth.History.HistoryActivity;
 import org.multibluetooth.multibluetooth.R;
+import org.multibluetooth.multibluetooth.SafeScore.Model.SafeScoreModel;
 import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
 import org.multibluetooth.multibluetooth.Setting.SettingActivity;
+import org.multibluetooth.multibluetooth.retrofit.RetrofitService;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOInsertCallback;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOLastIndexCallback;
+import org.multibluetooth.multibluetooth.retrofit.format.DTOLastIndexCallbackData;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -72,6 +92,8 @@ public class MainMenuActivity extends AppCompatActivity {
 							&& connectivityManager.getActiveNetworkInfo().isConnected()){
 						// TODO 업로드 시나리오
 						Log.d("TEST", "WIFI 연결됨");
+
+						getLastIndexAndUpload();
 					}
 
 					if(connectivityManager.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_MOBILE
@@ -224,4 +246,112 @@ public class MainMenuActivity extends AppCompatActivity {
 			btconnectSign.setImageResource(R.drawable.green_dot);
 		}
 	}
+
+	private void getLastIndexAndUpload() {
+		Retrofit retrofit = new Retrofit.Builder()
+				.baseUrl(getResources().getString(R.string.baseURL))
+				.addConverterFactory(GsonConverterFactory.create())
+				.build();
+
+		RetrofitService service = retrofit.create(RetrofitService.class);
+
+		SharedPreferences pref = getSharedPreferences("pref", Context.MODE_PRIVATE);
+		Call<DTOLastIndexCallback> call = service.getLastIndex(
+				pref.getString("access_token", ""));
+		call.enqueue(new Callback<DTOLastIndexCallback>() {
+			@Override
+			public void onResponse(Response<DTOLastIndexCallback> response) {
+				if (response.isSuccess() && response.body() != null) {
+					DTOLastIndexCallbackData lastIndexData = response.body().getData();
+
+					// 인덱스에 해당하는 데이터 가져옴
+					DriveInfoModel driveInfoModel = new DriveInfoModel(getApplicationContext(), "DriveInfo.db", null);
+					SafeScoreModel safeScoreModel = new SafeScoreModel(getApplicationContext(), "SafeScore.db", null);
+					JSONArray driveList;
+					JSONArray safeScoreList;
+					if (lastIndexData != null) {
+						driveList = new JSONArray(driveInfoModel.getAfterData(lastIndexData.getLastDriveId(), lastIndexData.getLastRequestId()));
+						safeScoreList = new JSONArray(safeScoreModel.getAfterData(lastIndexData.getLastDriveId()));
+					} else {
+						driveList = new JSONArray(driveInfoModel.getAfterData(0, 0));
+						safeScoreList = new JSONArray(safeScoreModel.getAfterData(0));
+					}
+
+					if (driveList.length() > 0) {
+						// 가져온 데이터 임시파일변환
+						File driveFile = generateTempFile("tempDrive", driveList.toString());
+						File scoreFile = generateTempFile("tempScore", safeScoreList.toString());
+
+						// 파일 업로드
+						onServerUpload(driveFile, scoreFile);
+					}
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable t) {
+				Toast.makeText(getApplicationContext(), "서버 연결 실패", Toast.LENGTH_LONG).show();
+			}
+		});
+	}
+
+	private void onServerUpload(File driveFile, File scoreFile) {
+
+		// create upload service client
+		Retrofit retrofit = new Retrofit.Builder()
+				.baseUrl(getResources().getString(R.string.baseURL))
+				.addConverterFactory(GsonConverterFactory.create())
+				.build();
+
+		RetrofitService service = retrofit.create(RetrofitService.class);
+
+		Map<String, RequestBody> driveMap = new HashMap<>();
+		RequestBody driveFileBody = RequestBody.create(MediaType.parse("json"), driveFile);
+		driveMap.put("raw_drive_data\"; filename=\"" + driveFile.getName(), driveFileBody);
+
+		Map<String, RequestBody> scoreMap = new HashMap<>();
+		RequestBody scoreFileBody = RequestBody.create(MediaType.parse("json"), scoreFile);
+		scoreMap.put("raw_safe_score\"; filename=\"" + driveFile.getName(), scoreFileBody);
+
+		// 서버 업로드
+		SharedPreferences pref = getSharedPreferences("pref", Context.MODE_PRIVATE);
+		Call<DTOInsertCallback> call = service.uploadNativeData(
+				pref.getString("access_token", ""),
+				driveMap,
+				scoreMap);
+		call.enqueue(new Callback<DTOInsertCallback>() {
+			@Override
+			public void onResponse(Response<DTOInsertCallback> response) {
+				if (response.isSuccess() && response.body() != null) {
+					Toast.makeText(getApplicationContext(), "동기화 완료", Toast.LENGTH_LONG).show();
+					Log.d("TEST"," 동기화 완료");
+				}
+
+				Log.d("TEST", response.raw().toString());
+			}
+
+			@Override
+			public void onFailure(Throwable t) {
+				Log.d("TEST",t.toString());
+				Toast.makeText(getApplicationContext(), "서버 연결 실패", Toast.LENGTH_LONG).show();
+			}
+		});
+	}
+
+	private File generateTempFile(String fileName, String writeData) {
+		File file = new File(getFilesDir(), fileName);
+
+		FileOutputStream outputStream;
+
+		try{
+			outputStream = openFileOutput( fileName, Context.MODE_PRIVATE);
+			outputStream.write( writeData.getBytes());
+			outputStream.close();
+		}catch( Exception e){
+			e.printStackTrace();
+		}
+
+		return file;
+	}
+
 }

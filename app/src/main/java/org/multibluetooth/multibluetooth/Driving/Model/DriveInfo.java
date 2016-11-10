@@ -85,6 +85,18 @@ public class DriveInfo {
     }
 
     public String toString() {
-        return "ID: "+_id + ", DR_ID: "+drive_id+", VS: "+vehicle_speed+", FD: "+front_distance+", BD: "+back_distance + ", SD: " + side_distance +", LAT: "+gps_latitude+", LON: "+gps_longitude+", MT: "+measure_time;
+        return "{\"request_id\": \""+_id + "\", \"drive_id\": \""+drive_id+"\", " +
+                "\"vehicle_speed\": \""+vehicle_speed+"\", \"front_distance\": \""+front_distance+"\", " +
+                "\"back_distance\": \""+back_distance + "\", \"side_distance\": \"" + side_distance +"\", " +
+                "\"gps_latitude\": \""+gps_latitude+"\", \"gps_longitude\": \""+gps_longitude+"\", " +
+                "\"measure_time\": \""+measure_time+"\"}";
     }
+
+    /*public JSONObject toString() {
+        try {
+            return new JSONObject("{\"ID\": \""+_id + "\", \"DR_ID\": \""+drive_id+"\", \"VS\": \""+vehicle_speed+"\", \"FD\": \""+front_distance+"\", \"BD\": \""+back_distance + "\", \"SD\": \"" + side_distance +"\", \"LAT\": \""+gps_latitude+"\", \"LON\": \""+gps_longitude+"\", \"MT\": \""+measure_time+"\"}");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }*/
 }

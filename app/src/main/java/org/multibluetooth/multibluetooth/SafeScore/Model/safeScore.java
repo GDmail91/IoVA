@@ -96,6 +96,14 @@ public class SafeScore implements Serializable {
     }
 
     public String toString() {
-        return "drive_id: "+drive_id + ", distance_count: "+ safe_distance_count + ", speed_count: "+speeding_count+", FAC: "+fast_acc_count+", FBC: "+fast_break_count+", STC: "+sudden_start_count+", SPC: "+sudden_stop_count+", TIME: "+drive_start+"/"+drive_stop;
+        return "{\"drive_id\": \""+drive_id+"\", " +
+                "\"safe_distance_count\": \""+safe_distance_count+"\", \"speeding_count\": \""+speeding_count+"\", " +
+                "\"fast_acc_count\": \""+fast_acc_count + "\", \"fast_break_count\": \"" + fast_break_count +"\", " +
+                "\"sudden_start_count\": \""+sudden_start_count+"\", \"sudden_stop_count\": \""+sudden_stop_count+"\", " +
+                "\"drive_start\": \""+drive_start+"\", \"drive_stop\": \""+drive_stop+"\"}";
     }
+
+    /*public String toString() {
+        return "{drive_id: "+drive_id + ", distance_count: "+ safe_distance_count + ", speed_count: "+speeding_count+", FAC: "+fast_acc_count+", FBC: "+fast_break_count+", STC: "+sudden_start_count+", SPC: "+sudden_stop_count+", TIME: "+drive_start+"/"+drive_stop;
+    }*/
 }
