@@ -56,8 +56,8 @@ public class MainMenuActivity extends AppCompatActivity {
 	private TextView btDeviceName;
 	private ImageView btconnectSign;
 
-	public static BluetoothConnection btLaserCon;
-	public static BluetoothConnection btOBDCon;
+	public static LaserScanner btLaserCon;
+	public static OBDScanner btOBDCon;
 	private ConnectivityManager connectivityManager;
 	private BroadcastReceiver receiver;
 
@@ -116,12 +116,20 @@ public class MainMenuActivity extends AppCompatActivity {
 		if (btLaserCon == null) {
 			btLaserCon = new LaserScanner(this);
 		}
-		((LaserScanner) btLaserCon).setupService();
+		if (btOBDCon == null) {
+			btOBDCon = new OBDScanner(this);
+		}
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		if (btLaserCon != null) {
+			btLaserCon.serviceStop();
+		}
+		if (btOBDCon != null) {
+			btOBDCon.serviceStop();
+		}
 		unregisterReceiver(receiver);
 	}
 
@@ -196,7 +204,6 @@ public class MainMenuActivity extends AppCompatActivity {
 			prefEdit.putString(DeviceListActivity.EXTRA_DEVICE_ADDRESS, "");
 			prefEdit.apply();
 
-			btOBDCon = new OBDScanner(this);
 			btOBDCon.conn();
 		}
 
@@ -232,13 +239,11 @@ public class MainMenuActivity extends AppCompatActivity {
 	}
 
 	public void setBtConnectSign() {
-		if (btLaserCon != null
+		if (btLaserCon != null && btOBDCon != null
 				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
-				&& (btOBDCon == null || btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED)) {
-			btOBDCon = new OBDScanner(this);
+				&& btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
 			Log.d(TAG, "OBD 연결 실행");
 			btOBDCon.conn();
-			Log.d(TAG, "OBD 연결 실행2");
 		}
 		if (btLaserCon != null && btOBDCon != null
 				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
@@ -276,8 +281,9 @@ public class MainMenuActivity extends AppCompatActivity {
 						driveList = new JSONArray(driveInfoModel.getAfterData(0, 0));
 						safeScoreList = new JSONArray(safeScoreModel.getAfterData(0));
 					}
+					driveInfoModel.close();
+					safeScoreModel.close();
 
-					Log.d("TEST",safeScoreList.toString());
 					if (driveList.length() > 0) {
 						// 가져온 데이터 임시파일변환
 						File driveFile = generateTempFile("tempDrive", driveList.toString());

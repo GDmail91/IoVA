@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,9 +46,9 @@ import org.multibluetooth.multibluetooth.SafeScore.SafeScoreActivity;
 public class DrivingActivity extends AppCompatActivity {
 
     // VIEW
-    private LinearLayout forwardDistanceLayout;
+    private RelativeLayout forwardDistanceLayout;
     private TextView forwardDistance;
-    private LinearLayout backDistanceLayout;
+    private RelativeLayout backDistanceLayout;
     private TextView backDistance;
     private TextView btDeviceName;
     private RelativeLayout sideScanActivity;
@@ -114,16 +115,16 @@ public class DrivingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.driving_activity);
+        setContentView(R.layout.driving_signal_activity);
 
         Intent intent = new Intent(DrivingActivity.this, DriveStartDialog.class);
         startActivityForResult(intent, DRIVE_START_FLAG);
 
         // VIEW 연결
-        forwardDistanceLayout = (LinearLayout) findViewById(R.id.forward_distance_layout);
-        forwardDistance = (TextView) findViewById(R.id.forward_distance);
-        backDistanceLayout = (LinearLayout) findViewById(R.id.back_distance_layout);
-        backDistance = (TextView) findViewById(R.id.back_distance);
+        forwardDistanceLayout = (RelativeLayout) findViewById(R.id.forward_distance_layout);
+        //forwardDistance = (TextView) findViewById(R.id.forward_distance);
+        backDistanceLayout = (RelativeLayout) findViewById(R.id.back_distance_layout);
+        //backDistance = (TextView) findViewById(R.id.back_distance);
         btDeviceName = (TextView) findViewById(R.id.bt_device_name);
         sideScanActivity = (RelativeLayout) findViewById(R.id.side_scan_activity);
         sideSafeDistance = (TextView) findViewById(R.id.side_safe_distance);
@@ -168,10 +169,10 @@ public class DrivingActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (MainMenuActivity.btLaserCon != null)
+        /*if (MainMenuActivity.btLaserCon != null)
             MainMenuActivity.btLaserCon.serviceConn();
         if (MainMenuActivity.btOBDCon != null)
-            MainMenuActivity.btOBDCon.serviceConn();
+            MainMenuActivity.btOBDCon.serviceConn();*/
     }
 
     @Override
@@ -304,13 +305,13 @@ public class DrivingActivity extends AppCompatActivity {
     public void setForwardBackground(int mode) {
         switch (mode) {
             case DISTANCE_WARNING:
-                forwardDistanceLayout.setBackgroundResource(R.color.warning);
+                forwardDistance.setBackgroundResource(R.color.warning);
                 break;
             case DISTANCE_DANGER:
-                forwardDistanceLayout.setBackgroundResource(R.color.danger);
+                forwardDistance.setBackgroundResource(R.color.danger);
                 break;
             case DISTANCE_NORMAL:
-                forwardDistanceLayout.setBackgroundResource(R.color.black);
+                forwardDistance.setBackgroundResource(R.color.good);
                 break;
         }
         // TODO 최상위뷰 색 변경
@@ -337,13 +338,13 @@ public class DrivingActivity extends AppCompatActivity {
     public void setBackwardBackground(int mode) {
         switch (mode) {
             case DISTANCE_WARNING:
-                backDistanceLayout.setBackgroundResource(R.color.warning);
+                backDistance.setBackgroundResource(R.color.warning);
                 break;
             case DISTANCE_DANGER:
-                backDistanceLayout.setBackgroundResource(R.color.danger);
+                backDistance.setBackgroundResource(R.color.danger);
                 break;
             case DISTANCE_NORMAL:
-                backDistanceLayout.setBackgroundResource(R.color.black);
+                backDistance.setBackgroundResource(R.color.good);
                 break;
         }
     }
@@ -522,6 +523,48 @@ public class DrivingActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+
+        HalfCircleView halfTopView = new HalfCircleView(getApplicationContext(), forwardDistanceLayout.getWidth(), forwardDistanceLayout.getHeight(), HalfCircleView.TOP);
+        halfTopView.setFill(true);
+        halfTopView.setColorByResource(R.color.good);
+        halfTopView.startDraw();
+
+        HalfCircleView halfBottomView = new HalfCircleView(getApplicationContext(), backDistanceLayout.getWidth(), backDistanceLayout.getHeight(), HalfCircleView.BOTTOM);
+        halfBottomView.setFill(true);
+        halfBottomView.setColorByResource(R.color.good);
+        halfBottomView.startDraw();
+
+        forwardDistanceLayout.addView(halfTopView);
+        //test.addView(halfTopBorder);
+        backDistanceLayout.addView(halfBottomView);
+        //test2.addView(halfBottomBorder);
+
+
+        forwardDistance = new TextView(getApplicationContext());
+        forwardDistance.setText("- m");
+        forwardDistance.setTextSize(90);
+        forwardDistance.setTextColor(Color.WHITE);
+        backDistance = new TextView(getApplicationContext());
+        backDistance.setText("- m");
+        backDistance.setTextSize(90);
+        backDistance.setTextColor(Color.WHITE);
+
+        forwardDistanceLayout.addView(forwardDistance, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        backDistanceLayout.addView(backDistance, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)forwardDistance.getLayoutParams();
+        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)backDistance.getLayoutParams();
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        params2.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        forwardDistance.setLayoutParams(params); //causes layout update
+        backDistance.setLayoutParams(params2);
     }
 /*
     public void sendTest(View v) {

@@ -4,20 +4,24 @@ package org.multibluetooth.multibluetooth.Driving.Bluetooth.Service;
  * Created by YS on 2016-09-25.
  */
 
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -26,7 +30,7 @@ import java.util.UUID;
  * incoming connections, a thread for connecting with a device, and a
  * thread for performing data transmissions when connected.
  */
-public abstract class BluetoothService {
+public abstract class BluetoothService extends Service {
     // Debugging
     private static final String TAG = "BluetoothService";
 
@@ -42,12 +46,16 @@ public abstract class BluetoothService {
     protected static String deviceName;
 
     // Member fields
-    protected final BluetoothAdapter mAdapter;
-    protected final Handler mHandler;
+    protected BluetoothAdapter mAdapter;
+    protected Handler mHandler;
     protected AcceptThread mSecureAcceptThread;
     protected ConnectThread mConnectThread;
     protected ConnectedThread mConnectedThread;
     protected int mState;
+
+    protected IBinder mBinder;    // 컴포넌트에 반환되는 IBinder
+
+    private final Random rand = new Random();
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -55,7 +63,7 @@ public abstract class BluetoothService {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
-    public static final int REQUEST_OBD_SENSOR_DATA = 500;  // OBD 센서 데이터 요청
+        public static final int REQUEST_OBD_SENSOR_DATA = 500;  // OBD 센서 데이터 요청
     public static final int REQUEST_LASER_SENSOR_DATA = 501;  // Laser 센서 데이터 요청
     public static final int REQUEST_SCAN_LEFT_SENSOR_DATA = 502;  // 왼쪽 Scan 센서 데이터 요청
     public static final int REQUEST_SCAN_RIGHT_SENSOR_DATA = 503;  // 오른쪽 Scan 센서 데이터 요청
@@ -67,10 +75,26 @@ public abstract class BluetoothService {
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public BluetoothService(Context context, Handler handler) {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
+    public void init(Handler handler) {
+        this.mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
-        mHandler = handler;
+        this.mHandler = handler;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // TODO Auto-generated method stub
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent){
+        return mBinder;
     }
 
     /**
@@ -85,18 +109,18 @@ public abstract class BluetoothService {
         // Give the new state to the Handler so the UI Activity can update
         mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
-
-    /**
+/*
+    *//**
      * Return the current connection state.
-     */
+     *//*
     public synchronized int getState() {
         return mState;
     }
 
-    /**
+    *//**
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
-     */
+     *//*
     public synchronized void start() {
         Log.d(TAG, "start");
 
@@ -120,11 +144,11 @@ public abstract class BluetoothService {
             mSecureAcceptThread.start();
         }
         // remove insecure accept
-        /*if (mInsecureAcceptThread == null) {
+        *//*if (mInsecureAcceptThread == null) {
             mInsecureAcceptThread = new AcceptThread(false);
             mInsecureAcceptThread.start();
-        }*/
-    }
+        }*//*
+    }*/
 
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
@@ -132,7 +156,7 @@ public abstract class BluetoothService {
      * @param device The BluetoothDevice to connect
      * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
-    public synchronized void connect(BluetoothDevice device, boolean secure) {
+    /*public synchronized void connect(BluetoothDevice device, boolean secure) {
         Log.d(TAG, "connect to: " + device);
 
         // Cancel any thread attempting to make a connection
@@ -154,7 +178,7 @@ public abstract class BluetoothService {
         mConnectThread.start();
         setState(STATE_CONNECTING);
     }
-
+*/
     /**
      * Start the ConnectedThread to begin managing a Bluetooth connection
      *
@@ -163,10 +187,10 @@ public abstract class BluetoothService {
      */
     public abstract void connected(BluetoothSocket socket, BluetoothDevice
             device, final String socketType);
-
-    /**
+/*
+    *//**
      * Stop all threads
-     */
+     *//*
     public synchronized void stop() {
         Log.d(TAG, "stop");
 
@@ -186,13 +210,13 @@ public abstract class BluetoothService {
         }
 
         // remove insecure accept
-        /*
+        *//*
         if (mInsecureAcceptThread != null) {
             mInsecureAcceptThread.cancel();
             mInsecureAcceptThread = null;
-        }*/
+        }*//*
         setState(STATE_NONE);
-    }
+    }*/
 
     /**
      * Write to the ConnectedThread in an unsynchronized manner
@@ -200,7 +224,7 @@ public abstract class BluetoothService {
      * @param out The bytes to write
      * @see ConnectedThread#write(byte[])
      */
-    public abstract void write(Bundle out);
+    //public abstract void write(Bundle out);
 
     /**
      * Indicate that the connection attempt failed and notify the UI Activity.
@@ -231,6 +255,8 @@ public abstract class BluetoothService {
         // Start the service over to restart listening mode
         BluetoothService.this.start();
     }
+
+    public abstract void start();
 
     /**
      * This thread runs while listening for incoming connections. It behaves

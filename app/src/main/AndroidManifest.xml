@@ -77,6 +77,19 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".Driving.Bluetooth.Service.BluetoothOBDService">
+            <intent-filter>
+                <action android:name=".Driving.Bluetooth.Service.BluetoothOBDService"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".Driving.Bluetooth.Service.BluetoothLaserService">
+            <intent-filter>
+                <action android:name=".Driving.Bluetooth.Service.BluetoothLaserService"/>
+            </intent-filter>
+        </service>
         <!-- 서버 통신 -->
 <!--
         <service

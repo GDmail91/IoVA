@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,7 +17,6 @@ import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
@@ -25,7 +26,7 @@ import org.multibluetooth.multibluetooth.SafeScore.ScoreCalculator;
 /**
  * Created by YS on 2016-09-19.
  */
-public class BluetoothConnection {
+public abstract class BluetoothConnection implements ServiceConnection, ServiceControl{
     private static final String TAG = "BluetoothConnection";
 
     // Intent request codes
@@ -85,6 +86,9 @@ public class BluetoothConnection {
         return 0;
     }
 
+    protected Binder binder = null;
+    protected boolean mBound = false;    // 서비스 연결 여부
+
     public void queueInit(int topNumber) {
         // make score calculate queue
         if (mScoreCalculator == null) {
@@ -94,19 +98,7 @@ public class BluetoothConnection {
         }
     }
 
-    public void conn() {
-        // If BT is not on, request that it be enabled.
-        // setupChat() will then be called during onActivityResult
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-        } else if (mChatService == null) {
-            // TODO sendMessage() 를 할 컴포넌트 연결
-            // ex) sendMessage(message);
-            //setupChat(context);
-            setupConnect();
-        }
-    }
+    public abstract void conn();
 
     public void setChangeContext(Context context) {
         this.mContext = context;
@@ -114,7 +106,7 @@ public class BluetoothConnection {
             mScoreCalculator.setChangeContext(context);
     }
 
-    public void serviceConn() {
+    /*public void serviceConn() {
         // Performing this check in onResume() covers the case in which BT was
         // not enabled during onStart(), so we were paused to enable it...
         // onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
@@ -125,17 +117,17 @@ public class BluetoothConnection {
                 mChatService.start();
             }
         }
-    }
+    }*/
 
-    public void serviceStop() {
-        if (mChatService != null) {
-            mChatService.stop();
-        }
-    }
+    public abstract void bindService();
+
+    public abstract void serviceStop();
 
     protected void setupStringBuffer() {
         mOutStringBuffer = new StringBuffer("");
     }
+
+    public abstract void setupService();
 
     protected void setupConnect() {
         setupStringBuffer();
@@ -145,9 +137,7 @@ public class BluetoothConnection {
         ((AppCompatActivity) mContext).startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
     }
 
-    public int getConnectionStatus() {
-        return mChatService.getState();
-    }
+    public abstract int getConnectionStatus();
 
     /**
      * Establish connection with other divice
@@ -155,16 +145,7 @@ public class BluetoothConnection {
      * @param data   An {@link Intent} with {@link DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
      * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
-    public void connectDevice(Intent data, boolean secure) {
-        Log.d(TAG, "커넥 디바이스 실행");
-        // Get the device MAC address
-        String address = data.getExtras()
-                .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-        // Get the BluetoothDevice object
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        // Attempt to connect to the device
-        mChatService.connect(device, secure);
-    }
+    public abstract void connectDevice(Intent data, boolean secure);
 
     /**
      * Updates the status on the action bar.
@@ -188,7 +169,7 @@ public class BluetoothConnection {
      * Sends a message.
      *
      * @param message A string of text to send.
-     */
+     *//*
     public void sendMessage(String message) {
         // Check that we're actually connected before trying anything
         Log.d(TAG, "message 보낼때 "+ mChatService.getState());
@@ -209,7 +190,7 @@ public class BluetoothConnection {
             //mOutStringBuffer.setLength(0);
             Log.d(TAG, "write: "+message);
         }
-    }
+    }*/
 
     /**
      * The Handler that gets information back from the BluetoothLaserService
@@ -300,7 +281,7 @@ public class BluetoothConnection {
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
                     // Bluetooth is now enabled, so set up a chat session
-                    if (mChatService == null)
+                    if (!mBound)
                         setupConnect();
                 } else {
                     // User did not enable Bluetooth or an error occurred

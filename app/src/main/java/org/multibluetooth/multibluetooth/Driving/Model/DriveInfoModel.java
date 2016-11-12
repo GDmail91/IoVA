@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
-    protected static final int DB_VERSION = 13;
+    protected static final int DB_VERSION = 14;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -33,7 +33,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
 
         Log.d("MEMOMODEL", "생성");
         db.execSQL("CREATE TABLE DriveInfo ( " +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "_id INTEGER NOT NULL, " +
                 "drive_id INTEGER NOT NULL, " +
                 "vehicle_speed INTEGER DEFAULT 0, " +
                 "front_distance INTEGER DEFAULT 0, " +
@@ -41,7 +41,8 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                 "side_distance INTEGER DEFAULT 0, " +
                 "gps_latitude REAL DEFAULT 0, " +
                 "gps_longitude REAL DEFAULT 0, " +
-                "measure_time TEXT);");
+                "measure_time TEXT, " +
+                "PRIMARY KEY(_id, drive_id) );");
 
     }
 
@@ -100,7 +101,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public int createIndex(int topDriveNumber) {
         int topNumber = 0;
 
-        Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo WHERE drive_id >= '"+topDriveNumber+"'ORDER BY _id DESC LIMIT 1", null);
+        Cursor cursor = dbR.rawQuery("SELECT _id FROM DriveInfo WHERE drive_id >= '"+topDriveNumber+"' ORDER BY _id DESC LIMIT 1", null);
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 topNumber = cursor.getInt(0);
@@ -134,7 +135,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public int getTopNumber() {
         int topDriveNumber = 0;
 
-        Cursor cursor = dbR.rawQuery("SELECT drive_id FROM DriveInfo ORDER BY _id DESC LIMIT 1", null);
+        Cursor cursor = dbR.rawQuery("SELECT drive_id FROM DriveInfo ORDER BY drive_id DESC LIMIT 1", null);
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 topDriveNumber = cursor.getInt(0);
@@ -342,7 +343,6 @@ public class DriveInfoModel extends SQLiteOpenHelper {
 
     public DriveInfoList getAfterData(int id, int reqId) {
         DriveInfoList allData = new DriveInfoList();
-        int i =0;
         Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo WHERE _id > '"+ reqId +"' AND drive_id >= '"+id+"' ORDER BY drive_id DESC, _id DESC", null);
 
         while(cursor.moveToNext()) {

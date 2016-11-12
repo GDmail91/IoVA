@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDCommandList;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.Driving.ServerConnection.ZoneNameFinder;
 import org.multibluetooth.multibluetooth.MainMenu.MainMenuActivity;
@@ -106,17 +105,17 @@ public class DriveThread extends Thread {
                         mHandler.sendMessage(bMessage);*/
 
                         // OBD 데이터 출력
-                        ((OBDScanner) MainMenuActivity.btOBDCon).sendMessage(id);
+                        MainMenuActivity.btOBDCon.sendMessage(id);
 
                         if (leftScan) {
                             // 앞쪽 센서 데이터 출력
-                            ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_LEFT);
+                            MainMenuActivity.btLaserCon.sendScan(LaserScanner.SCAN_LEFT);
                         } else if (rightScan) {
                             // 앞쪽 센서 데이터 출력
-                            ((LaserScanner) MainMenuActivity.btLaserCon).sendScan(LaserScanner.SCAN_RIGHT);
+                            MainMenuActivity.btLaserCon.sendScan(LaserScanner.SCAN_RIGHT);
                         } else {
                             // 앞쪽 센서 데이터 출력
-                            ((LaserScanner) MainMenuActivity.btLaserCon).sendMessage(id);
+                            MainMenuActivity.btLaserCon.sendMessage(id);
                         }
 
                         // TODO 뒷쪽 데이터 출력

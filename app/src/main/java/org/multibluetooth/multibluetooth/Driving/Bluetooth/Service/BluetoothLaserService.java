@@ -16,16 +16,19 @@
 
 package org.multibluetooth.multibluetooth.Driving.Bluetooth.Service;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
+import android.content.Intent;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserCommand;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,32 +51,119 @@ public class BluetoothLaserService extends BluetoothService {
     protected static String scanInputMessage = "";
     protected static String distance = "";
 
-    /**
-     * Constructor. Prepares a new BluetoothChat session.
-     *
-     * @param context The UI Activity Context
-     * @param handler A Handler to send messages back to the UI Activity
-     */
-    public BluetoothLaserService(Context context, Handler handler) {
-        super(context, handler);
+    @Override
+    public IBinder onBind(Intent intent){
+        mBinder = new LocalBinder();    // 컴포넌트에 반환되는 IBinder
+        return mBinder;
     }
 
-    /**
-     * Write to the ConnectedThread in an unsynchronized manner
-     *
-     * @param cmdInfo The bytes to write
-     * @see ConnectedThread#write(Bundle)
-     */
-    public void write(Bundle cmdInfo) {
-        // Create temporary object
-        ConnectedThread r;
-        // Synchronize a copy of the ConnectedThread
-        synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
-            r = mConnectedThread;
+    // 컴포넌트에 반환해줄 IBinder를 위한 클래스
+    public class LocalBinder extends Binder implements BluetoothBinderInterface {
+        public BluetoothLaserService getService(){
+            return BluetoothLaserService.this;
         }
-        // Perform the write unsynchronized
-        r.write(cmdInfo);
+
+        public void init(Handler handler) {
+            mAdapter = BluetoothAdapter.getDefaultAdapter();
+            mState = STATE_NONE;
+            mHandler = handler;
+        }
+
+        @Override
+        public synchronized int getState() {
+            return mState;
+        }
+
+        @Override
+        public synchronized void start() {
+            Log.d(TAG, "start");
+
+            // Cancel any thread attempting to make a connection
+            if (mConnectThread != null) {
+                mConnectThread.cancel();
+                mConnectThread = null;
+            }
+
+            // Cancel any thread currently running a connection
+            if (mConnectedThread != null) {
+                mConnectedThread.cancel();
+                mConnectedThread = null;
+            }
+
+            setState(STATE_LISTEN);
+
+            // Start the thread to listen on a BluetoothServerSocket
+            if (mSecureAcceptThread == null) {
+                mSecureAcceptThread = new AcceptThread(true);
+                mSecureAcceptThread.start();
+            }
+        }
+
+        @Override
+        public synchronized void stop() {
+            Log.d(TAG, "stop");
+
+            if (mConnectThread != null) {
+                mConnectThread.cancel();
+                mConnectThread = null;
+            }
+
+            if (mConnectedThread != null) {
+                mConnectedThread.cancel();
+                mConnectedThread = null;
+            }
+
+            if (mSecureAcceptThread != null) {
+                mSecureAcceptThread.cancel();
+                mSecureAcceptThread = null;
+            }
+
+            setState(STATE_NONE);
+        }
+
+        @Override
+        public synchronized void connect(BluetoothDevice device, boolean secure) {
+            Log.d(TAG, "connect to: " + device);
+
+            // Cancel any thread attempting to make a connection
+            if (mState == STATE_CONNECTING) {
+                if (mConnectThread != null) {
+                    mConnectThread.cancel();
+                    mConnectThread = null;
+                }
+            }
+
+            // Cancel any thread currently running a connection
+            if (mConnectedThread != null) {
+                mConnectedThread.cancel();
+                mConnectedThread = null;
+            }
+
+            // Start the thread to connect with the given device
+            mConnectThread = new ConnectThread(device, secure);
+            mConnectThread.start();
+            setState(STATE_CONNECTING);
+        }
+
+        @Override
+        public void write(Bundle cmdInfo) {
+            // Create temporary object
+            ConnectedThread r;
+            // Synchronize a copy of the ConnectedThread
+            synchronized (this) {
+                if (mState != STATE_CONNECTED) return;
+                r = mConnectedThread;
+            }
+            // Perform the write unsynchronized
+            r.write(cmdInfo);
+        }
+
+
+    }
+
+    @Override
+    public void start() {
+        ((LocalBinder) mBinder).start();
     }
 
     /**

@@ -6,10 +6,10 @@ import com.google.gson.annotations.SerializedName;
  * Created by YS on 2016-11-09.
  */
 public class DTOLastIndexCallbackData {
-    @SerializedName("drive_id")
+    @SerializedName("last_drive_id")
     int lastDriveId;
 
-    @SerializedName("request_id")
+    @SerializedName("last_request_id")
     int lastRequestId;
 
     public int getLastDriveId() {
