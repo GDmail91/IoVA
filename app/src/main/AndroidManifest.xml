@@ -94,6 +94,15 @@
                 <action android:name="org.multibluetooth.multibluetooth.BluetoothLaserService"/>
             </intent-filter>
         </service>
+
+        <service
+            android:name=".Driving.Bluetooth.Service.BluetoothSideService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.multibluetooth.multibluetooth.BluetoothSideService"/>
+            </intent-filter>
+        </service>
         <!-- 서버 통신 -->
 <!--
         <service

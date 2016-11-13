@@ -264,6 +264,31 @@ public class DrivingActivity extends AppCompatActivity {
         }
     }
 
+    public void onScan(int side) {
+        switch (side) {
+            case LaserScanner.SCAN_LEFT:
+                // 왼쪽 스캔 시작
+                sideScanActivity.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
+                sideScanQueue.init();
+                driveThread.scanChange(side);
+                break;
+            case LaserScanner.SCAN_RIGHT:
+                // 오른쪽 스캔 시작
+                sideScanActivity.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
+                sideScanQueue.init();
+                driveThread.scanChange(side);
+                break;
+            case LaserScanner.SCAN_STOP:
+                // 스캔 종료
+                sideScanActivity.setVisibility(View.GONE);
+                sideScanQueue.init();
+                driveThread.scanChange(side);
+                break;
+        }
+    }
+
     public void setSideDistance(float distance) {
         loadingDialog.setVisibility(View.INVISIBLE);
         sideSafeDistance.setText(distance+"m");

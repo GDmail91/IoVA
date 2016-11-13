@@ -33,6 +33,17 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
     public static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     public static final int REQUEST_ENABLE_BT = 3;
 
+    public static final int REQUEST_CONNECT_DEVICE_SECURE_BY_LASER = 2001;
+    public static final int REQUEST_ENABLE_BT_BY_LASER = 2003;
+
+    public static final int REQUEST_CONNECT_DEVICE_SECURE_BY_OBD = 3001;
+    public static final int REQUEST_ENABLE_BT_BY_OBD = 3003;
+
+    public static final int REQUEST_CONNECT_DEVICE_SECURE_BY_SIDE = 4001;
+    public static final int REQUEST_ENABLE_BT_BY_SIDE = 4003;
+    public static final int SCAN_STOP = 4010;
+    public static final int SCAN_LEFT = 4011;
+    public static final int SCAN_RIGHT = 4012;
     /**
      * Bluetooth Device ID
      */

@@ -56,6 +56,7 @@ public class DeviceListActivity extends Activity {
      */
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
     public static String EXTRA_DEVICE_ADDRESS_OBD = "obd_device_address";
+    public static String EXTRA_DEVICE_ADDRESS_SIDE = "side_device_address";
 
     /**
      * Member fields

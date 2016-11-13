@@ -218,6 +218,7 @@ public abstract class BluetoothService extends Service {
 
     protected abstract boolean checkDevice(String checkStr);
 
+    protected abstract String readBuffer(InputStream sin);
 /*
     *//**
      * Return the current connection state.
@@ -429,14 +430,12 @@ public abstract class BluetoothService extends Service {
                         InputStream sin = socket.getInputStream();
 
                         int timeOut = 0;
-                        byte[] buffer = new byte[255];
                         while(timeOut++ <= 10) {
 
                             sout.write(sendDeviceCheckStr.getBytes());
                             sout.flush();
 
-                            int length = sin.read(buffer);
-                            String testWord = new String(buffer, 0, length);
+                            String testWord = readBuffer(sin);
 
                             Log.d(TAG, testWord);
                             if (checkDevice(testWord)) {
@@ -560,11 +559,9 @@ public abstract class BluetoothService extends Service {
                     sout.write(sendDeviceCheckStr.getBytes());
                     sout.flush();
 
-                    byte[] buffer = new byte[255];
+                    String testWord = readBuffer(sin);
 
-                    int length = sin.read(buffer);
-                    String testWord = new String(buffer, 0, length);
-
+                    Log.d(TAG, testWord);
                     if (checkDevice(testWord)) {
                         setState(STATE_CONNECTING);
                         break;

@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothLaserService;
 import org.multibluetooth.multibluetooth.R;
@@ -34,9 +33,11 @@ public class BluetoothCheckDialog extends Activity {
         if (extras != null) {
             setChangeText(extras.getInt("LASER", BluetoothLaserService.STATE_NONE), R.id.laser_state);
             setChangeText(extras.getInt("OBD", BluetoothLaserService.STATE_NONE), R.id.obd_state);
+            setChangeText(extras.getInt("SIDE", BluetoothLaserService.STATE_NONE), R.id.side_state);
         } else {
             setChangeText(BluetoothLaserService.STATE_NONE, R.id.laser_state);
             setChangeText(BluetoothLaserService.STATE_NONE, R.id.obd_state);
+            setChangeText(BluetoothLaserService.STATE_NONE, R.id.side_state);
         }
     }
 
@@ -70,6 +71,11 @@ public class BluetoothCheckDialog extends Activity {
             case R.id.obd_conn:
                 Intent obdIntent = new Intent();
                 setResult(MainMenuActivity.BLUETOOTH_OBD_CONNECT, obdIntent);
+                finish();
+                break;
+            case R.id.side_conn:
+                Intent sideIntent = new Intent();
+                setResult(MainMenuActivity.BLUETOOTH_SIDE_CONNECT, sideIntent);
                 finish();
                 break;
         }

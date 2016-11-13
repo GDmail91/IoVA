@@ -78,10 +78,21 @@ public class BluetoothLaserService extends BluetoothService {
     }
 
     @Override
-    public boolean checkDevice(String checkStr) {
+    protected boolean checkDevice(String checkStr) {
         return checkDeviceCheckStr.equals(checkStr);
     }
 
+    @Override
+    protected String readBuffer(InputStream sin) {
+        try {
+            byte[] buffer = new byte[255];
+            int length = sin.read(buffer);
+
+            return new String(buffer, 0, length);
+        } catch (IOException e) {
+            return "";
+        }
+    }
     /**
      * Start the ConnectedThread to begin managing a Bluetooth connection
      *
