@@ -16,13 +16,10 @@
 
 package org.multibluetooth.multibluetooth.Driving.Bluetooth.Service;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
@@ -50,113 +47,27 @@ public class BluetoothOBDService extends BluetoothService {
     //public static final int REQUEST_SENSOR_DATA = 500;  // OBD 센서 데이터 요청
 
     @Override
-    public IBinder onBind(Intent intent){
-        Log.d("BINDING", "바인딩");
-        mBinder = new LocalBinder();    // 컴포넌트에 반환되는 IBinder
-        return mBinder;
+    public void onCreate() {
+        super.onCreate();
+
+        sendDeviceCheckStr = "01 0D\r";
+        checkDeviceCheckStr = "Number";
     }
 
-    // 컴포넌트에 반환해줄 IBinder를 위한 클래스
-    public class LocalBinder extends Binder implements BluetoothBinderInterface {
-        public BluetoothOBDService getService(){
-            return BluetoothOBDService.this;
-        }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // TODO Auto-generated method stub
+        Log.d(TAG, "Service Starting");
+        mBinder = new LocalBinder();    // 컴포넌트에 반환되는 IBinder
+        //mBinder.start();
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
+    }
 
-        @Override
-        public void init(Handler handler) {
-            mAdapter = BluetoothAdapter.getDefaultAdapter();
-            mState = STATE_NONE;
-            mHandler = handler;
-        }
-
-        @Override
-        public synchronized int getState() {
-            return mState;
-        }
-
-        @Override
-        public synchronized void start() {
-            Log.d(TAG, "start");
-
-            // Cancel any thread attempting to make a connection
-            if (mConnectThread != null) {
-                mConnectThread.cancel();
-                mConnectThread = null;
-            }
-
-            // Cancel any thread currently running a connection
-            if (mConnectedThread != null) {
-                mConnectedThread.cancel();
-                mConnectedThread = null;
-            }
-
-            setState(STATE_LISTEN);
-
-            // Start the thread to listen on a BluetoothServerSocket
-            if (mSecureAcceptThread == null) {
-                mSecureAcceptThread = new AcceptThread(true);
-                mSecureAcceptThread.start();
-            }
-        }
-
-        @Override
-        public synchronized void stop() {
-            Log.d(TAG, "stop");
-
-            if (mConnectThread != null) {
-                mConnectThread.cancel();
-                mConnectThread = null;
-            }
-
-            if (mConnectedThread != null) {
-                mConnectedThread.cancel();
-                mConnectedThread = null;
-            }
-
-            if (mSecureAcceptThread != null) {
-                mSecureAcceptThread.cancel();
-                mSecureAcceptThread = null;
-            }
-
-            setState(STATE_NONE);
-        }
-
-        @Override
-        public synchronized void connect(BluetoothDevice device, boolean secure) {
-            Log.d(TAG, "connect to: " + device);
-
-            // Cancel any thread attempting to make a connection
-            if (mState == STATE_CONNECTING) {
-                if (mConnectThread != null) {
-                    mConnectThread.cancel();
-                    mConnectThread = null;
-                }
-            }
-
-            // Cancel any thread currently running a connection
-            if (mConnectedThread != null) {
-                mConnectedThread.cancel();
-                mConnectedThread = null;
-            }
-
-            // Start the thread to connect with the given device
-            mConnectThread = new ConnectThread(device, secure);
-            mConnectThread.start();
-            setState(STATE_CONNECTING);
-        }
-
-        @Override
-        public void write(Bundle cmdInfo) {
-            // Create temporary object
-            ConnectedThread r;
-            // Synchronize a copy of the ConnectedThread
-            synchronized (this) {
-                if (mState != STATE_CONNECTED) return;
-                r = mConnectedThread;
-            }
-            // Perform the write unsynchronized
-            r.write(cmdInfo);
-        }
+    @Override
+    public IBinder onBind(Intent intent){
+        Log.d(TAG, "onBind()");
+        return mBinder;
     }
 
     /**
@@ -164,7 +75,18 @@ public class BluetoothOBDService extends BluetoothService {
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {
-        ((LocalBinder) mBinder).start();
+        mBinder.start();
+    }
+
+    protected boolean checkDevice(String checkStr) {
+        try {
+            Log.d(TAG, "checkDevice: "+checkStr);
+            Integer.parseInt(checkStr);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -211,40 +133,61 @@ public class BluetoothOBDService extends BluetoothService {
         mConnectedThread = new ConnectedOBDThread(socket, socketType);
         ((ConnectedOBDThread) mConnectedThread).start();
 
-        // Send the name of the connected device back to the UI Activity
-        Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.DEVICE_NAME, device.getName());
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        if (mHandler != null) {
+            // Send the name of the connected device back to the UI Activity
+            Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.DEVICE_NAME, device.getName());
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
 
-        Message msg2 = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-        Bundle bundle2 = new Bundle();
-        bundle2.putString(Constants.TOAST, "OBD 연결됨");
-        msg2.setData(bundle2);
-        mHandler.sendMessage(msg2);
+            Message msg2 = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+            Bundle bundle2 = new Bundle();
+            bundle2.putString(Constants.TOAST, "OBD 연결됨");
+            msg2.setData(bundle2);
+            mHandler.sendMessage(msg2);
+        }
 
         // Set device name
         deviceName = device.getName();
 
     }
 
+    /**
+     * Indicate that the connection attempt failed and notify the UI Activity.
+     */
+    @Override
+    protected void connectionFailed() {
+        Log.d(TAG, "connectionFailed()");
+        if (mHandler != null) {
+            // Send a failure message back to the Activity
+            Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.TOAST, "Unable to connect device");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
+
+            mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, STATE_NONE, -1).sendToTarget();
+        }
+    }
 
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
+    @Override
     protected void connectionLost() {
-        // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.TOAST, "Device connection was lost");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        Log.d(TAG, "connectionLost()");
+        if (mHandler != null) {
+            // Send a failure message back to the Activity
+            Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.TOAST, "Device connection was lost");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
 
-        // Start the service over to restart listening mode
-        BluetoothOBDService.this.start();
+            mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, STATE_NONE, -1).sendToTarget();
+        }
     }
-
 
     /**
      * This thread runs during a connection with a remote device.
@@ -299,9 +242,11 @@ public class BluetoothOBDService extends BluetoothService {
                             bundle.putString("MESSAGE", message);
                             Log.d(TAG, message);
 
-                            // Send the obtained bytes to the UI Activity
-                            mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
-                                    .sendToTarget();
+                            if (mHandler != null) {
+                                // Send the obtained bytes to the UI Activity
+                                mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
+                                        .sendToTarget();
+                            }
                         }
                         requestOBD = false;
                     }
@@ -322,9 +267,11 @@ public class BluetoothOBDService extends BluetoothService {
                         bundle.putString(Constants.DEVICE_NAME, deviceName);
                         bundle.putString("MESSAGE", message);
 
-                        // Send the obtained bytes to the UI Activity
-                        mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
-                                .sendToTarget();
+                        if (mHandler != null) {
+                            // Send the obtained bytes to the UI Activity
+                            mHandler.obtainMessage(Constants.MESSAGE_READ, message.length(), -1, bundle)
+                                    .sendToTarget();
+                        }
                         testOBD = false;
                     }
                 } catch (IOException e) {

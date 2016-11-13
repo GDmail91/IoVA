@@ -39,7 +39,7 @@ public class OBDScanner extends BluetoothConnection {
     public OBDScanner(Context context) {
         super(context);
 
-        bindService();
+        //bindService();
         Log.d(TAG, "OBD Scanner 생성");
     }
 
@@ -55,16 +55,14 @@ public class OBDScanner extends BluetoothConnection {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_OBD);
-        } else if (!mBound
-            || ((BluetoothOBDService.LocalBinder) binder).getState() == BluetoothService.STATE_NONE
-            || ((BluetoothOBDService.LocalBinder) binder).getState() == BluetoothService.STATE_LISTEN) {
-            Log.d("BINDING", "호출");
+        } else if (!mBound) {
             bindService();
         }
     }
 
     @Override
     public void bindService() {
+        Log.d(TAG, "bindService()");
         Intent intent = new Intent(mContext, BluetoothOBDService.class);
         mContext.bindService(intent, this, Context.BIND_AUTO_CREATE);
     }
@@ -72,7 +70,7 @@ public class OBDScanner extends BluetoothConnection {
     @Override
     public void serviceStop() {
         if(mBound){
-            ((BluetoothOBDService.LocalBinder) binder).stop();
+            //binder.stop();
             mContext.unbindService(this);
             mBound = false;
         }
@@ -87,28 +85,31 @@ public class OBDScanner extends BluetoothConnection {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_OBD);
         } else {
-            Intent intent = new Intent(mContext, BluetoothOBDService.class);
-            mContext.startService(intent);
             if (mBound) {
+                Log.d(TAG, "setupService().init()");
+                binder.init(mHandler);
                 setupStringBuffer();
 
-                setupConnect();
+                //((BluetoothOBDService.LocalBinder) binder).start();
+
+
                 // Only if the state is STATE_NONE, do we know that we haven't started already
-                if (((BluetoothOBDService.LocalBinder) binder).getState() == BluetoothService.STATE_NONE) {
+                /*if (((BluetoothOBDService.LocalBinder) binder).getState() == BluetoothService.STATE_NONE) {
                     // Start the Bluetooth chat services
                     ((BluetoothOBDService.LocalBinder) binder).start();
-                }
+                }*/
+                // Start the Bluetooth services
             }
         }
     }
 
     @Override
-    protected void setupConnect() {
+    public void setupConnect() {
         Log.d(TAG, "setupConnect 실행");
         mOutStringBuffer = new StringBuffer("");
 
 
-        SharedPreferences pref = mContext.getSharedPreferences("pref", mContext.MODE_PRIVATE);
+        SharedPreferences pref = mContext.getSharedPreferences("pref", Context.MODE_PRIVATE);
         String address = pref.getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS_OBD, "");
         Log.d(TAG, "뭘가지고 있나: "+address);
         if ("".equals(address) || !AUTO_CONN) {
@@ -126,7 +127,10 @@ public class OBDScanner extends BluetoothConnection {
 
     @Override
     public int getConnectionStatus() {
-        return 0;
+        if (binder != null)
+            return binder.getState();
+        else
+            return BluetoothService.STATE_NONE;
     }
 
     /**
@@ -141,15 +145,15 @@ public class OBDScanner extends BluetoothConnection {
         String address = data.getExtras()
                 .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
 
-        SharedPreferences pref = mContext.getSharedPreferences("pref", mContext.MODE_PRIVATE);
+        SharedPreferences pref = mContext.getSharedPreferences("pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor prefEdit = pref.edit();
         prefEdit.putString(DeviceListActivity.EXTRA_DEVICE_ADDRESS_OBD, address);
         prefEdit.apply();
 
         // Get the BluetoothDevice object
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+            BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
-        ((BluetoothOBDService.LocalBinder) binder).connect(device, secure);
+        binder.connect(device, secure);
     }
 
     /**
@@ -158,8 +162,8 @@ public class OBDScanner extends BluetoothConnection {
      */
     public void sendMessage(int id) {
         // Check that we're actually connected before trying anything
-        Log.d(TAG, "message 보낼때 "+ ((BluetoothOBDService.LocalBinder) binder).getState());
-        if (((BluetoothOBDService.LocalBinder) binder).getState() != BluetoothService.STATE_CONNECTED) {
+        Log.d(TAG, "message 보낼때 "+ binder.getState());
+        if (binder.getState() != BluetoothService.STATE_CONNECTED) {
             Toast.makeText(mContext, mContext.getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -169,7 +173,7 @@ public class OBDScanner extends BluetoothConnection {
         Bundle out = new Bundle();
         out.putInt("sensing_id", id);
         out.putInt("out", BluetoothService.REQUEST_OBD_SENSOR_DATA);
-        ((BluetoothOBDService.LocalBinder) binder).write(out);
+        binder.write(out);
 
         // Reset out string buffer to zero and clear the edit text field
         mOutStringBuffer.setLength(0);
@@ -214,14 +218,12 @@ public class OBDScanner extends BluetoothConnection {
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        Log.d("BINDING", "바인딩 받음");
+        Log.d(TAG, "onServiceConnected()");
         // We've bound to LocalService, cast the IBinder and get LocalService instance
         binder = (BluetoothOBDService.LocalBinder) service;
-        ((BluetoothOBDService.LocalBinder) binder).init(mHandler);
-        mChatService = ((BluetoothOBDService.LocalBinder) binder).getService();
-        setupService();
-        setupConnect();
         mBound = true;
+        setupService();
+        //setupConnect();
         Log.d(TAG, "OBD 서비스 연결됨");
         Toast.makeText(mContext, "OBD 서비스 연결됨", Toast.LENGTH_SHORT).show();
     }

@@ -8,7 +8,6 @@ import android.os.Handler;
  * Created by YS on 2016-11-12.
  */
 public interface BluetoothBinderInterface {
-    public BluetoothService getService();
     public void init(Handler handler);
     public int getState();
     public void start();

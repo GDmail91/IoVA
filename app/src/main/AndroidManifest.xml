@@ -69,7 +69,7 @@
         <!-- 최상위 뷰 -->
         <service
             android:name=".Driving.TopActivity.DrivingOnTopService"
-            android:permission="android.permission.SYSTEM_ALERT_WINDOW" >
+            android:permission="android.permission.SYSTEM_ALERT_WINDOW"
             android:enabled="true"
             android:exported="false"> <!-- 퍼미션 중요 -->
             <intent-filter >
@@ -78,16 +78,20 @@
         </service>
 
         <service
-            android:name=".Driving.Bluetooth.Service.BluetoothOBDService">
+            android:name=".Driving.Bluetooth.Service.BluetoothOBDService"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
-                <action android:name=".Driving.Bluetooth.Service.BluetoothOBDService"/>
+                <action android:name="org.multibluetooth.multibluetooth.BluetoothOBDService"/>
             </intent-filter>
         </service>
 
         <service
-            android:name=".Driving.Bluetooth.Service.BluetoothLaserService">
+            android:name=".Driving.Bluetooth.Service.BluetoothLaserService"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
-                <action android:name=".Driving.Bluetooth.Service.BluetoothLaserService"/>
+                <action android:name="org.multibluetooth.multibluetooth.BluetoothLaserService"/>
             </intent-filter>
         </service>
         <!-- 서버 통신 -->

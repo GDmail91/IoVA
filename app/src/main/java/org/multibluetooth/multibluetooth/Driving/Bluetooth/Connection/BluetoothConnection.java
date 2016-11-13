@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -56,11 +55,6 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
     protected ArrayAdapter<String> mConversationArrayAdapter;
 
     /**
-     * Member object for the chat services
-     */
-    protected BluetoothService mChatService = null;
-
-    /**
      * String buffer for outgoing messages
      */
     protected StringBuffer mOutStringBuffer;
@@ -86,8 +80,10 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
         return 0;
     }
 
-    protected Binder binder = null;
+    protected BluetoothService.LocalBinder binder = null;
     protected boolean mBound = false;    // 서비스 연결 여부
+
+    public boolean isBound() { return mBound; }
 
     public void queueInit(int topNumber) {
         // make score calculate queue
@@ -129,7 +125,7 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
 
     public abstract void setupService();
 
-    protected void setupConnect() {
+    public void setupConnect() {
         setupStringBuffer();
 
         // Launch the DeviceListActivity to see devices and do scan
@@ -208,13 +204,18 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
                             ((MainMenuActivity) mContext).setBtConnectSign();
                             break;
                         case BluetoothService.STATE_CONNECTING:
+                            ((MainMenuActivity) mContext).setBtConnectSign();
                             setStatus(R.string.title_connecting);
                             break;
                         case BluetoothService.STATE_LISTEN:
                         case BluetoothService.STATE_NONE:
+                            ((MainMenuActivity) mContext).setBtConnectSign();
                             setStatus(R.string.title_not_connected);
                             break;
                     }
+                    break;
+                case Constants.MESSAGE_LASER_CONNECT:
+                    ((MainMenuActivity) mContext).onAutoConnectOBD();
                     break;
                 case Constants.MESSAGE_WRITE:
                     if (mContext.getApplicationInfo().className.equals("org.multibluetooth.multibluetooth.Driving.DrivingActivity")) {
@@ -281,7 +282,7 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
                     // Bluetooth is now enabled, so set up a chat session
-                    if (!mBound)
+                    if (mBound)
                         setupConnect();
                 } else {
                     // User did not enable Bluetooth or an error occurred

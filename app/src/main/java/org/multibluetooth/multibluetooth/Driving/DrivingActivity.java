@@ -56,6 +56,8 @@ public class DrivingActivity extends AppCompatActivity {
     private TextView sideSafeSpeed;
     private TextView sideSafeMsg;
     private LinearLayout loadingDialog;
+    private HalfCircleView halfTopView;
+    private HalfCircleView halfBottomView;
 
     double mySpeed, maxSpeed;
     int driveId;
@@ -305,15 +307,16 @@ public class DrivingActivity extends AppCompatActivity {
     public void setForwardBackground(int mode) {
         switch (mode) {
             case DISTANCE_WARNING:
-                forwardDistance.setBackgroundResource(R.color.warning);
+                halfBottomView.setColorByResource(R.color.warning);
                 break;
             case DISTANCE_DANGER:
-                forwardDistance.setBackgroundResource(R.color.danger);
+                halfBottomView.setColorByResource(R.color.danger);
                 break;
             case DISTANCE_NORMAL:
-                forwardDistance.setBackgroundResource(R.color.good);
+                halfBottomView.setColorByResource(R.color.good);
                 break;
         }
+        halfTopView.startDraw();
         // TODO 최상위뷰 색 변경
         // mBoundService.setColor(mode);
     }
@@ -338,15 +341,16 @@ public class DrivingActivity extends AppCompatActivity {
     public void setBackwardBackground(int mode) {
         switch (mode) {
             case DISTANCE_WARNING:
-                backDistance.setBackgroundResource(R.color.warning);
+                halfBottomView.setColorByResource(R.color.warning);
                 break;
             case DISTANCE_DANGER:
-                backDistance.setBackgroundResource(R.color.danger);
+                halfBottomView.setColorByResource(R.color.danger);
                 break;
             case DISTANCE_NORMAL:
-                backDistance.setBackgroundResource(R.color.good);
+                halfBottomView.setColorByResource(R.color.good);
                 break;
         }
+        halfBottomView.startDraw();
     }
 
     // 운행 시작 버튼 클릭
@@ -529,12 +533,12 @@ public class DrivingActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
 
-        HalfCircleView halfTopView = new HalfCircleView(getApplicationContext(), forwardDistanceLayout.getWidth(), forwardDistanceLayout.getHeight(), HalfCircleView.TOP);
+        halfTopView = new HalfCircleView(getApplicationContext(), forwardDistanceLayout.getWidth(), forwardDistanceLayout.getHeight(), HalfCircleView.TOP);
         halfTopView.setFill(true);
         halfTopView.setColorByResource(R.color.good);
         halfTopView.startDraw();
 
-        HalfCircleView halfBottomView = new HalfCircleView(getApplicationContext(), backDistanceLayout.getWidth(), backDistanceLayout.getHeight(), HalfCircleView.BOTTOM);
+        halfBottomView = new HalfCircleView(getApplicationContext(), backDistanceLayout.getWidth(), backDistanceLayout.getHeight(), HalfCircleView.BOTTOM);
         halfBottomView.setFill(true);
         halfBottomView.setColorByResource(R.color.good);
         halfBottomView.startDraw();

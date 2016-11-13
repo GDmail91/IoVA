@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
@@ -21,6 +20,8 @@ import android.util.Log;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Random;
 import java.util.UUID;
 
@@ -45,6 +46,9 @@ public abstract class BluetoothService extends Service {
             UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
     protected static String deviceName;
 
+    protected String sendDeviceCheckStr;
+    protected String checkDeviceCheckStr;
+
     // Member fields
     protected BluetoothAdapter mAdapter;
     protected Handler mHandler;
@@ -53,7 +57,7 @@ public abstract class BluetoothService extends Service {
     protected ConnectedThread mConnectedThread;
     protected int mState;
 
-    protected IBinder mBinder;    // 컴포넌트에 반환되는 IBinder
+    protected LocalBinder mBinder;    // 컴포넌트에 반환되는 IBinder
 
     private final Random rand = new Random();
 
@@ -69,12 +73,6 @@ public abstract class BluetoothService extends Service {
     public static final int REQUEST_SCAN_RIGHT_SENSOR_DATA = 503;  // 오른쪽 Scan 센서 데이터 요청
     public static final int REQUEST_SCAN_STOP = 504; // Scan Stop
 
-    /**
-     * Constructor. Prepares a new BluetoothChat session.
-     *
-     * @param context The UI Activity Context
-     * @param handler A Handler to send messages back to the UI Activity
-     */
     public void init(Handler handler) {
         this.mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
@@ -84,17 +82,123 @@ public abstract class BluetoothService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mAdapter = BluetoothAdapter.getDefaultAdapter();
+        mState = STATE_NONE;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // TODO Auto-generated method stub
-        return super.onStartCommand(intent, flags, startId);
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent){
         return mBinder;
+    }
+
+    // 컴포넌트에 반환해줄 IBinder를 위한 클래스
+    public class LocalBinder extends Binder implements BluetoothBinderInterface {
+
+        @Override
+        public void init(Handler handler) {
+            mHandler = handler;
+        }
+
+        @Override
+        public int getState() {
+            return mState;
+        }
+
+        @Override
+        public void start() {
+            Log.d(TAG, "start");
+
+            // Cancel any thread attempting to make a connection
+            if (mConnectThread != null) {
+                mConnectThread.cancel();
+                mConnectThread = null;
+            }
+
+            // Cancel any thread currently running a connection
+            if (mConnectedThread != null) {
+                mConnectedThread.cancel();
+                mConnectedThread = null;
+            }
+
+            setState(STATE_LISTEN);
+
+            // Start the thread to listen on a BluetoothServerSocket
+            if (mSecureAcceptThread == null) {
+                mSecureAcceptThread = new AcceptThread(true);
+                mSecureAcceptThread.start();
+            }
+        }
+
+        @Override
+        public void stop() {
+            Log.d(TAG, "stop");
+
+            if (mConnectThread != null) {
+                mConnectThread.cancel();
+                mConnectThread = null;
+            }
+
+            if (mConnectedThread != null) {
+                mConnectedThread.cancel();
+                mConnectedThread = null;
+            }
+
+            if (mSecureAcceptThread != null) {
+                mSecureAcceptThread.cancel();
+                mSecureAcceptThread = null;
+            }
+
+            setState(STATE_NONE);
+        }
+
+        @Override
+        public void connect(BluetoothDevice device, boolean secure) {
+            Log.d(TAG, "connect to: " + device);
+
+            // Cancel any thread attempting to make a connection
+            if (mState == STATE_CONNECTING) {
+                if (mConnectThread != null) {
+                    mConnectThread.cancel();
+                    mConnectThread = null;
+                }
+            }
+
+            // Cancel any thread currently running a connection
+            if (mConnectedThread != null) {
+                mConnectedThread.cancel();
+                mConnectedThread = null;
+            }
+
+            if (mSecureAcceptThread != null) {
+                mSecureAcceptThread.cancel();
+                mSecureAcceptThread = null;
+            }
+
+            // Start the thread to connect with the given device
+            mConnectThread = new ConnectThread(device, secure);
+            mConnectThread.start();
+            setState(STATE_CONNECTING);
+        }
+
+        @Override
+        public void write(Bundle cmdInfo) {
+            // Create temporary object
+            ConnectedThread r;
+            // Synchronize a copy of the ConnectedThread
+            synchronized (this) {
+                if (mState != STATE_CONNECTED) return;
+                r = mConnectedThread;
+            }
+            // Perform the write unsynchronized
+            r.write(cmdInfo);
+        }
     }
 
     /**
@@ -106,9 +210,14 @@ public abstract class BluetoothService extends Service {
         Log.d(TAG, "setState() " + mState + " -> " + state);
         mState = state;
 
-        // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        if (mHandler != null) {
+            // Give the new state to the Handler so the UI Activity can update
+            mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        }
     }
+
+    protected abstract boolean checkDevice(String checkStr);
+
 /*
     *//**
      * Return the current connection state.
@@ -230,13 +339,16 @@ public abstract class BluetoothService extends Service {
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
     protected void connectionFailed() {
-        // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.TOAST, "Unable to connect device");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        if (mHandler != null) {
+            // Send a failure message back to the Activity
+            Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.TOAST, "Unable to connect device");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
 
+            mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, STATE_NONE, -1).sendToTarget();
+        }
         // Start the service over to restart listening mode
         BluetoothService.this.start();
     }
@@ -245,13 +357,16 @@ public abstract class BluetoothService extends Service {
      * Indicate that the connection was lost and notify the UI Activity.
      */
     protected void connectionLost() {
-        // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.TOAST, "Device connection was lost");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        if (mHandler != null) {
+            // Send a failure message back to the Activity
+            Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.TOAST, "Device connection was lost");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
 
+            mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, STATE_NONE, -1).sendToTarget();
+        }
         // Start the service over to restart listening mode
         BluetoothService.this.start();
     }
@@ -308,6 +423,37 @@ public abstract class BluetoothService extends Service {
 
                 // If a connection was accepted
                 if (socket != null) {
+                    // 10초간 원하는 커넥션인지 파악
+                    try {
+                        OutputStream sout = socket.getOutputStream();
+                        InputStream sin = socket.getInputStream();
+
+                        int timeOut = 0;
+                        byte[] buffer = new byte[255];
+                        while(timeOut++ <= 10) {
+
+                            sout.write(sendDeviceCheckStr.getBytes());
+                            sout.flush();
+
+                            int length = sin.read(buffer);
+                            String testWord = new String(buffer, 0, length);
+
+                            Log.d(TAG, testWord);
+                            if (checkDevice(testWord)) {
+                                setState(STATE_CONNECTING);
+                                break;
+                            }
+
+                            setState(STATE_NONE);
+                            // 1초간 슬립
+                            sleep(1000);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     synchronized (BluetoothService.this) {
                         Log.d(TAG, "AcceptThread mState:"+mState);
                         switch (mState) {
@@ -402,14 +548,76 @@ public abstract class BluetoothService extends Service {
                 return;
             }
 
-            // Reset the ConnectThread because we're done
-            synchronized (BluetoothService.this) {
-                mConnectThread = null;
+            // 10초간 원하는 커넥션인지 파악
+            try {
+                OutputStream sout = mmSocket.getOutputStream();
+                InputStream sin = mmSocket.getInputStream();
+
+                setState(STATE_NONE);
+                int timeOut = 0;
+                while(timeOut++ <= 10) {
+
+                    sout.write(sendDeviceCheckStr.getBytes());
+                    sout.flush();
+
+                    byte[] buffer = new byte[255];
+
+                    int length = sin.read(buffer);
+                    String testWord = new String(buffer, 0, length);
+
+                    if (checkDevice(testWord)) {
+                        setState(STATE_CONNECTING);
+                        break;
+                    }
+
+                    // 1초간 슬립
+                    sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                // Close the socket
+                try {
+                    mmSocket.close();
+                } catch (IOException e2) {
+                    Log.e(TAG, "unable to close() " + mSocketType +
+                            " socket during connection failure", e2);
+                }
+                connectionFailed();
+                return;
+            } catch (IOException e) {
+                // Close the socket
+                try {
+                    mmSocket.close();
+                } catch (IOException e2) {
+                    Log.e(TAG, "unable to close() " + mSocketType +
+                            " socket during connection failure", e2);
+                }
+                connectionFailed();
+                return;
             }
 
-            Log.d(TAG, "여기 실행 되야해");
-            // Start the connected thread
-            connected(mmSocket, mmDevice, mSocketType);
+            mConnectThread = null;
+
+            Log.d(TAG, "ConnectThread mState:"+mState);
+            switch (mState) {
+                case STATE_LISTEN:
+                case STATE_CONNECTING:
+                case STATE_CONNECTED:
+                    // Situation normal. Start the connected thread.
+                    Log.d(TAG, "여기 실행 되야해");
+                    // Start the connected thread
+                    connected(mmSocket, mmDevice, mSocketType);
+                    break;
+                case STATE_NONE:
+                    // Either not ready or already connected. Terminate new socket.
+                    try {
+                        mmSocket.close();
+                        connectionFailed();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Could not close unwanted socket", e);
+                    }
+                    break;
+
+            }
         }
 
         public void cancel() {

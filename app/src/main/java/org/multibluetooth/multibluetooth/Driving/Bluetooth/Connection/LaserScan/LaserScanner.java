@@ -39,7 +39,11 @@ public class LaserScanner extends BluetoothConnection {
 
     public LaserScanner(Context context) {
         super(context);
-        bindService();
+        //bindService();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
+        }
     }
 
     @Override
@@ -49,18 +53,14 @@ public class LaserScanner extends BluetoothConnection {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
-        } else if (!mBound
-                || ((BluetoothLaserService.LocalBinder) binder).getState() == BluetoothService.STATE_NONE
-                || ((BluetoothLaserService.LocalBinder) binder).getState() == BluetoothService.STATE_LISTEN) {
-            // TODO sendMessage() 를 할 컴포넌트 연결
-            // ex) sendMessage(message);
-            //setupChat(context);
+        } else if (!mBound) {
             bindService();
         }
     }
 
     @Override
     public void bindService() {
+        Log.d(TAG, "bindService()");
         Intent intent = new Intent(mContext, BluetoothLaserService.class);
         mContext.bindService(intent, this, Context.BIND_AUTO_CREATE);
     }
@@ -68,7 +68,7 @@ public class LaserScanner extends BluetoothConnection {
     @Override
     public void serviceStop() {
         if(mBound){
-            ((BluetoothLaserService.LocalBinder) binder).stop();
+            //binder.stop();
             mContext.unbindService(this);
             mBound = false;
         }
@@ -83,24 +83,19 @@ public class LaserScanner extends BluetoothConnection {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
         } else {
-            Intent intent = new Intent(mContext, BluetoothLaserService.class);
-            mContext.startService(intent);
             if (mBound) {
-                ((BluetoothLaserService.LocalBinder) binder).init(mHandler);
+                Log.d(TAG, "setupService().init()");
+                binder.init(mHandler);
                 setupStringBuffer();
 
-                setupConnect();
-                // Only if the state is STATE_NONE, do we know that we haven't started already
-                if (((BluetoothLaserService.LocalBinder) binder).getState() == BluetoothService.STATE_NONE) {
-                    // Start the Bluetooth chat services
-                    ((BluetoothLaserService.LocalBinder) binder).start();
-                }
+                //((BluetoothLaserService.LocalBinder) binder).start();
             }
         }
     }
 
     @Override
-    protected void setupConnect() {
+    public void setupConnect() {
+        Log.d(TAG, "setupConnect()");
         setupStringBuffer();
 
         // Launch the DeviceListActivity to see devices and do scan
@@ -110,7 +105,10 @@ public class LaserScanner extends BluetoothConnection {
 
     @Override
     public int getConnectionStatus() {
-        return ((BluetoothLaserService.LocalBinder) binder).getState();
+        if (binder != null)
+            return binder.getState();
+        else
+            return BluetoothService.STATE_NONE;
     }
 
     /**
@@ -127,7 +125,7 @@ public class LaserScanner extends BluetoothConnection {
         // Get the BluetoothDevice object
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
-        ((BluetoothLaserService.LocalBinder) binder).connect(device, secure);
+        binder.connect(device, secure);
     }
 
     /**
@@ -136,8 +134,8 @@ public class LaserScanner extends BluetoothConnection {
      */
     public void sendMessage(int id) {
         // Check that we're actually connected before trying anything
-        Log.d(TAG, "message 보낼때 "+ ((BluetoothLaserService.LocalBinder) binder).getState());
-        if (((BluetoothLaserService.LocalBinder) binder).getState() != BluetoothService.STATE_CONNECTED) {
+        Log.d(TAG, "message 보낼때 "+ binder.getState());
+        if (binder.getState() != BluetoothService.STATE_CONNECTED) {
             Toast.makeText(mContext, mContext.getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -147,7 +145,7 @@ public class LaserScanner extends BluetoothConnection {
         Bundle out = new Bundle();
         out.putInt("sensing_id", id);
         out.putInt("out", BluetoothService.REQUEST_LASER_SENSOR_DATA);
-        ((BluetoothLaserService.LocalBinder) binder).write(out);
+        binder.write(out);
 
         // Reset out string buffer to zero and clear the edit text field
         mOutStringBuffer.setLength(0);
@@ -159,7 +157,7 @@ public class LaserScanner extends BluetoothConnection {
      */
     public void sendScan(int side) {
         // Check that we're actually connected before trying anything
-        if (((BluetoothLaserService.LocalBinder) binder).getState() != BluetoothLaserService.STATE_CONNECTED) {
+        if (binder.getState() != BluetoothLaserService.STATE_CONNECTED) {
             Toast.makeText(mContext, mContext.getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -179,7 +177,7 @@ public class LaserScanner extends BluetoothConnection {
                 out.putInt("out", BluetoothService.REQUEST_SCAN_STOP);
                 break;
         }
-        ((BluetoothLaserService.LocalBinder) binder).write(out);
+        binder.write(out);
 
         // Reset out string buffer to zero and clear the edit text field
         mOutStringBuffer.setLength(0);
@@ -331,13 +329,12 @@ public class LaserScanner extends BluetoothConnection {
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
+        Log.d(TAG, "onServiceConnected()");
         // We've bound to LocalService, cast the IBinder and get LocalService instance
         binder = (BluetoothLaserService.LocalBinder) service;
-        ((BluetoothLaserService.LocalBinder) binder).init(mHandler);
-        mChatService = ((BluetoothLaserService.LocalBinder) binder).getService();
-        setupService();
-        setupConnect();
         mBound = true;
+        setupService();
+        //setupConnect();
         Log.d(TAG, "Laser 서비스 연결됨");
         Toast.makeText(mContext, "Laser 서비스 연결됨", Toast.LENGTH_SHORT).show();
     }

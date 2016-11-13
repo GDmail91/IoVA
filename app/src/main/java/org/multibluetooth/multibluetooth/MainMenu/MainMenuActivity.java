@@ -108,29 +108,31 @@ public class MainMenuActivity extends AppCompatActivity {
 		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
 
 		registerReceiver(receiver, filter);
-	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
 		if (btLaserCon == null) {
 			btLaserCon = new LaserScanner(this);
+			// Start the Bluetooth services
+			Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothLaserService");
+			intent.setPackage("org.multibluetooth.multibluetooth");
+			startService(intent);
 		}
 		if (btOBDCon == null) {
 			btOBDCon = new OBDScanner(this);
+			// Start the Bluetooth services
+			Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothOBDService");
+			intent.setPackage("org.multibluetooth.multibluetooth");
+			startService(intent);
 		}
+		btLaserCon.conn();
+		btOBDCon.conn();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (btLaserCon != null) {
-			btLaserCon.serviceStop();
-		}
-		if (btOBDCon != null) {
-			btOBDCon.serviceStop();
-		}
 		unregisterReceiver(receiver);
+		btLaserCon.serviceStop();
+		btOBDCon.serviceStop();
 	}
 
 	public void onMenuClick(View v) {
@@ -196,17 +198,27 @@ public class MainMenuActivity extends AppCompatActivity {
 	// 불루투스 연결
 	public void onBluetoothConnect(int connectDevice) {
 		if (connectDevice == BLUETOOTH_LASER_CONNECT) {
-			btLaserCon = new LaserScanner(this);
-			btLaserCon.conn();
+			btLaserCon.setupConnect();
 		} else if (connectDevice == BLUETOOTH_OBD_CONNECT) {
 			SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
 			SharedPreferences.Editor prefEdit = pref.edit();
 			prefEdit.putString(DeviceListActivity.EXTRA_DEVICE_ADDRESS, "");
 			prefEdit.apply();
 
-			btOBDCon.conn();
+			btOBDCon.connMode(false);
+			btOBDCon.setupConnect();
 		}
 
+	}
+
+	public void onAutoConnectOBD() {
+		if (btLaserCon != null && btOBDCon != null
+				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
+				&& btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
+			Log.d(TAG, "OBD 연결 실행");
+			btOBDCon.connMode(true);
+			btOBDCon.setupConnect();
+		}
 	}
 
 	// 디바이스 메세지 전달
@@ -221,30 +233,21 @@ public class MainMenuActivity extends AppCompatActivity {
 				break;
 			case LaserScanner.REQUEST_ENABLE_BT_BY_LASER:
 				btLaserCon.onActivityResult(BluetoothConnection.REQUEST_ENABLE_BT, resultCode, data);
-				Log.d(TAG, "이떄 연결됬는지 확인?");
 				break;
 			case OBDScanner.REQUEST_CONNECT_DEVICE_SECURE_BY_OBD:
+				Log.d(TAG, "이떄 연결됬는지 확인?");
 				btOBDCon.onActivityResult(BluetoothConnection.REQUEST_CONNECT_DEVICE_SECURE, resultCode, data);
 				break;
 			case OBDScanner.REQUEST_ENABLE_BT_BY_OBD:
 				btOBDCon.onActivityResult(BluetoothConnection.REQUEST_ENABLE_BT, resultCode, data);
 				break;
 			case BLUETOOTH_CONNECTING:
-				if (resultCode == BLUETOOTH_LASER_CONNECT) {
-					onBluetoothConnect(BLUETOOTH_LASER_CONNECT);
-				} else if (resultCode == BLUETOOTH_OBD_CONNECT)
-				 	onBluetoothConnect(BLUETOOTH_OBD_CONNECT);
+				onBluetoothConnect(resultCode);
 				break;
 		}
 	}
 
 	public void setBtConnectSign() {
-		if (btLaserCon != null && btOBDCon != null
-				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
-				&& btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
-			Log.d(TAG, "OBD 연결 실행");
-			btOBDCon.conn();
-		}
 		if (btLaserCon != null && btOBDCon != null
 				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
 				&& btOBDCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED) {
