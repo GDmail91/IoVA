@@ -85,10 +85,13 @@ public class DrivingOnTopService extends Service {
         mPopupView.setBackgroundColor(Color.argb(255, 0, 0, 0));        // 텍스트뷰 배경 색
         mPopupView.setPadding(20,10,20,10);
 
-        mTopTextView.setText("0\n0");                                   //텍스트 설정
+        mTopTextView = new TextView(this);
+        mBottomTextView = new TextView(this);
+
+        mTopTextView.setText("0");                                      //텍스트 설정
         mTopTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);       //텍스트 크기 18sp
         mTopTextView.setTextColor(Color.WHITE);                         //글자 색상
-        mBottomTextView.setText("0\n0");                                //텍스트 설정
+        mBottomTextView.setText("0");                                   //텍스트 설정
         mBottomTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);    //텍스트 크기 18sp
         mBottomTextView.setTextColor(Color.WHITE);                      //글자 색상
 

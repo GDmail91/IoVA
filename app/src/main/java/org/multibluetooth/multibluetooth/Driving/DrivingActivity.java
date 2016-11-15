@@ -559,6 +559,7 @@ public class DrivingActivity extends AppCompatActivity {
     }
 
 
+    // 신호등 원 그리기
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
 
