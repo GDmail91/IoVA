@@ -50,7 +50,7 @@ public class DriveInfo {
 
     public int getVehicleSpeed() { return vehicle_speed; }
 
-    public int rpm() { return rpm; }
+    public int getRpm() { return rpm; }
 
     public float getFrontDistance() { return front_distance; }
 
@@ -76,7 +76,7 @@ public class DriveInfo {
         this._id = driveInfo.getId();
         this.drive_id = driveInfo.getDriveId();
         this.vehicle_speed = driveInfo.getVehicleSpeed();
-        this.rpm = driveInfo.rpm();
+        this.rpm = driveInfo.getRpm();
     }
 
     public void setLaserSensor(DriveInfo driveInfo) {

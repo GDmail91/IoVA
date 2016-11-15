@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
-    protected static final int DB_VERSION = 14;
+    protected static final int DB_VERSION = 15;
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();
@@ -36,6 +36,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                 "_id INTEGER NOT NULL, " +
                 "drive_id INTEGER NOT NULL, " +
                 "vehicle_speed INTEGER DEFAULT 0, " +
+                "rpm INTEGER DEFAULT 0, " +
                 "front_distance INTEGER DEFAULT 0, " +
                 "back_distance INTEGER DEFAULT 0, " +
                 "side_distance INTEGER DEFAULT 0, " +
@@ -71,10 +72,11 @@ public class DriveInfoModel extends SQLiteOpenHelper {
 
         topNumber = topNumber+1;
 
-        String sql = "INSERT INTO DriveInfo (_id, vehicle_speed, front_distance, back_distance) " +
+        String sql = "INSERT INTO DriveInfo (_id, vehicle_speed, rpm, front_distance, back_distance) " +
                 "VALUES(" +
                 "'" + topNumber + "', " +
                 "'" + driveInfo.getVehicleSpeed() + "', " +
+                "'" + driveInfo.getRpm() + "', " +
                 "'" + driveInfo.getFrontDistance() + "', " +
                 "'" + driveInfo.getBackDistance() + "');";
 
@@ -155,6 +157,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public int update(DriveInfo driveInfo) {
         String sql = "UPDATE DriveInfo SET " +
                 "vehicle_speed='" + driveInfo.getVehicleSpeed() + "', " +
+                "rpm='" + driveInfo.getRpm() + "', " +
                 "front_distance='" + driveInfo.getFrontDistance() + "', " +
                 "back_distance='" + driveInfo.getBackDistance() + "' " +
                 "WHERE _id='"+driveInfo.getId()+"' ;";
@@ -181,6 +184,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public int updateOBD(DriveInfo driveInfo) {
         String sql = "UPDATE DriveInfo SET " +
                 "vehicle_speed='" + driveInfo.getVehicleSpeed() + "' " +
+                "rpm='" + driveInfo.getRpm() + "' " +
                 "WHERE _id='"+driveInfo.getId()+"' ;";
 
         // DB 작업 실행
@@ -328,12 +332,13 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
-                    cursor.getFloat(3),
+                    cursor.getInt(3),
                     cursor.getFloat(4),
                     cursor.getFloat(5),
-                    cursor.getDouble(6),
+                    cursor.getFloat(6),
                     cursor.getDouble(7),
-                    cursor.getString(8));
+                    cursor.getDouble(8),
+                    cursor.getString(9));
 
             allData.add(i++, tempData);
         }
@@ -350,12 +355,13 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
-                    cursor.getFloat(3),
+                    cursor.getInt(3),
                     cursor.getFloat(4),
                     cursor.getFloat(5),
-                    cursor.getDouble(6),
+                    cursor.getFloat(6),
                     cursor.getDouble(7),
-                    cursor.getString(8));
+                    cursor.getDouble(8),
+                    cursor.getString(9));
 
             allData.push(tempData);
         }
@@ -376,12 +382,13 @@ public class DriveInfoModel extends SQLiteOpenHelper {
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
-                    cursor.getFloat(3),
+                    cursor.getInt(3),
                     cursor.getFloat(4),
                     cursor.getFloat(5),
-                    cursor.getDouble(6),
+                    cursor.getFloat(6),
                     cursor.getDouble(7),
-                    cursor.getString(8));
+                    cursor.getDouble(8),
+                    cursor.getString(9));
         }
 
         return data;
