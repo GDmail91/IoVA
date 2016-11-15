@@ -24,6 +24,9 @@
     <!-- WiFi 연결상태 확인 퍼미션 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
+    <!-- 화면꺼짐 방지 퍼미션 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
 
     <application
         android:allowBackup="true"
