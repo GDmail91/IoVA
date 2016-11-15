@@ -265,7 +265,8 @@ public class BluetoothOBDService extends BluetoothService {
                         for (org.multibluetooth.multibluetooth.Obd.ObdCommand cmd : obdCommandList.cmdList) {
                             cmd.run(mmInStream, mmOutStream);
 
-                            Log.d(TAG, "결과: "+cmd.getResult() + " / " +cmd.getCalculatedResult() + " / "+ cmd.getResultUnit());
+                            Log.d(TAG, "이름: "+cmd.getName() + ", 결과: "+cmd.getResult() + " / " +cmd.getCalculatedResult() + " / "+ cmd.getResultUnit());
+                            String name = cmd.getName();
                             String message = cmd.getCalculatedResult();
 
                             Bundle bundle = new Bundle();
@@ -274,6 +275,7 @@ public class BluetoothOBDService extends BluetoothService {
                             bundle.putString("CATEGORY", "OBD");
                             bundle.putInt("sensing_id", sensingId);
                             bundle.putString("MESSAGE", message);
+                            bundle.putString("NAME", name);
                             Log.d(TAG, message);
 
                             if (mHandler != null) {

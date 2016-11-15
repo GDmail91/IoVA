@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.github.pires.obd.enums.AvailableCommandNames;
+
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothOBDService;
@@ -31,6 +33,8 @@ public class OBDScanner extends BluetoothConnection {
     private static final String TAG = "OBDScanner";
 
     public boolean AUTO_CONN = true;
+
+    private DriveInfo mDriveInfo = new DriveInfo();;
 
     private static final LinkedList<Character> buffer = new LinkedList<>();
 
@@ -173,6 +177,7 @@ public class OBDScanner extends BluetoothConnection {
     @Override
     protected String updateData(Bundle bundle) {
         String parsedMessage = messageParse(bundle.getString("MESSAGE"));
+        AvailableCommandNames parsedName = AvailableCommandNames.valueOf(bundle.getString("NAME"));
 
         Log.d(TAG, parsedMessage);
         String category = bundle.getString("CATEGORY");
@@ -183,13 +188,22 @@ public class OBDScanner extends BluetoothConnection {
                     Log.d(TAG, "OBD 저장");
                     // OBD 센싱된 데이터 DB에 저장
                     int sensingId = bundle.getInt("sensing_id");
-                    DriveInfo driveInfo = new DriveInfo();
-                    driveInfo.setOBDSensor(sensingId, Integer.valueOf(parsedMessage));
-                    mScoreCalculator.putData(ScoreCalculator.OBD_DATA, driveInfo);
+                    switch (parsedName) {
+                        case SPEED:
+                            mDriveInfo.setOBDSpeed(sensingId, Integer.valueOf(parsedMessage));
+                            break;
+                        case ENGINE_RPM:
+                            mDriveInfo.setOBDRpm(sensingId, Integer.valueOf(parsedMessage));
+                            break;
+                    }
 
-                    DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
-                    driveInfoModel.updateOBD(driveInfo);
-                    driveInfoModel.close();
+                    if (mDriveInfo.isSetOBDData()) {
+                        mScoreCalculator.putData(ScoreCalculator.OBD_DATA, mDriveInfo);
+                        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+                        driveInfoModel.updateOBD(mDriveInfo);
+                        driveInfoModel.close();
+                        mDriveInfo.clear();
+                    }
                     break;
                 case "Laser":
                     break;

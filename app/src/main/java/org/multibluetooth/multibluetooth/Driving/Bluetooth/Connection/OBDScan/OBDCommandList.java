@@ -1,6 +1,7 @@
 package org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan;
 
 import org.multibluetooth.multibluetooth.Obd.ObdCommand;
+import org.multibluetooth.multibluetooth.Obd.RPMCommand;
 import org.multibluetooth.multibluetooth.Obd.SpeedCommand;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class OBDCommandList {
     public OBDCommandList() {
         // TODO If need more commnad
         cmdList.add(new SpeedCommand());
+        cmdList.add(new RPMCommand());
     }
 
 }
