@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -20,7 +21,9 @@ import android.widget.TextView;
  * Created by YS on 2016-10-09.
  */
 public class DrivingOnTopService extends Service {
-    private TextView mPopupView;							//항상 보이게 할 뷰
+    private LinearLayout mPopupView;							//항상 보이게 할 뷰
+    private TextView mTopTextView;							//항상 보이게 할 뷰
+    private TextView mBottomTextView;							//항상 보이게 할 뷰
     private WindowManager.LayoutParams mParams;		//layout params 객체. 뷰의 위치 및 크기를 지정하는 객체
     private WindowManager mWindowManager;			//윈도우 매니저
     private SeekBar mSeekBar;								//투명도 조절 seek bar
@@ -78,14 +81,23 @@ public class DrivingOnTopService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        mPopupView = new TextView(this);																//뷰 생성
-        mPopupView.setText("0\n0");                             	//텍스트 설정
-        mPopupView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);								//텍스트 크기 18sp
-        mPopupView.setTextColor(Color.WHITE);															//글자 색상
-        mPopupView.setBackgroundColor(Color.argb(255, 0, 0, 0));								//텍스트뷰 배경 색
+        mPopupView = new LinearLayout(this);                            // 뷰 생성
+        mPopupView.setBackgroundColor(Color.argb(255, 0, 0, 0));        // 텍스트뷰 배경 색
         mPopupView.setPadding(20,10,20,10);
 
-        mPopupView.setOnTouchListener(mViewTouchListener);										//팝업뷰에 터치 리스너 등록
+        mTopTextView.setText("0\n0");                                   //텍스트 설정
+        mTopTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);       //텍스트 크기 18sp
+        mTopTextView.setTextColor(Color.WHITE);                         //글자 색상
+        mBottomTextView.setText("0\n0");                                //텍스트 설정
+        mBottomTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);    //텍스트 크기 18sp
+        mBottomTextView.setTextColor(Color.WHITE);                      //글자 색상
+
+        mParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT);
+        mPopupView.addView(mTopTextView, mParams);
+        mPopupView.addView(mBottomTextView, mParams);
+        mPopupView.setOnTouchListener(mViewTouchListener);              //팝업뷰에 터치 리스너 등록
 
         //최상위 윈도우에 넣기 위한 설정
         mParams = new WindowManager.LayoutParams(
@@ -127,11 +139,11 @@ public class DrivingOnTopService extends Service {
 
     public void setForwardText(String message) {
         forwardDistance = message;
-        mPopupView.setText(forwardDistance + "\n" + backDistance);
+        mTopTextView.setText(forwardDistance);
     }
     public void setBackText(String message) {
         backDistance = message;
-        mPopupView.setText(forwardDistance + "\n" + backDistance);
+        mBottomTextView.setText(backDistance);
     }
 
     /**
@@ -176,6 +188,8 @@ public class DrivingOnTopService extends Service {
     @Override
     public void onDestroy() {
         if(mWindowManager != null) {		//서비스 종료시 뷰 제거. *중요 : 뷰를 꼭 제거 해야함.
+            if(mTopTextView != null) mPopupView.removeView(mTopTextView);
+            if(mBottomTextView != null) mPopupView.removeView(mBottomTextView);
             if(mPopupView != null) mWindowManager.removeView(mPopupView);
             if(mSeekBar != null) mWindowManager.removeView(mSeekBar);
         }
