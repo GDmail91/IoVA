@@ -38,7 +38,7 @@ public class BluetoothSideService extends BluetoothService {
         // TODO Auto-generated method stub
         Log.d(TAG, "Service Starting");
         mBinder = new LocalBinder();    // 컴포넌트에 반환되는 IBinder
-        mBinder.start();
+        //mBinder.start();
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }

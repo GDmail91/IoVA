@@ -279,23 +279,25 @@ public class BluetoothLaserService extends BluetoothService {
                 char c = messageStack.removeFirst();
 
                 switch (c) {
-                    case '{':
                     case '(':
+                    case '{':
                     case '[':
                         distance = "";
                         break;
-                    case '}':
+                    case ')':
                         distance = distance.trim();
                         while (distance.length() < 6)
                             distance = "0"+distance;
                         frontInputMessage += "AA01" + distance;
                         break;
-                    case ')':
+                    case '}':
+                        distance = distance.trim();
                         while (distance.length() < 6)
                             distance = "0"+distance;
                         backInputMessage += "AA02" + distance;
                         break;
                     case ']':
+                        distance = distance.trim();
                         while (distance.length() < 6)
                             distance = "0"+distance;
                         scanInputMessage += "AA03" + distance;

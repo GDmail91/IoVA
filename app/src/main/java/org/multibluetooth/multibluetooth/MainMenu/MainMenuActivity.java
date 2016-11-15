@@ -144,6 +144,7 @@ public class MainMenuActivity extends AppCompatActivity {
 		unregisterReceiver(receiver);
 		btLaserCon.serviceStop();
 		btOBDCon.serviceStop();
+		btSideCon.serviceStop();
 	}
 
 	public void onMenuClick(View v) {
@@ -206,6 +207,8 @@ public class MainMenuActivity extends AppCompatActivity {
 			intent.putExtra("LASER", btLaserCon.getConnectionStatus());
 		if (btOBDCon != null)
 			intent.putExtra("OBD", btOBDCon.getConnectionStatus());
+		if (btSideCon != null)
+			intent.putExtra("SIDE", btSideCon.getConnectionStatus());
 		startActivityForResult(intent, BLUETOOTH_CONNECTING);
 	}
 
