@@ -421,7 +421,7 @@ public class DrivingActivity extends AppCompatActivity {
     // 운행시작 함수
     private void startDriving() {
         // 운행 시작
-        DriveInfoModel driveInfoModel = new DriveInfoModel(this, "DriveInfo.db", null);
+        DriveInfoModel driveInfoModel = new DriveInfoModel(this, DriveInfoModel.DB_NAME, null);
         driveId = driveInfoModel.getTopNumber();
         driveInfoModel.close();
         driveThread = new DriveThread(this, mHandler, driveId, gpsInfo);
@@ -517,7 +517,7 @@ public class DrivingActivity extends AppCompatActivity {
 
         // 반복 쓰레드 종료
         driveThread.stopRequest();
-        SafeScoreModel safeScoreModel = new SafeScoreModel(this, "SafeScore.db", null);
+        SafeScoreModel safeScoreModel = new SafeScoreModel(this, SafeScoreModel.DB_NAME, null);
         SafeScore safeScore = safeScoreModel.getData(driveId);
         safeScoreModel.close();
         Log.d("TEST","액티비티가 가지고있는 ID:"+driveId);

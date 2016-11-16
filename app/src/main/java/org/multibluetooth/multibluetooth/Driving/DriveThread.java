@@ -79,7 +79,7 @@ public class DriveThread extends Thread {
                         // TODO 값 출력
 
                         // TODO 센서 ID 가져와야함
-                        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+                        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
                         int id = driveInfoModel.createIndex(topDriveNumber);
                         Location temp = gpsInfo.getLocation();
                         Log.d("TEST", temp.toString());
@@ -166,7 +166,7 @@ public class DriveThread extends Thread {
     }
 
     private void driveStop() {
-        SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, "SafeScore.db", null);
+        SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, SafeScoreModel.DB_NAME, null);
         safeScoreModel.updateEndOfDrive(topDriveNumber);
         safeScoreModel.close();
     }

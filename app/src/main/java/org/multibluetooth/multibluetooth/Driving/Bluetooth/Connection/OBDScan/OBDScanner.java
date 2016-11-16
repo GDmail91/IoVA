@@ -199,7 +199,7 @@ public class OBDScanner extends BluetoothConnection {
 
                     if (mDriveInfo.isSetOBDData()) {
                         mScoreCalculator.putData(ScoreCalculator.OBD_DATA, mDriveInfo);
-                        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+                        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
                         driveInfoModel.updateOBD(mDriveInfo);
                         driveInfoModel.close();
                         mDriveInfo.clear();

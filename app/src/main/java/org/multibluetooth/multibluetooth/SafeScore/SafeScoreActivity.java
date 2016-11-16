@@ -52,7 +52,7 @@ public class SafeScoreActivity extends ScoreBase {
         if (bundle == null) {
 
             // 안전점수 가져와서 뿌려줌
-            SafeScoreModel safeScoreModel = new SafeScoreModel(this, "SafeScore.db", null);
+            SafeScoreModel safeScoreModel = new SafeScoreModel(this, SafeScoreModel.DB_NAME, null);
             safeScore = safeScoreModel.getScoreData();
             safeScoreModel.close();
 

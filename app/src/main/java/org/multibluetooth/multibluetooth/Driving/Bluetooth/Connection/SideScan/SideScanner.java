@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Constants;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothSideService;
@@ -145,13 +146,13 @@ public class SideScanner extends BluetoothConnection {
                 case "Laser":
                 case "Side":
                     switch (bundle.getString("MESSAGE1", "")) {
-                        case "{0}":
+                        case Constants.SIDE_LEFT:
                             ((DrivingActivity) mContext).onScan(SCAN_LEFT);
                             break;
-                        case "{1}":
+                        case Constants.SIDE_RIGHT:
                             ((DrivingActivity) mContext).onScan(SCAN_RIGHT);
                             break;
-                        case "{2}":
+                        case Constants.SIDE_STOP:
                             ((DrivingActivity) mContext).onScan(SCAN_STOP);
                             break;
                     }

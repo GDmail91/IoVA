@@ -312,8 +312,8 @@ public class MainMenuActivity extends AppCompatActivity {
 					DTOLastIndexCallbackData lastIndexData = response.body().getData();
 
 					// 인덱스에 해당하는 데이터 가져옴
-					DriveInfoModel driveInfoModel = new DriveInfoModel(getApplicationContext(), "DriveInfo.db", null);
-					SafeScoreModel safeScoreModel = new SafeScoreModel(getApplicationContext(), "SafeScore.db", null);
+					DriveInfoModel driveInfoModel = new DriveInfoModel(getApplicationContext(), DriveInfoModel.DB_NAME, null);
+					SafeScoreModel safeScoreModel = new SafeScoreModel(getApplicationContext(), SafeScoreModel.DB_NAME, null);
 					JSONArray driveList;
 					JSONArray safeScoreList;
 					if (lastIndexData != null) {

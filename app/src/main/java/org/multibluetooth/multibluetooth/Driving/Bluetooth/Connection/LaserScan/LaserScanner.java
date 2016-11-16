@@ -316,7 +316,7 @@ public class LaserScanner extends BluetoothConnection {
                     }
                     mScoreCalculator.putData(ScoreCalculator.LASER_DATA, driveInfo);
 
-                    DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+                    DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
                     driveInfoModel.updateFrontLaser(driveInfo);
                     driveInfoModel.close();
                     break;

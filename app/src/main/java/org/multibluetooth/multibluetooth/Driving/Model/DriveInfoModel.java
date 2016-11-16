@@ -17,6 +17,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
     protected static final int DB_VERSION = 15;
+    public static final String DB_NAME = "DriveInfo.db";
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();

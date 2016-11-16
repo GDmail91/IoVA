@@ -15,6 +15,7 @@ public class SafeScoreModel extends SQLiteOpenHelper {
     private static final String TAG = "SafeScoreModel";
 
     protected static final int DB_VERSION = 14;
+    public static final String DB_NAME = "SafeScore.db";
 
     SQLiteDatabase dbR = getReadableDatabase();
     SQLiteDatabase dbW = getWritableDatabase();

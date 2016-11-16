@@ -35,4 +35,8 @@ public interface Constants {
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
+    // Side scan control word
+    public static final String SIDE_LEFT = "{0}";
+    public static final String SIDE_RIGHT = "{1}";
+    public static final String SIDE_STOP = "{00}";
 }

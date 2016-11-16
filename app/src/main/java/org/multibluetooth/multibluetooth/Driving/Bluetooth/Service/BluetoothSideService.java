@@ -264,12 +264,8 @@ public class BluetoothSideService extends BluetoothService {
                         inputeMessage = "{";
                         break;
                     case '}':
-                        if (inputeMessage.length() > 3)
-                            inputeMessage = "";
-                        else {
-                            inputeMessage = inputeMessage.trim();
-                            inputeMessage += inputeMessage + "}";
-                        }
+                        inputeMessage = inputeMessage.trim();
+                        inputeMessage += inputeMessage + "}";
                         break;
                     default:
                         inputeMessage += c;

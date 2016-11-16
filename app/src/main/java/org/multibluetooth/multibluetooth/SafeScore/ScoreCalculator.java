@@ -93,7 +93,7 @@ import retrofit2.Retrofit;
         scorePool.init();
 
         // TODO 반드시 close하고 끝내도록 짤것
-        safeScoreModel = new SafeScoreModel(mContext, "SafeScore.db", null);
+        safeScoreModel = new SafeScoreModel(mContext, SafeScoreModel.DB_NAME, null);
         safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0,"",""));
 
         this.gpsInfo = new GpsInfo(mContext);
@@ -317,7 +317,7 @@ import retrofit2.Retrofit;
 
     // 안전거리 알람
     public void onDistanceAlertBySpeak(int type, int requestId) {
-        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, "DriveInfo.db", null);
+        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
         DriveInfo driveInfo = driveInfoModel.getData(requestId);
         Location location = new Location("gps");
         location.setLatitude(driveInfo.getGpsLatitude());

@@ -10,6 +10,7 @@ import android.util.Log;
  */
 public class ModelStructure extends SQLiteOpenHelper {
     protected static final int DB_VERSION = 4;
+    public static final String DB_NAME = "MyModel.db";
 
     public ModelStructure(Context context, String name, SQLiteDatabase.CursorFactory factory) {
         super(context, name, factory, DB_VERSION);
