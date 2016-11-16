@@ -176,10 +176,10 @@ public class HalfCircleView extends View {
         LinearGradient shader;
         switch (heading) {
             case BOTTOM:
-                shader = new LinearGradient(0, 0, width, height, colors, color_pos, Shader.TileMode.CLAMP);
+                shader = new LinearGradient(0, 0, 0, height, colors, color_pos, Shader.TileMode.CLAMP);
                 break;
             default:
-                shader = new LinearGradient(0, height, width, 0, colors, color_pos, Shader.TileMode.CLAMP);
+                shader = new LinearGradient(0, height, 0, 0, colors, color_pos, Shader.TileMode.CLAMP);
                 break;
         }
         mPaint.setShader(shader);
@@ -202,13 +202,28 @@ public class HalfCircleView extends View {
         canvas.drawArc(oval, startPoint, mSweep, useCenter, paint);
     }
 
+    /**
+     * draw 사각형
+     * @param canvas
+     * @param oval
+     * @param paint
+     */
+    private void drawHalf(Canvas canvas, RectF oval, Paint paint) {
+        //Path circle;
+        //circle = new Path();
+        //circle.addCircle(230, 350, 150, Path.Direction.CW);
+        //canvas.drawPath(circle, paint);
+        canvas.drawRect(oval, paint);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
 
         //배경색
         //canvas.drawColor(Color.WHITE);
         //선
-        drawArcs(canvas, mHalfCircle, false, getStartPoint(), mPaint);
+        drawHalf(canvas, mHalfCircle, mPaint);
+
         //반원만
         mSweep += SWEEP_INC;
         if (mSweep > 180) {
