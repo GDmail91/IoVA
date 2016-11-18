@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +55,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
 	// VIEW
 	private TextView btDeviceName;
-	private ImageView btconnectSign;
+	private TextView btCheckText;
+	private LinearLayout btconnectSign;
 
 	public static LaserScanner btLaserCon;
 	public static OBDScanner btOBDCon;
@@ -78,7 +79,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
 		// VIEW 연결
 		btDeviceName = (TextView) findViewById(R.id.bt_device_name);
-		btconnectSign = (ImageView) findViewById(R.id.bt_connect_sign);
+		btCheckText = (TextView) findViewById(R.id.bt_check_text);
+		btconnectSign = (LinearLayout) findViewById(R.id.bt_check);
 
 		// Bluetooth connection check
 		setBtConnectSign();
@@ -112,6 +114,11 @@ public class MainMenuActivity extends AppCompatActivity {
 
 		registerReceiver(receiver, filter);
 
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 		if (btLaserCon == null) {
 			btLaserCon = new LaserScanner(this);
 			// Start the Bluetooth services
@@ -290,8 +297,11 @@ public class MainMenuActivity extends AppCompatActivity {
 				&& btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
 				&& btOBDCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED
 				&& btSideCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED) {
-			btconnectSign.setImageResource(R.drawable.green_dot);
+			btconnectSign.setBackgroundResource(R.drawable.bluetooth_btn);
+			btCheckText.setText("블르투스 연결됨");
 		}
+		btconnectSign.setBackgroundResource(R.drawable.bluetooth_red_btn);
+		btCheckText.setText("연결이 필요합니다");
 	}
 
 	private void getLastIndexAndUpload() {

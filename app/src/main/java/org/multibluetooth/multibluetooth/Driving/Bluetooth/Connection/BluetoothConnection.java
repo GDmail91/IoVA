@@ -284,7 +284,8 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
                 }
                 break;
             case REQUEST_CONNECT_DEVICE_INSECURE:
-                // When DeviceListActivity returns with a device to connect
+                // When Device
+                // ListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
                     connectDevice(data, false);
                 }
@@ -295,6 +296,8 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
                     // Bluetooth is now enabled, so set up a chat session
                     if (mBound)
                         setupConnect();
+                    else
+                        conn();
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");

@@ -40,10 +40,6 @@ public class LaserScanner extends BluetoothConnection {
     public LaserScanner(Context context) {
         super(context);
         //bindService();
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
-        }
     }
 
     @Override

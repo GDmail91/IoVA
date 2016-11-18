@@ -40,21 +40,12 @@
             android:src="@drawable/bluetooth"
             android:scaleType="fitXY"/>-->
         <TextView
+            android:id="@+id/bt_check_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="블루투스 연결"
             android:textColor="@color/white"/>
-
-        <ImageView
-            android:id="@+id/bt_connect_sign"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/red_dot"
-            android:scaleType="fitCenter"/>
     </LinearLayout>
 
     <LinearLayout
