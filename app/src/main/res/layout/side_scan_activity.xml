@@ -13,7 +13,7 @@
         android:weightSum="2">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical">
@@ -33,16 +33,22 @@
                 android:textColor="@color/white" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/side_safe_msg"
+        <RelativeLayout
+            android:id="@+id/side_scan_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="출력 메세지"
-            android:textSize="40sp"
-            android:textColor="@color/white"
-            android:background="@color/black"/>
+            android:gravity="center">
+
+            <!--<TextView
+                android:id="@+id/side_safe_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="출력 메세지"
+                android:textSize="40sp"
+                android:textColor="@color/white"/>-->
+        </RelativeLayout>
     </LinearLayout>
 
     <include layout="@layout/loading_dialog"/>
@@ -51,8 +57,8 @@
     <Button
         android:id="@+id/end_scan_btn"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="5dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
         android:layout_alignParentBottom="true"
         android:text="스캐닝 종료"
         android:onClick="onScan"/>

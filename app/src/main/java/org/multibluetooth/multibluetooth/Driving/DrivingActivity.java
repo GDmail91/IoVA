@@ -53,12 +53,14 @@ public class DrivingActivity extends AppCompatActivity {
     private TextView backDistance;
     private TextView btDeviceName;
     private RelativeLayout sideScanActivity;
+    private RelativeLayout sideScanLayout;
     private TextView sideSafeDistance;
     private TextView sideSafeSpeed;
     private TextView sideSafeMsg;
     private LinearLayout loadingDialog;
     private HalfCircleView halfTopView;
     private HalfCircleView halfBottomView;
+    private SideScanView sideScanView;
 
     double mySpeed, maxSpeed;
     int driveId;
@@ -133,9 +135,10 @@ public class DrivingActivity extends AppCompatActivity {
         //backDistance = (TextView) findViewById(R.id.back_distance);
         btDeviceName = (TextView) findViewById(R.id.bt_device_name);
         sideScanActivity = (RelativeLayout) findViewById(R.id.side_scan_activity);
+        sideScanLayout = (RelativeLayout) findViewById(R.id.side_scan_layout);
         sideSafeDistance = (TextView) findViewById(R.id.side_safe_distance);
         sideSafeSpeed = (TextView) findViewById(R.id.side_safe_speed);
-        sideSafeMsg = (TextView) findViewById(R.id.side_safe_msg);
+        //sideSafeMsg = (TextView) findViewById(R.id.side_safe_msg);
         loadingDialog = (LinearLayout) findViewById(R.id.loading_dialog);
 
         maxSpeed = mySpeed = 0;
@@ -248,14 +251,14 @@ public class DrivingActivity extends AppCompatActivity {
             case R.id.left_btn:
                 // 왼쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                loadingDialog.setVisibility(View.VISIBLE);
+                //loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(LaserScanner.SCAN_LEFT);
                 break;
             case R.id.right_btn:
                 // 오른쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                loadingDialog.setVisibility(View.VISIBLE);
+                //loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(LaserScanner.SCAN_RIGHT);
                 break;
@@ -273,14 +276,14 @@ public class DrivingActivity extends AppCompatActivity {
             case LaserScanner.SCAN_LEFT:
                 // 왼쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                loadingDialog.setVisibility(View.VISIBLE);
+                //loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(side);
                 break;
             case LaserScanner.SCAN_RIGHT:
                 // 오른쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                loadingDialog.setVisibility(View.VISIBLE);
+                //loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(side);
                 break;
@@ -302,15 +305,15 @@ public class DrivingActivity extends AppCompatActivity {
         // 위험 단계에 따른 알림
         switch (mode) {
             case SIDE_DISTANCE_DANGER:
-                sideSafeMsg.setBackgroundResource(R.color.danger);
+                sideScanView.setBackgroundResource(R.color.danger);
                 sideSafeMsg.setText("위험합니다. \n차선 거리나 속도를 늘려주세요.");
                 break;
             case SIDE_DISTANCE_WARNING:
-                sideSafeMsg.setBackgroundResource(R.color.warning);
+                sideScanView.setBackgroundResource(R.color.warning);
                 sideSafeMsg.setText("조금 위험합니다.\n옆차량과 거리가 가깝습니다.");
                 break;
             case SIDE_DISTANCE_GOOD:
-                sideSafeMsg.setBackgroundResource(R.color.good);
+                sideScanView.setBackgroundResource(R.color.good);
                 sideSafeMsg.setText("끼어들어도 좋습니다.");
                 break;
         }
@@ -329,20 +332,29 @@ public class DrivingActivity extends AppCompatActivity {
         // View 반영
         forwardDistance.setText(distance+" m");
         if (mBoundService != null)
-            mBoundService.setForwardText("앞 "+distance);
+            mBoundService.setForwardText(""+distance);
     }
 
     // 전방 배경색 변경
     public void setForwardBackground(int mode) {
         switch (mode) {
             case DISTANCE_WARNING:
-                halfBottomView.setColorByResource(R.color.warning);
+                halfTopView.setColorByResource(R.color.warning);
+                if (mBoundService != null) {
+                    mBoundService.setForwardBackground(R.color.warning);
+                }
                 break;
             case DISTANCE_DANGER:
-                halfBottomView.setColorByResource(R.color.danger);
+                halfTopView.setColorByResource(R.color.danger);
+                if (mBoundService != null) {
+                    mBoundService.setForwardBackground(R.color.warning);
+                }
                 break;
             case DISTANCE_NORMAL:
-                halfBottomView.setColorByResource(R.color.good);
+                halfTopView.setColorByResource(R.color.good);
+                if (mBoundService != null) {
+                    mBoundService.setForwardBackground(R.color.warning);
+                }
                 break;
         }
         halfTopView.startDraw();
@@ -355,7 +367,7 @@ public class DrivingActivity extends AppCompatActivity {
         // View 반영
         backDistance.setText(message);
         if (mBoundService != null)
-            mBoundService.setBackText("뒤 "+message);
+            mBoundService.setBackText(""+message);
     }
 
     // 후방 데이터 전달
@@ -363,7 +375,7 @@ public class DrivingActivity extends AppCompatActivity {
         // View 반영
         backDistance.setText(distance+" m");
         if (mBoundService != null)
-            mBoundService.setBackText("뒤 "+distance);
+            mBoundService.setBackText(""+distance);
     }
 
     // 후방 배경색 변경
@@ -573,11 +585,16 @@ public class DrivingActivity extends AppCompatActivity {
         halfBottomView.setColorByResource(R.color.good);
         halfBottomView.startDraw();
 
+        sideScanView = new SideScanView(getApplicationContext(), sideScanLayout.getWidth(), sideScanLayout.getHeight(), SideScanView.BOTTOM);
+        sideScanView.setFill(true);
+        sideScanView.setColorByResource(R.color.good);
+        sideScanView.startDraw();
+
         forwardDistanceLayout.addView(halfTopView);
         //test.addView(halfTopBorder);
         backDistanceLayout.addView(halfBottomView);
         //test2.addView(halfBottomBorder);
-
+        sideScanLayout.addView(sideScanView);
 
         forwardDistance = new TextView(getApplicationContext());
         forwardDistance.setText("- m");
@@ -587,18 +604,26 @@ public class DrivingActivity extends AppCompatActivity {
         backDistance.setText("- m");
         backDistance.setTextSize(90);
         backDistance.setTextColor(Color.WHITE);
+        sideSafeMsg = new TextView(getApplicationContext());
+        sideSafeMsg.setText("잠시만 기다려주세요");
+        sideSafeMsg.setTextSize(40);
+        sideSafeMsg.setTextColor(Color.WHITE);
 
         forwardDistanceLayout.addView(forwardDistance, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         backDistanceLayout.addView(backDistance, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        sideScanLayout.addView(sideSafeMsg, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)forwardDistance.getLayoutParams();
-        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams)backDistance.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) forwardDistance.getLayoutParams();
+        RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) backDistance.getLayoutParams();
+        RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) sideSafeMsg.getLayoutParams();
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
         params2.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         params2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        params3.addRule(RelativeLayout.CENTER_IN_PARENT);
         forwardDistance.setLayoutParams(params); //causes layout update
         backDistance.setLayoutParams(params2);
+        sideSafeMsg.setLayoutParams(params3);
     }
 /*
     public void sendTest(View v) {

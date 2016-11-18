@@ -84,6 +84,7 @@ public class DrivingOnTopService extends Service {
         mPopupView = new LinearLayout(this);                            // 뷰 생성
         mPopupView.setBackgroundColor(Color.argb(255, 0, 0, 0));        // 텍스트뷰 배경 색
         mPopupView.setPadding(20,10,20,10);
+        mPopupView.setOrientation(LinearLayout.VERTICAL);
 
         mTopTextView = new TextView(this);
         mBottomTextView = new TextView(this);
@@ -91,9 +92,13 @@ public class DrivingOnTopService extends Service {
         mTopTextView.setText("0");                                      //텍스트 설정
         mTopTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);       //텍스트 크기 18sp
         mTopTextView.setTextColor(Color.WHITE);                         //글자 색상
+        mTopTextView.setWidth(200);
+        mTopTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         mBottomTextView.setText("0");                                   //텍스트 설정
         mBottomTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);    //텍스트 크기 18sp
         mBottomTextView.setTextColor(Color.WHITE);                      //글자 색상
+        mBottomTextView.setWidth(200);
+        mBottomTextView.setGravity(Gravity.CENTER_HORIZONTAL);
 
         mParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -147,6 +152,14 @@ public class DrivingOnTopService extends Service {
     public void setBackText(String message) {
         backDistance = message;
         mBottomTextView.setText(backDistance);
+    }
+
+    public void setForwardBackground(int color) {
+        mPopupView.setBackgroundResource(color);
+    }
+
+    public void setBackwardBackground(int color) {
+
     }
 
     /**

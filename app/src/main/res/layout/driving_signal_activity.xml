@@ -35,17 +35,20 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/scan_btn_layout"
         android:orientation="vertical"
+        android:weightSum="2"
         android:gravity="center">
 
         <RelativeLayout
             android:id="@+id/forward_distance_layout"
-            android:layout_width="400dp"
-            android:layout_height="240dp">
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/back_distance_layout"
-            android:layout_width="400dp"
-            android:layout_height="240dp">
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
         </RelativeLayout>
     </LinearLayout>
 
@@ -53,7 +56,7 @@
     <LinearLayout
         android:id="@+id/scan_btn_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:padding="16dp"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
@@ -62,7 +65,7 @@
         <Button
             android:id="@+id/left_btn"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:text="왼쪽스캔"
             android:onClick="onScan"/>
@@ -70,7 +73,7 @@
         <Button
             android:id="@+id/right_btn"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:text="오른쪽스캔"
             android:onClick="onScan"/>
