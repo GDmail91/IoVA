@@ -40,7 +40,7 @@ public class HalfCircleView extends View {
     private int[] colors = {Color.BLACK, Color.BLACK, Color.BLACK};
     private int color = Color.BLACK;
     //색 범위
-    float[] colorPos = {0.0f, 0.3f, 1.0f};
+    float[] colorPos = {0.0f, 0.8f, 1.0f};
     //채움
     private boolean styleFill = false;
 
@@ -85,7 +85,7 @@ public class HalfCircleView extends View {
 
         //this.color = ContextCompat.getColor(this.getContext(),resId);
         this.colors[0] = ContextCompat.getColor(this.getContext(),resId);
-        this.colors[1] = ContextCompat.getColor(this.getContext(),resId);
+        this.colors[1] = Color.rgb(10,10,10);
         this.colors[2] = Color.rgb(10,10,10);
     }
 
@@ -139,7 +139,7 @@ public class HalfCircleView extends View {
         }
 
         //반원 좌표
-        mHalfCircle = new RectF(left, top, right, bottom);
+        mHalfCircle = new RectF(0, 0, width, height);
     }
 
 
@@ -176,10 +176,10 @@ public class HalfCircleView extends View {
         LinearGradient shader;
         switch (heading) {
             case BOTTOM:
-                shader = new LinearGradient(0, 0, 0, height, colors, color_pos, Shader.TileMode.CLAMP);
+                shader = new LinearGradient(0, height, 0, 0, colors, color_pos, Shader.TileMode.CLAMP);
                 break;
             default:
-                shader = new LinearGradient(0, height, 0, 0, colors, color_pos, Shader.TileMode.CLAMP);
+                shader = new LinearGradient(0, 0, 0, height, colors, color_pos, Shader.TileMode.CLAMP);
                 break;
         }
         mPaint.setShader(shader);
