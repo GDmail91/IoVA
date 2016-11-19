@@ -54,6 +54,8 @@ import retrofit2.Retrofit;
     private static int queueLength = 0;
     private static long distanceAlertTime;
     private static long safeAlertTime;
+    private static int alertCount = 0;
+    private static final int maximumCount = 5;
 
     private static LinkedList<DriveInfo> mQueue = new LinkedList<>();
     private static LinkedList<DriveInfo> laserQueue = new LinkedList<>();
@@ -86,6 +88,7 @@ import retrofit2.Retrofit;
         START_FLAG = false;
         STOP_FLAG = false;
         DISTANCE_ALERT_WAIT = false;
+        alertCount = 0;
 
         queueLength = 0;
         mQueue.clear();
@@ -241,9 +244,10 @@ import retrofit2.Retrofit;
                 // 거리가 멀어졌는데
                 if (DISTANCE_ALERT_WAIT) {
                     // 알람 대기상태인 경우
-                    if (System.currentTimeMillis() - distanceAlertTime >= 30000) {
+                    if (System.currentTimeMillis() - distanceAlertTime >= 5000) {
                         // 30초가 지낫으면 다시울리도록
                         DISTANCE_ALERT_WAIT = false;
+                        alertCount = 0;
                     }
                 }
                 break;
@@ -328,9 +332,14 @@ import retrofit2.Retrofit;
             ((DrivingActivity) mContext).onAlert(type);
             DISTANCE_ALERT_WAIT = true;
             distanceAlertTime = System.currentTimeMillis();     // 시간 기록
-        } else if (System.currentTimeMillis() - distanceAlertTime >= 60000) {
-            // 알람을 울렸을 경우 60초 이후 초기화 (가까우면 다시 울리도록)
+        } else if (alertCount < maximumCount
+            && System.currentTimeMillis() - distanceAlertTime >= 5000) {
+                // 알람을 울렸을 경우 5초 이후 초기화 (가까우면 다시 울리도록)
+                DISTANCE_ALERT_WAIT = false;
+                alertCount++;
+        } else if (System.currentTimeMillis() - distanceAlertTime >= 30000) {
             DISTANCE_ALERT_WAIT = false;
+            alertCount = 0;
         }
     }
 
