@@ -102,7 +102,10 @@ public class MainMenuActivity extends AppCompatActivity {
 						// TODO 업로드 시나리오
 						Log.d("TEST", "WIFI 연결됨");
 
-						getLastIndexAndUpload();
+						SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+						if (pref.getBoolean("wifi_setting", true)) {
+							getLastIndexAndUpload();
+						}
 					}
 
 					if(connectivityManager.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_MOBILE

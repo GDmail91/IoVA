@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:layout_marginLeft="14dp"
-            android:layout_marginTop="44.6dp"
+            android:layout_marginTop="24.6dp"
             android:text="로그인 정보"
             android:textSize="12dp"
             android:textColor="#727272"
@@ -24,7 +24,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_below="@id/facebook_info"
+            android:layout_below="@+id/facebook_info"
             android:layout_marginTop="6dp"
             android:layout_marginStart="7dp"
             android:layout_marginLeft="7dp"
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:layout_marginLeft="14dp"
-            android:layout_marginTop="44.6dp"
+            android:layout_marginTop="24.6dp"
             android:layout_below="@+id/facebook_layout"
             android:text="프로그램 정보"
             android:textSize="12dp"
@@ -75,7 +75,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_below="@id/app_info_text"
+            android:layout_below="@+id/app_info_text"
             android:layout_marginTop="6dp"
             android:layout_marginStart="7dp"
             android:layout_marginLeft="7dp"
@@ -111,14 +111,102 @@
         </RelativeLayout>
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginTop="24.6dp"
+            android:layout_below="@+id/app_info_layout"
+            android:text="앱 설정"
+            android:textSize="12dp"
+            android:textColor="#727272"
+            android:id="@+id/wifi_text"/>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="62.6dp"
-            android:layout_below="@id/app_info_layout"
+            android:layout_below="@+id/wifi_text"
+            android:layout_marginTop="6dp"
             android:layout_marginStart="7dp"
             android:layout_marginLeft="7dp"
             android:layout_marginEnd="7dp"
             android:layout_marginRight="7dp"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="7dp"
+            android:paddingLeft="7dp"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:id="@+id/wifi_layout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="WiFi 업로드 설정"
+                android:textSize="14dp"
+                android:textColor="#000000"/>
+
+            <Switch
+                android:id="@+id/wifi_setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="15.3dp"
+                android:layout_marginEnd="15.3dp"
+                android:onClick="onSetting" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/wifi_layout"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginRight="7dp"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="7dp"
+            android:paddingLeft="7dp"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:id="@+id/speaker_layout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="음성 안내 설정"
+                android:textSize="14dp"
+                android:textColor="#000000"/>
+
+            <Switch
+                android:id="@+id/speaker_setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="15.3dp"
+                android:layout_marginEnd="15.3dp"
+                android:onClick="onSetting" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginEnd="7dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginBottom="10dp"
+            android:layout_alignParentBottom="true"
             android:background="#FFFFFF"
             style="?android:attr/borderlessButtonStyle"
             android:text="로그아웃"

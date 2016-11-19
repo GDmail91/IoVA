@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
@@ -22,11 +23,20 @@ public class SettingActivity extends AppCompatActivity {
 
     // VIEW
     private TextView facebookId;
+    private Switch wifiSetting;
+    private Switch speakerSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setting_activity);
+
+        wifiSetting = (Switch) findViewById(R.id.wifi_setting);
+        speakerSetting = (Switch) findViewById(R.id.speaker_setting);
+
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        wifiSetting.setChecked(pref.getBoolean("wifi_setting", true));
+        speakerSetting.setChecked(pref.getBoolean("speaker_setting", true));
 
         facebookId = (TextView) findViewById(R.id.facebook_id);
 
@@ -41,6 +51,24 @@ public class SettingActivity extends AppCompatActivity {
 
     public void onDataSync(View v) {
 
+    }
+
+    public void onSetting(View v) {
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        switch (v.getId()) {
+            case R.id.wifi_setting:
+                if (wifiSetting.isChecked()) editor.putBoolean("wifi_setting", true);
+                else editor.putBoolean("wifi_setting", false);
+                editor.apply();
+                break;
+            case R.id.speaker_setting:
+                if (speakerSetting.isChecked()) editor.putBoolean("speaker_setting", true);
+                else editor.putBoolean("speaker_setting", false);
+                editor.apply();
+                break;
+
+        }
     }
 
     public void onLogout(View v) {

@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -197,51 +198,54 @@ public class DrivingActivity extends AppCompatActivity {
     }
 
     public void onAlert(int mode) {
-        switch (mode) {
-            case DISTANCE_DANGER:
-                drTTS.speechingSentence("거리가 가깝습니다. 안전거리를 유지해주세요.");
-                setForwardBackground(mode);
-                break;
-            case DISTANCE_WARNING:
-                drTTS.speechingSentence("안전거리 위반입니다. 사고에 주의하세요.");
-                setForwardBackground(mode);
-                break;
-            case SIDE_DISTANCE_DANGER:
-                drTTS.speechingSentence("위험합니다. 차선 거리나 속도를 늘려주세요.");
-                setSideBackground(mode);
-                break;
-            case SIDE_DISTANCE_WARNING:
-                drTTS.speechingSentence("조금 위험합니다. 옆차량과 거리가 가깝습니다.");
-                setSideBackground(mode);
-                break;
-            case SIDE_DISTANCE_GOOD:
-                drTTS.speechingSentence("끼어들어도 좋습니다.");
-                setSideBackground(mode);
-                break;
-            case SAFE_SPEED_WARNING:
-                drTTS.speechingSentence("과속 주행중입니다. 속도를 줄여주세요.");
-                break;
-            case SUDDEN_FAST_WARNING:
-                drTTS.speechingSentence("급가속 하였습니다. 안전운전 해주세요.");
-                break;
-            case SUDDEN_SLOW_WARNING:
-                drTTS.speechingSentence("급감속 하였습니다. 안전운전 해주세요.");
-                break;
-            case SUDDEN_START_WARNING:
-                drTTS.speechingSentence("급출발 하였습니다. 안전운전 해주세요.");
-                break;
-            case SUDDEN_STOP_WARNING:
-                drTTS.speechingSentence("급정거 하였습니다. 안전운전 해주세요.");
-                break;
-            case DANGER_LOCATION_IN_MIDDLE:
-                drTTS.speechingSentence("사고유발 지역입니다. 운전에 주의하세요.");
-                break;
-            case DANGER_LOCATION_IN_WARNING:
-                drTTS.speechingSentence("위험행동 다발지역입니다. 방어운전을 해야합니다.");
-                break;
-            case DANGER_LOCATION_IN_CRITICAL:
-                drTTS.speechingSentence("위험한 지역입니다. 주변를 잘살피세요.");
-                break;
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        if (pref.getBoolean("speaker_setting", true)) {
+            switch (mode) {
+                case DISTANCE_DANGER:
+                    drTTS.speechingSentence("거리가 가깝습니다. 안전거리를 유지해주세요.");
+                    setForwardBackground(mode);
+                    break;
+                case DISTANCE_WARNING:
+                    drTTS.speechingSentence("안전거리 위반입니다. 사고에 주의하세요.");
+                    setForwardBackground(mode);
+                    break;
+                case SIDE_DISTANCE_DANGER:
+                    drTTS.speechingSentence("위험합니다. 차선 거리나 속도를 늘려주세요.");
+                    setSideBackground(mode);
+                    break;
+                case SIDE_DISTANCE_WARNING:
+                    drTTS.speechingSentence("조금 위험합니다. 옆차량과 거리가 가깝습니다.");
+                    setSideBackground(mode);
+                    break;
+                case SIDE_DISTANCE_GOOD:
+                    drTTS.speechingSentence("끼어들어도 좋습니다.");
+                    setSideBackground(mode);
+                    break;
+                case SAFE_SPEED_WARNING:
+                    drTTS.speechingSentence("과속 주행중입니다. 속도를 줄여주세요.");
+                    break;
+                case SUDDEN_FAST_WARNING:
+                    drTTS.speechingSentence("급가속 하였습니다. 안전운전 해주세요.");
+                    break;
+                case SUDDEN_SLOW_WARNING:
+                    drTTS.speechingSentence("급감속 하였습니다. 안전운전 해주세요.");
+                    break;
+                case SUDDEN_START_WARNING:
+                    drTTS.speechingSentence("급출발 하였습니다. 안전운전 해주세요.");
+                    break;
+                case SUDDEN_STOP_WARNING:
+                    drTTS.speechingSentence("급정거 하였습니다. 안전운전 해주세요.");
+                    break;
+                case DANGER_LOCATION_IN_MIDDLE:
+                    drTTS.speechingSentence("사고유발 지역입니다. 운전에 주의하세요.");
+                    break;
+                case DANGER_LOCATION_IN_WARNING:
+                    drTTS.speechingSentence("위험행동 다발지역입니다. 방어운전을 해야합니다.");
+                    break;
+                case DANGER_LOCATION_IN_CRITICAL:
+                    drTTS.speechingSentence("위험한 지역입니다. 주변를 잘살피세요.");
+                    break;
+            }
         }
     }
 
