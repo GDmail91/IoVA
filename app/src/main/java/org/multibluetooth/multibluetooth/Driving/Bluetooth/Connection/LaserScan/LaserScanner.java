@@ -46,10 +46,7 @@ public class LaserScanner extends BluetoothConnection {
     public void conn() {
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            ((AppCompatActivity) mContext).startActivityForResult(enableIntent, REQUEST_ENABLE_BT_BY_LASER);
-        } else if (!mBound) {
+        if (!mBound) {
             bindService();
         }
     }

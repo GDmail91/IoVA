@@ -1,16 +1,20 @@
 package org.multibluetooth.multibluetooth.Driving.Bluetooth;
 
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.util.Log;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothConnection;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
+import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.SideScan.SideScanner;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class BluetoothManager {
-	
+
     private static final String TAG = BluetoothManager.class.getName();
+
     /*
      * http://developer.android.com/reference/android/bluetooth/BluetoothDevice.html
      * #createRfcommSocketToServiceRecord(java.util.UUID)
@@ -22,6 +26,13 @@ public class BluetoothManager {
      */
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+
+    public static boolean isBtOn() {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        return mBluetoothAdapter.isEnabled();
+    }
+
     /**
      * Instantiates a BluetoothSocket for the remote device and connects it.
      * <p/>
@@ -31,29 +42,17 @@ public class BluetoothManager {
      * @return The BluetoothSocket
      * @throws IOException
      */
-    public static BluetoothSocket connect(BluetoothDevice dev) throws IOException {
-    	BluetoothSocket sock = null;
-        BluetoothSocket sockFallback = null;
-
-        Log.d(TAG, "Starting Bluetooth connection..");
-    	try {
-    		sock = dev.createRfcommSocketToServiceRecord(MY_UUID);
-    		sock.connect();
-        } catch (Exception e1) {
-            Log.e(TAG, "There was an error while establishing Bluetooth connection. Falling back..", e1);
-            Class<?> clazz = sock.getRemoteDevice().getClass();
-            Class<?>[] paramTypes = new Class<?>[]{Integer.TYPE};
-            try {
-                Method m = clazz.getMethod("createRfcommSocket", paramTypes);
-                Object[] params = new Object[]{Integer.valueOf(1)};
-                sockFallback = (BluetoothSocket) m.invoke(sock.getRemoteDevice(), params);
-                sockFallback.connect();
-                sock = sockFallback;
-            } catch (Exception e2) {
-                Log.e(TAG, "Couldn't fallback while establishing Bluetooth connection.", e2);
-                throw new IOException(e2.getMessage());
+    public static BluetoothConnection getBtConnection(Context mContext, DeviceList.Device dev) {
+        if (isBtOn()) {
+            switch (dev) {
+                case LASER:
+                    return new LaserScanner(mContext);
+                case OBD:
+                    return new OBDScanner(mContext);
+                case SIDE_SCANNER:
+                    return new SideScanner(mContext);
             }
         }
-    	return sock;
+        return null;
     }
 }
