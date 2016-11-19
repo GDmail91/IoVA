@@ -255,14 +255,14 @@ public class DrivingActivity extends AppCompatActivity {
             case R.id.left_btn:
                 // 왼쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                //loadingDialog.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(LaserScanner.SCAN_LEFT);
                 break;
             case R.id.right_btn:
                 // 오른쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                //loadingDialog.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(LaserScanner.SCAN_RIGHT);
                 break;
@@ -280,14 +280,14 @@ public class DrivingActivity extends AppCompatActivity {
             case LaserScanner.SCAN_LEFT:
                 // 왼쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                //loadingDialog.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(side);
                 break;
             case LaserScanner.SCAN_RIGHT:
                 // 오른쪽 스캔 시작
                 sideScanActivity.setVisibility(View.VISIBLE);
-                //loadingDialog.setVisibility(View.VISIBLE);
+                loadingDialog.setVisibility(View.VISIBLE);
                 sideScanQueue.init();
                 driveThread.scanChange(side);
                 break;
@@ -321,6 +321,9 @@ public class DrivingActivity extends AppCompatActivity {
                 sideSafeMsg.setText("끼어들어도 좋습니다.");
                 break;
         }
+        RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) sideSafeMsg.getLayoutParams();
+        params3.addRule(RelativeLayout.CENTER_IN_PARENT);
+        sideSafeMsg.setLayoutParams(params3);
     }
 
     // 전방 데이터 전달

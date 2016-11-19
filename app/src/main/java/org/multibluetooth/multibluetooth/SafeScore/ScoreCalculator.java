@@ -167,8 +167,10 @@ import retrofit2.Retrofit;
                 break;
         }
 
-        if (driveInfo.getSideDistance() != 0)
+        if (driveInfo.getSideDistance() > 0) {
+            Log.d("SIDE CAL", driveInfo.toString());
             getSideSafeDistance();
+        }
     }
 
     public SafeScore doCalculateScore(LinkedList<DriveInfo> mQueue) {
@@ -332,6 +334,15 @@ import retrofit2.Retrofit;
             ((DrivingActivity) mContext).onAlert(type);
             DISTANCE_ALERT_WAIT = true;
             distanceAlertTime = System.currentTimeMillis();     // 시간 기록
+        } else if (System.currentTimeMillis() - distanceAlertTime >= 5000) {
+            // 알람을 울렸을 경우 5초 이후 초기화 (가까우면 다시 울리도록)
+            DISTANCE_ALERT_WAIT = false;
+        }
+        /*if (!DISTANCE_ALERT_WAIT) {
+            // 알람을 안울렸으면 경보음 발생
+            ((DrivingActivity) mContext).onAlert(type);
+            DISTANCE_ALERT_WAIT = true;
+            distanceAlertTime = System.currentTimeMillis();     // 시간 기록
         } else if (alertCount < maximumCount
             && System.currentTimeMillis() - distanceAlertTime >= 5000) {
                 // 알람을 울렸을 경우 5초 이후 초기화 (가까우면 다시 울리도록)
@@ -340,7 +351,7 @@ import retrofit2.Retrofit;
         } else if (System.currentTimeMillis() - distanceAlertTime >= 30000) {
             DISTANCE_ALERT_WAIT = false;
             alertCount = 0;
-        }
+        }*/
     }
 
     // 안전점수 알람

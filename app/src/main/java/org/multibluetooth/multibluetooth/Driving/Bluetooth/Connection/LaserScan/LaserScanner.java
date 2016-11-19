@@ -209,12 +209,11 @@ public class LaserScanner extends BluetoothConnection {
                         ((DrivingActivity) mContext).setChangeText(msgBody);
                         ((DrivingActivity) mContext).setForwardText(Float.valueOf(msgBody));
                         // TODO 삭제 전시회용
-                        ((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
+                        //((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
                         break;
                     case "02":
                         // 후방 측정
-                        //((DrivingActivity) mContext).setChangeText("mode: "+msgMode+"\nbody: "+msgBody);
-                        //((DrivingActivity) mContext).setBackText(msgBody);
+                        ((DrivingActivity) mContext).setBackText(Float.valueOf(msgBody));
                         break;
                     case "03":
                         // 옆차선 측정
@@ -271,6 +270,7 @@ public class LaserScanner extends BluetoothConnection {
                         // 옆차선 측정
                         laserScanData.setSideDistance(Float.valueOf(msgBody));
                         ((DrivingActivity) mContext).setSideDistance(Float.valueOf(msgBody));
+                        Log.d("SIDE VALUE", "옆차선 측정됨 " + msgBody);
                         break;
                 }
             } else {

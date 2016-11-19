@@ -54,7 +54,7 @@ public class DeviceListActivity extends Activity {
     /**
      * Return Intent extra
      */
-    public static String EXTRA_DEVICE_ADDRESS = "device_address";
+        public static String EXTRA_DEVICE_ADDRESS = "device_address";
     public static String EXTRA_DEVICE_ADDRESS_OBD = "obd_device_address";
     public static String EXTRA_DEVICE_ADDRESS_SIDE = "side_device_address";
 

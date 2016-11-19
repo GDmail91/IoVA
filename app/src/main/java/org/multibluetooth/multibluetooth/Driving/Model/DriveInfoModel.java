@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class DriveInfoModel extends SQLiteOpenHelper {
     private static final String TAG = "DriveInfoModel";
 
-    protected static final int DB_VERSION = 15;
+    protected static final int DB_VERSION = 16;
     public static final String DB_NAME = "DriveInfo.db";
 
     SQLiteDatabase dbR = getReadableDatabase();
@@ -184,7 +184,7 @@ public class DriveInfoModel extends SQLiteOpenHelper {
      */
     public int updateOBD(DriveInfo driveInfo) {
         String sql = "UPDATE DriveInfo SET " +
-                "vehicle_speed='" + driveInfo.getVehicleSpeed() + "' " +
+                "vehicle_speed='" + driveInfo.getVehicleSpeed() + "', " +
                 "rpm='" + driveInfo.getRpm() + "' " +
                 "WHERE _id='"+driveInfo.getId()+"' ;";
 

@@ -23,7 +23,6 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.BluetoothC
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.LaserScan.LaserScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.OBDScan.OBDScanner;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.SideScan.SideScanner;
-import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceList;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
@@ -135,7 +134,7 @@ public class MainMenuActivity extends AppCompatActivity {
 		unregisterReceiver(receiver);
 		btLaserCon.serviceStop();
 		btOBDCon.serviceStop();
-		//btSideCon.serviceStop();
+		btSideCon.serviceStop();
 	}
 
 	public void onMenuClick(View v) {
@@ -144,8 +143,8 @@ public class MainMenuActivity extends AppCompatActivity {
 		switch (v.getId()) {
 			case R.id.driving_btn:	// 운전하기
 				if ((btLaserCon != null && btLaserCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)
-				&& (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)){
-				//&& (btSideCon != null && btSideCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)) {
+				&& (btOBDCon != null && btOBDCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)
+				&& (btSideCon != null && btSideCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED)) {
 					Intent drivingIntent = new Intent(MainMenuActivity.this, DrivingActivity.class);
 					drivingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					startActivity(drivingIntent);
@@ -153,9 +152,9 @@ public class MainMenuActivity extends AppCompatActivity {
 					Toast.makeText(getApplicationContext(), "Laser 연결이 필요합니다.", Toast.LENGTH_LONG).show();
 				} else if (btOBDCon == null || btOBDCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
 					Toast.makeText(getApplicationContext(), "OBD 연결이 필요합니다.", Toast.LENGTH_LONG).show();
-				} /*else if (btSideCon == null || btSideCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
+				} else if (btSideCon == null || btSideCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
 					Toast.makeText(getApplicationContext(), "깜박이 연결이 필요합니다.", Toast.LENGTH_LONG).show();
-				}*/
+				}
 				break;
 
 			case R.id.safe_score_btn:	// 안전점수 보기
@@ -197,34 +196,35 @@ public class MainMenuActivity extends AppCompatActivity {
 			startActivityForResult(enableIntent, MainMenuActivity.REQUEST_ENABLE_BT_BY_MANAGER);
 		} else {
 			if (btLaserCon == null) {
-				btLaserCon = (LaserScanner) BluetoothManager.getBtConnection(this, DeviceList.Device.LASER);
+				btLaserCon = new LaserScanner(this);
 				// Start the Bluetooth services
 				Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothLaserService");
 				intent.setPackage("org.multibluetooth.multibluetooth");
 				startService(intent);
 			}
 			if (btOBDCon == null) {
-				btOBDCon = (OBDScanner) BluetoothManager.getBtConnection(this, DeviceList.Device.OBD);
+				btOBDCon = new OBDScanner(this);
 				// Start the Bluetooth services
 				Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothOBDService");
 				intent.setPackage("org.multibluetooth.multibluetooth");
 				startService(intent);
 			}
-			/*if (btSideCon == null) {
-				btSideCon = (SideScanner) BluetoothManager.getBtConnection(this, DeviceList.Device.SIDE_SCANNER);
+			if (btSideCon == null) {
+				btSideCon = new SideScanner(this);
 				// Start the Bluetooth services
 				Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothSideService");
 				intent.setPackage("org.multibluetooth.multibluetooth");
 				startService(intent);
-			}*/
+			}
 			if (btLaserCon != null
-			&& btOBDCon != null) {
-				//&& btSideCon != null) {
+			&& btOBDCon != null
+			&& btSideCon != null) {
 				btLaserCon.setChangeContext(this);
 				btOBDCon.setChangeContext(this);
+				btSideCon.setChangeContext(this);
 				btLaserCon.conn();
 				btOBDCon.conn();
-				//btSideCon.conn();
+				btSideCon.conn();
 			}
 		}
 	}
@@ -272,12 +272,11 @@ public class MainMenuActivity extends AppCompatActivity {
 				btOBDCon.connMode(true);
 				btOBDCon.setupConnect();
 			}
-/*
 			if (btSideCon != null && btSideCon.getConnectionStatus() != BluetoothService.STATE_CONNECTED) {
 				Log.d(TAG, "Side 연결 실행");
 				btSideCon.connMode(true);
 				btSideCon.setupConnect();
-			}*/
+			}
 		}
 	}
 
@@ -324,9 +323,10 @@ public class MainMenuActivity extends AppCompatActivity {
 				&& btSideCon.getConnectionStatus() == BluetoothService.STATE_CONNECTED) {
 			btconnectSign.setBackgroundResource(R.drawable.bluetooth_btn);
 			btCheckText.setText("블르투스 연결됨");
+		} else {
+			btconnectSign.setBackgroundResource(R.drawable.bluetooth_red_btn);
+			btCheckText.setText("연결이 필요합니다");
 		}
-		btconnectSign.setBackgroundResource(R.drawable.bluetooth_red_btn);
-		btCheckText.setText("연결이 필요합니다");
 	}
 
 	private void getLastIndexAndUpload() {
