@@ -351,7 +351,11 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         DriveInfoList allData = new DriveInfoList();
         Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo WHERE _id > '"+ reqId +"' AND drive_id >= '"+id+"' ORDER BY drive_id DESC, _id DESC", null);
 
+        if (cursor.getCount() == 0) {
+            cursor = dbR.rawQuery("SELECT * FROM DriveInfo WHERE drive_id > '"+id+"' ORDER BY drive_id DESC, _id DESC", null);
+        }
         while(cursor.moveToNext()) {
+            Log.d(TAG, cursor.getInt(0) +" "+cursor.getInt(1));
             DriveInfo tempData = new DriveInfo(
                     cursor.getInt(0),
                     cursor.getInt(1),

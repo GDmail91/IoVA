@@ -349,6 +349,7 @@ public class MainMenuActivity extends AppCompatActivity {
 					JSONArray driveList;
 					JSONArray safeScoreList;
 					if (lastIndexData != null) {
+						Log.d(TAG, lastIndexData.getLastDriveId() +" "+ lastIndexData.getLastRequestId());
 						driveList = new JSONArray(driveInfoModel.getAfterData(lastIndexData.getLastDriveId(), lastIndexData.getLastRequestId()));
 						safeScoreList = new JSONArray(safeScoreModel.getAfterData(lastIndexData.getLastDriveId()));
 					} else {
@@ -357,8 +358,10 @@ public class MainMenuActivity extends AppCompatActivity {
 					}
 					driveInfoModel.close();
 					safeScoreModel.close();
-
+					Log.d(TAG, "목록 가져오기는 되나");
+					Log.d(TAG, driveList.toString());
 					if (driveList.length() > 0) {
+						Log.d(TAG, "임시 파일 변환");
 						// 가져온 데이터 임시파일변환
 						File driveFile = generateTempFile("tempDrive", driveList.toString());
 						File scoreFile = generateTempFile("tempScore", safeScoreList.toString());
