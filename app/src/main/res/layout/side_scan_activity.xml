@@ -24,13 +24,13 @@
                 android:text="-m"
                 android:textSize="40sp"
                 android:textColor="@color/white"/>
-            <TextView
+            <!--<TextView
                 android:id="@+id/side_safe_speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="-km/h"
                 android:textSize="30sp"
-                android:textColor="@color/white" />
+                android:textColor="@color/white" />-->
         </LinearLayout>
 
         <RelativeLayout
@@ -60,6 +60,9 @@
         android:layout_height="48dp"
         android:layout_margin="16dp"
         android:layout_alignParentBottom="true"
+        style="?android:attr/buttonBarButtonStyle"
+        android:background="@drawable/driving_btn"
+        android:textColor="@color/white"
         android:text="스캐닝 종료"
         android:onClick="onScan"/>
 </RelativeLayout>

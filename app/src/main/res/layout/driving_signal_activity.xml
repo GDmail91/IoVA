@@ -67,7 +67,12 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            style="?android:attr/buttonBarButtonStyle"
+            android:background="@drawable/driving_btn"
             android:text="왼쪽스캔"
+            android:textColor="@color/white"
             android:onClick="onScan"/>
 
         <Button
@@ -75,6 +80,11 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            style="?android:attr/buttonBarButtonStyle"
+            android:background="@drawable/driving_btn"
+            android:textColor="@color/white"
             android:text="오른쪽스캔"
             android:onClick="onScan"/>
     </LinearLayout>

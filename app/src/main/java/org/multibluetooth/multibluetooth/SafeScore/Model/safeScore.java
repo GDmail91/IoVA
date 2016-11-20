@@ -86,12 +86,12 @@ public class SafeScore implements Serializable {
     }
 
     public int getAvgScore() {
-        int avgScore = (safe_distance_count +
-                speeding_count +
-                fast_acc_count +
-                fast_break_count +
-                sudden_start_count +
-                sudden_stop_count) / 6;
+        int avgScore = (int) ((getPercentSafeDistance() +
+                getPercentSpeeding() +
+                getPercentFastAcc() +
+                getPercentFastBreak() +
+                getPercentSuddenStart() +
+                getPercentSuddenStop()) / 6);
         return avgScore;
     }
 

@@ -138,7 +138,7 @@ public class DrivingActivity extends AppCompatActivity {
         sideScanActivity = (RelativeLayout) findViewById(R.id.side_scan_activity);
         sideScanLayout = (RelativeLayout) findViewById(R.id.side_scan_layout);
         sideSafeDistance = (TextView) findViewById(R.id.side_safe_distance);
-        sideSafeSpeed = (TextView) findViewById(R.id.side_safe_speed);
+        //sideSafeSpeed = (TextView) findViewById(R.id.side_safe_speed);
         //sideSafeMsg = (TextView) findViewById(R.id.side_safe_msg);
         loadingDialog = (LinearLayout) findViewById(R.id.loading_dialog);
 

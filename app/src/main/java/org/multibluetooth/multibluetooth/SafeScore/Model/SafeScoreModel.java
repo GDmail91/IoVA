@@ -297,8 +297,10 @@ public class SafeScoreModel extends SQLiteOpenHelper {
         int avgSuddenStop = 0;
 
         int size = allData.size();
-        if (size != 0) {
+        Log.d(TAG, ""+size);
+        if (size > 0) {
             for (SafeScore safeScore : allData) {
+                Log.d(TAG, safeScore.toString());
                 avgDistance += safeScore.getSafeDistanceCount();
                 avgSpeeding += safeScore.getSpeedingCount();
                 avgFastAcc += safeScore.getFastAccCount();
