@@ -31,6 +31,19 @@ public class DriveInfo {
         gps_latitude = -1;
     }
 
+    public DriveInfo(DriveInfo driveInfo) {
+        this._id = driveInfo.getId();
+        this.drive_id = driveInfo.getDriveId();
+        this.vehicle_speed = driveInfo.getVehicleSpeed();
+        this.rpm = driveInfo.getRpm();
+        this.front_distance = driveInfo.getFrontDistance();
+        this.back_distance = driveInfo.getBackDistance();
+        this.side_distance = driveInfo.getSideDistance();
+        this.gps_latitude = driveInfo.getGpsLatitude();
+        this.gps_longitude = driveInfo.getGpsLongitude();
+        this.measure_time = driveInfo.getMeasureTime();
+    }
+
     public DriveInfo(int _id, int drive_id, int vehicle_speed, int rpm, float front_distance, float back_distance, float side_distance, double gps_latitude, double gps_longitude, String measure_time) {
         this._id = _id;
         this.drive_id = drive_id;
@@ -61,6 +74,12 @@ public class DriveInfo {
     public double getGpsLatitude() { return gps_latitude; }
 
     public double getGpsLongitude() { return gps_longitude; }
+
+    public String getMeasureTime() { return measure_time; }
+
+    public void setDriveId(int drive_id) {
+        this.drive_id = drive_id;
+    }
 
     public void setOBDSpeed(int _id, int vehicle_speed) {
         this._id = _id;

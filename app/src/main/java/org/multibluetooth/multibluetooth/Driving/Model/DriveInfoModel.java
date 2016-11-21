@@ -131,6 +131,20 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         return topNumber;
     }
 
+    public int getCountRequestNumber(int driveId) {
+        int topNumber = 0;
+
+        Cursor cursor = dbR.rawQuery("SELECT COUNT(_id) AS id_count FROM DriveInfo WHERE drive_id = '"+driveId+"' ", null);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                topNumber = cursor.getInt(0);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return topNumber;
+    }
+
     /** 읽기 SQL
      *
      * @return topNumber
@@ -186,7 +200,8 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         String sql = "UPDATE DriveInfo SET " +
                 "vehicle_speed='" + driveInfo.getVehicleSpeed() + "', " +
                 "rpm='" + driveInfo.getRpm() + "' " +
-                "WHERE _id='"+driveInfo.getId()+"' ;";
+                "WHERE _id='"+driveInfo.getId()+"' " +
+                "AND drive_id='"+driveInfo.getDriveId()+"' ;";
 
         // DB 작업 실행
         dbW.beginTransaction();
@@ -230,7 +245,8 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public int updateFrontLaser(DriveInfo driveInfo) {
         String sql = "UPDATE DriveInfo SET " +
                 "front_distance='" + driveInfo.getFrontDistance() + "' " +
-                "WHERE _id='"+driveInfo.getId()+"' ;";
+                "WHERE _id='"+driveInfo.getId()+"' " +
+                "AND drive_id='"+driveInfo.getDriveId()+"' ;";
 
         // DB 작업 실행
         dbW.beginTransaction();
@@ -246,11 +262,12 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         return driveInfo.getId();
     }
 
-    public void updateGps(int id, Location location) {
+    public void updateGps(int id, int drive_id, Location location) {
         String sql = "UPDATE DriveInfo SET " +
                 "gps_latitude = '" + location.getLatitude() + "', " +
                 "gps_longitude = '" + location.getLongitude() + "' " +
-                "WHERE _id='"+ id +"' ;";
+                "WHERE _id='"+ id +"' " +
+                "AND drive_id='"+drive_id+"' ;";
 
         // DB 작업 실행
         dbW.beginTransaction();
@@ -374,10 +391,10 @@ public class DriveInfoModel extends SQLiteOpenHelper {
         return allData;
     }
 
-    public DriveInfo getData(int id) {
+    public DriveInfo getData(int id, int drive_id) {
         DriveInfo data = null;
 
-        Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo WHERE _id='"+id+"' ORDER BY _id DESC", null);
+        Cursor cursor = dbR.rawQuery("SELECT * FROM DriveInfo WHERE _id='"+id+"' AND drive_id='"+drive_id+"' ORDER BY _id DESC", null);
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
             Calendar calendar = Calendar.getInstance();

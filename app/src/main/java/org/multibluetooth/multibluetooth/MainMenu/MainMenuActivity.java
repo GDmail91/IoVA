@@ -26,6 +26,7 @@ import org.multibluetooth.multibluetooth.Driving.Bluetooth.Connection.SideScan.S
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.DeviceListActivity;
 import org.multibluetooth.multibluetooth.Driving.Bluetooth.Service.BluetoothService;
 import org.multibluetooth.multibluetooth.Driving.DrivingActivity;
+import org.multibluetooth.multibluetooth.Driving.GpsInfo;
 import org.multibluetooth.multibluetooth.Driving.Model.DriveInfoModel;
 import org.multibluetooth.multibluetooth.Facebook.FacebookLogin;
 import org.multibluetooth.multibluetooth.History.HistoryActivity;
@@ -191,42 +192,46 @@ public class MainMenuActivity extends AppCompatActivity {
 	}
 
 	public void onBtInit() {
+		if (btLaserCon == null) {
+			btLaserCon = new LaserScanner(this);
+			// Start the Bluetooth services
+			Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothLaserService");
+			intent.setPackage("org.multibluetooth.multibluetooth");
+			startService(intent);
+		}
+		if (btOBDCon == null) {
+			btOBDCon = new OBDScanner(this);
+			// Start the Bluetooth services
+			Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothOBDService");
+			intent.setPackage("org.multibluetooth.multibluetooth");
+			startService(intent);
+		}
+		if (btSideCon == null) {
+			btSideCon = new SideScanner(this);
+			// Start the Bluetooth services
+			Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothSideService");
+			intent.setPackage("org.multibluetooth.multibluetooth");
+			startService(intent);
+		}
+		if (btLaserCon != null
+		&& btOBDCon != null
+		&& btSideCon != null) {
+			btLaserCon.setChangeContext(this);
+			btOBDCon.setChangeContext(this);
+			btSideCon.setChangeContext(this);
+			btLaserCon.conn();
+			btOBDCon.conn();
+			btSideCon.conn();
+		}
+	}
+
+	public void onCheckPermission() {
 		if (!BluetoothManager.isBtOn()) {
 			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, MainMenuActivity.REQUEST_ENABLE_BT_BY_MANAGER);
-		} else {
-			if (btLaserCon == null) {
-				btLaserCon = new LaserScanner(this);
-				// Start the Bluetooth services
-				Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothLaserService");
-				intent.setPackage("org.multibluetooth.multibluetooth");
-				startService(intent);
-			}
-			if (btOBDCon == null) {
-				btOBDCon = new OBDScanner(this);
-				// Start the Bluetooth services
-				Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothOBDService");
-				intent.setPackage("org.multibluetooth.multibluetooth");
-				startService(intent);
-			}
-			if (btSideCon == null) {
-				btSideCon = new SideScanner(this);
-				// Start the Bluetooth services
-				Intent intent = new Intent("org.multibluetooth.multibluetooth.BluetoothSideService");
-				intent.setPackage("org.multibluetooth.multibluetooth");
-				startService(intent);
-			}
-			if (btLaserCon != null
-			&& btOBDCon != null
-			&& btSideCon != null) {
-				btLaserCon.setChangeContext(this);
-				btOBDCon.setChangeContext(this);
-				btSideCon.setChangeContext(this);
-				btLaserCon.conn();
-				btOBDCon.conn();
-				btSideCon.conn();
-			}
 		}
+
+		GpsInfo.checkGrantedPermission(this);
 	}
 
 	// 블루투스 연결상태 확인

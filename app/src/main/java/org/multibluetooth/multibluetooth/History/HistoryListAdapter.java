@@ -64,7 +64,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         final SafeScore item = items.get(position);
 
         holder.driveId.setText(""+item.getDriveId());
-        holder.avgScore.setText(""+item.getAvgScore());
+        holder.avgScore.setText(""+item.getAvgScore(context));
 
         // 선택 되있을경우 선택 표시로 바꿈
         if (selectedList.get(position)) holder.selected.setVisibility(View.VISIBLE);
@@ -78,8 +78,8 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
             calendar.setTimeInMillis(Long.valueOf(item.getDriveStart()));
 
             String date = String.valueOf(calendar.get(Calendar.YEAR)).substring(2,4) + "-";
-            if (calendar.get(Calendar.MONTH) < 10)  date += "0" + calendar.get(Calendar.MONTH) + "-";
-            else                                    date += calendar.get(Calendar.MONTH) + "-";
+            if (calendar.get(Calendar.MONTH) < 9)  date += "0" + (calendar.get(Calendar.MONTH) + 1) + "-";
+            else                                    date += (calendar.get(Calendar.MONTH) + 1) + "-";
 
             if (calendar.get(Calendar.DAY_OF_MONTH) < 10)   date += "0" + calendar.get(Calendar.DAY_OF_MONTH) + " ";
             else                                            date += calendar.get(Calendar.DAY_OF_MONTH) + " ";

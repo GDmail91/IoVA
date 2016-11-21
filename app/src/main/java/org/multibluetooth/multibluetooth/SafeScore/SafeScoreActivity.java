@@ -66,7 +66,7 @@ public class SafeScoreActivity extends ScoreBase {
         avgScoreView.setBackgroundResource(R.color.metroBackground);
 
         // 전체 지표의 평균 계산
-        avgScoreView.setText("" + safeScore.getAvgScore());
+        avgScoreView.setText("" + safeScore.getAvgScore(this));
 
         LinearLayout tvg = (LinearLayout) findViewById(R.id.textViewGroup);
         tvg.setBackgroundResource(R.color.metroBackground);
@@ -142,12 +142,12 @@ public class SafeScoreActivity extends ScoreBase {
 
         ArrayList<RadarEntry> entries1 = new ArrayList<RadarEntry>();
 
-        entries1.add(new RadarEntry(safeScore.getPercentSafeDistance()));
-        entries1.add(new RadarEntry(safeScore.getPercentSpeeding()));
-        entries1.add(new RadarEntry(safeScore.getPercentFastAcc()));
-        entries1.add(new RadarEntry(safeScore.getPercentFastBreak()));
-        entries1.add(new RadarEntry(safeScore.getPercentSuddenStart()));
-        entries1.add(new RadarEntry(safeScore.getPercentSuddenStop()));
+        entries1.add(new RadarEntry(safeScore.getPercentSafeDistance(this)));
+        entries1.add(new RadarEntry(safeScore.getPercentSpeeding(this)));
+        entries1.add(new RadarEntry(safeScore.getPercentFastAcc(this)));
+        entries1.add(new RadarEntry(safeScore.getPercentFastBreak(this)));
+        entries1.add(new RadarEntry(safeScore.getPercentSuddenStart(this)));
+        entries1.add(new RadarEntry(safeScore.getPercentSuddenStop(this)));
 
 
         RadarDataSet set2 = new RadarDataSet(entries1, "평균 안전점수");

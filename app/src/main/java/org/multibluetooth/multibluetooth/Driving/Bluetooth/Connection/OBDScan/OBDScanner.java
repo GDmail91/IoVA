@@ -33,11 +33,18 @@ public class OBDScanner extends BluetoothConnection {
     public boolean AUTO_CONN = true;
 
     private DriveInfo mDriveInfo = new DriveInfo();
+    private int mDriveId = -1;
 
     private static final LinkedList<Character> buffer = new LinkedList<>();
 
     public OBDScanner(Context context) {
         super(context);
+    }
+
+    @Override
+    public void queueInit(int topDriveNumber) {
+        super.queueInit(topDriveNumber);
+        mDriveId = topDriveNumber;
     }
 
     public void connMode(boolean autoMode) {
@@ -192,7 +199,8 @@ public class OBDScanner extends BluetoothConnection {
                     }
 
                     if (mDriveInfo.isSetOBDData()) {
-                        mScoreCalculator.putData(ScoreCalculator.OBD_DATA, mDriveInfo);
+                        mDriveInfo.setDriveId(mDriveId);
+                        mScoreCalculator.putData(ScoreCalculator.OBD_DATA, new DriveInfo(mDriveInfo));
                         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
                         driveInfoModel.updateOBD(mDriveInfo);
                         driveInfoModel.close();

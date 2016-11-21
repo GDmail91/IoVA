@@ -48,11 +48,11 @@ public class GpsInfo extends Service implements LocationListener {
 
     public GpsInfo(Context context) {
         this.mContext = context;
-        checkGrantedPermission();
+        checkGrantedPermission(mContext);
     }
 
     public void startLocation() {
-        checkGrantedPermission();
+        checkGrantedPermission(mContext);
 
         try {
             locationManager = (LocationManager) mContext
@@ -134,6 +134,9 @@ public class GpsInfo extends Service implements LocationListener {
      * Location을 가져옵니다.
      */
     public Location getLocation() {
+        if (location == null) {
+            startLocation();
+        }
         return location;
     }
 
@@ -193,7 +196,7 @@ public class GpsInfo extends Service implements LocationListener {
         alertDialog.show();
     }
 
-    public void checkGrantedPermission() {
+    public static void checkGrantedPermission(Context mContext) {
         if ( Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission( mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

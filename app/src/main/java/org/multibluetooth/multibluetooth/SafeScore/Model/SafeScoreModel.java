@@ -96,6 +96,7 @@ public class SafeScoreModel extends SQLiteOpenHelper {
      * @return id
      */
     public int update(SafeScore safeScore) {
+        Log.d(TAG, "UPDATE DATA!!");
         String sql = "UPDATE SafeScore SET " +
                 "speeding_count='" + safeScore.getSpeedingCount() + "', " +
                 "fast_acc_count='" + safeScore.getFastAccCount() + "', " +

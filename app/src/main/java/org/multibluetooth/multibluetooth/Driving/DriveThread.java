@@ -83,7 +83,7 @@ public class DriveThread extends Thread {
                         int id = driveInfoModel.createIndex(topDriveNumber);
                         Location temp = gpsInfo.getLocation();
                         Log.d("TEST", temp.toString());
-                        driveInfoModel.updateGps(id, temp);    // GPS 위치 저장
+                        driveInfoModel.updateGps(id, topDriveNumber, temp);    // GPS 위치 저장
                         driveInfoModel.close();
 
                         /*Message fMessage = new Message();

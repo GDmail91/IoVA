@@ -62,12 +62,10 @@ import retrofit2.Retrofit;
 
     private SafeScore safeScore;
     private SafeScore safeDistance;
-    private SafeScoreModel safeScoreModel;
     private ScorePool scorePool = ScorePool.getInstance();
 
     private Context mContext;
     // GpsInfo 객체를 얻어온다
-    GpsInfo gpsInfo;
 
     public ScoreCalculator(Context mContext, int drive_id) {
         this.mContext = mContext;
@@ -75,7 +73,7 @@ import retrofit2.Retrofit;
     }
 
     public void init(int drive_id) {
-        this.drive_id = drive_id;
+        ScoreCalculator.drive_id = drive_id;
         FAST_COUNT = 0;
         SLOW_COUNT = 0;
         START_COUNT = 0;
@@ -96,10 +94,9 @@ import retrofit2.Retrofit;
         scorePool.init();
 
         // TODO 반드시 close하고 끝내도록 짤것
-        safeScoreModel = new SafeScoreModel(mContext, SafeScoreModel.DB_NAME, null);
+        SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, SafeScoreModel.DB_NAME, null);
         safeScoreModel.insert(new SafeScore(drive_id,0,0,0,0,0,"",""));
-
-        this.gpsInfo = new GpsInfo(mContext);
+        safeScoreModel.close();
     }
 
     public void setChangeContext(Context context) {
@@ -109,19 +106,23 @@ import retrofit2.Retrofit;
     // 데이터 RECIVE 프로세스
     public void putData(int device, DriveInfo driveInfo) {
 
-        if (gpsInfo.isGetLocation()) {
-            gpsInfo.showSettingsAlert();
-        }
-
+        SafeScoreModel safeScoreModel = new SafeScoreModel(mContext, SafeScoreModel.DB_NAME, null);
         switch (device) {
             case OBD_DATA:
-                Log.d(TAG, driveInfo.toString());
                 mQueue.add(driveInfo);
 
                 // 큐가 5개 이상일시 부터 운행안전정보 기록
                 if (mQueue.size() >= 5) {
                     // 안전점수 계산
+                    Log.d(TAG, "큐 길이: " + mQueue.size());
+                    Log.d(TAG, mQueue.get(0).toString());
+                    Log.d(TAG, mQueue.get(1).toString());
+                    Log.d(TAG, mQueue.get(2).toString());
+                    Log.d(TAG, mQueue.get(3).toString());
+                    Log.d(TAG, mQueue.get(mQueue.size()-1).toString());
                     safeScore = doCalculateScore(mQueue);
+                    Log.d(TAG, "계산된 점수");
+                    Log.d(TAG, safeScore.toString());
                     // 점수 DB 삽입
                     safeScoreModel.update(safeScore);
 
@@ -167,6 +168,8 @@ import retrofit2.Retrofit;
                 break;
         }
 
+        safeScoreModel.close();
+
         if (driveInfo.getSideDistance() > 0) {
             Log.d("SIDE CAL", driveInfo.toString());
             getSideSafeDistance();
@@ -174,6 +177,7 @@ import retrofit2.Retrofit;
     }
 
     public SafeScore doCalculateScore(LinkedList<DriveInfo> mQueue) {
+        Log.d(TAG, "안전점수 계산 시작");
         queueLength = mQueue.size() - 1;
         int speedingCount = getSpeedingCount(mQueue);
         int fastAccCount = getFastAccCount(mQueue);
@@ -255,13 +259,13 @@ import retrofit2.Retrofit;
                 break;
             case 1:
                 // 조금 가까운 경우
-                onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING, driveInfo.getId());
+                onDistanceAlertBySpeak(DrivingActivity.DISTANCE_WARNING, driveInfo.getId(), driveInfo.getDriveId());
                 ((DrivingActivity) mContext).setForwardBackground(DrivingActivity.DISTANCE_WARNING);
                 ++CLOSE_COUNT;
                 break;
             case 2:
                 // 너무 가까운경우
-                onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER, driveInfo.getId());
+                onDistanceAlertBySpeak(DrivingActivity.DISTANCE_DANGER, driveInfo.getId(), driveInfo.getDriveId());
                 ((DrivingActivity) mContext).setForwardBackground(DrivingActivity.DISTANCE_DANGER);
                 ++CLOSE_COUNT;
                 break;
@@ -322,9 +326,10 @@ import retrofit2.Retrofit;
     }
 
     // 안전거리 알람
-    public void onDistanceAlertBySpeak(int type, int requestId) {
+    public void onDistanceAlertBySpeak(int type, int requestId, int driveId) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
-        DriveInfo driveInfo = driveInfoModel.getData(requestId);
+        DriveInfo driveInfo = driveInfoModel.getData(requestId, driveId);
+        driveInfoModel.close();
         Location location = new Location("gps");
         location.setLatitude(driveInfo.getGpsLatitude());
         location.setLongitude(driveInfo.getGpsLongitude());
@@ -338,6 +343,7 @@ import retrofit2.Retrofit;
             // 알람을 울렸을 경우 5초 이후 초기화 (가까우면 다시 울리도록)
             DISTANCE_ALERT_WAIT = false;
         }
+        // 시간 조정전
         /*if (!DISTANCE_ALERT_WAIT) {
             // 알람을 안울렸으면 경보음 발생
             ((DrivingActivity) mContext).onAlert(type);
@@ -356,6 +362,7 @@ import retrofit2.Retrofit;
 
     // 안전점수 알람
     public void onSafeDriveAlertBySpeak(int type) {
+        GpsInfo gpsInfo = ((DrivingActivity) mContext).gpsInfo;
         sendDangerBehavior(ZoneNameFinder.getKoZNF(gpsInfo.getLocation()), gpsInfo.getLocation(), type);
         if (!SAFE_ALERT_WAIT) {
             // 알람을 안울렸으면 경보음 발생
@@ -370,6 +377,9 @@ import retrofit2.Retrofit;
 
     // 급 가속 횟수
     public int getFastAccCount(LinkedList<DriveInfo> driveData) {
+        Log.d(TAG, "급가속: " + (driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-1).getVehicleSpeed())
+        + "/" + (driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-2).getVehicleSpeed())
+        + "/" + (driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-3).getVehicleSpeed()));
         // 3초 이내 급가속 건수
         if ((driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-1).getVehicleSpeed()) > 11
         || (driveData.get(queueLength).getVehicleSpeed() - driveData.get(queueLength-2).getVehicleSpeed()) > 11
@@ -392,6 +402,7 @@ import retrofit2.Retrofit;
 
     // 급 감속 횟수
     public int getFastBreakCount(LinkedList<DriveInfo> driveData) {
+        Log.d(TAG, "급감속: " + (driveData.get(queueLength-1).getVehicleSpeed() - driveData.get(queueLength).getVehicleSpeed()));
         // 1초 이내 급감속 건수
         if ((driveData.get(queueLength-1).getVehicleSpeed() - driveData.get(queueLength).getVehicleSpeed()) > 7) {
             if (!SLOW_FLAG) {
@@ -412,7 +423,7 @@ import retrofit2.Retrofit;
 
     // 급 출발 횟수
     public int getSuddenStartCount(LinkedList<DriveInfo> driveData) {
-
+        Log.d(TAG, "급출발: " + driveData.get(queueLength-1).getVehicleSpeed() + "/" + driveData.get(queueLength).getVehicleSpeed());
         // 정지에서 초당 11km/h 이상 가속한경우
         if (driveData.get(queueLength-1).getVehicleSpeed() == 0
         && driveData.get(queueLength).getVehicleSpeed() > 11) {
@@ -434,7 +445,7 @@ import retrofit2.Retrofit;
 
     // 급 정거 횟수
     public int getSuddenStopCount(LinkedList<DriveInfo> driveData) {
-
+        Log.d(TAG, "급정거: " + (driveData.get(queueLength-1).getVehicleSpeed() - driveData.get(queueLength).getVehicleSpeed()));
         // 초당 7km/h 이상 감속하여 속도가 0이 된경우
         if ((driveData.get(queueLength-1).getVehicleSpeed() - driveData.get(queueLength).getVehicleSpeed()) > 7
         && driveData.get(queueLength).getVehicleSpeed() == 0) {
@@ -455,7 +466,7 @@ import retrofit2.Retrofit;
     }
 
     public int getSpeedingCount(LinkedList<DriveInfo> driveData) {
-
+        Log.d(TAG, "과속: " + driveData.get(queueLength).getVehicleSpeed());
         // 속도가 120 이상으로 달린 초
         if (driveData.get(queueLength).getVehicleSpeed() > 120) {
             SPEEDING_COUNT++;

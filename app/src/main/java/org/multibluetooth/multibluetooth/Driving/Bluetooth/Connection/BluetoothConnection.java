@@ -96,12 +96,12 @@ public abstract class BluetoothConnection implements ServiceConnection, ServiceC
 
     public boolean isBound() { return mBound; }
 
-    public void queueInit(int topNumber) {
+    public void queueInit(int topDriveNumber) {
         // make score calculate queue
         if (mScoreCalculator == null) {
-            mScoreCalculator = new ScoreCalculator(mContext, topNumber);
+            mScoreCalculator = new ScoreCalculator(mContext, topDriveNumber);
         } else {
-            mScoreCalculator.init(topNumber);
+            mScoreCalculator.init(topDriveNumber);
         }
     }
 

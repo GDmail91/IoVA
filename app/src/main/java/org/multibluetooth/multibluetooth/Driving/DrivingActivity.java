@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -310,20 +311,17 @@ public class DrivingActivity extends AppCompatActivity {
         switch (mode) {
             case SIDE_DISTANCE_DANGER:
                 sideScanView.setBackgroundResource(R.color.danger);
-                sideSafeMsg.setText("위험합니다. \n차선 거리나 속도를 늘려주세요.");
+                sideSafeMsg.setText("위험합니다. \n차선 거리나 속도를\n늘려주세요.");
                 break;
             case SIDE_DISTANCE_WARNING:
                 sideScanView.setBackgroundResource(R.color.warning);
-                sideSafeMsg.setText("조금 위험합니다.\n옆차량과 거리가 가깝습니다.");
+                sideSafeMsg.setText("조금 위험합니다.\n옆차량과 거리가\n가깝습니다.");
                 break;
             case SIDE_DISTANCE_GOOD:
                 sideScanView.setBackgroundResource(R.color.good);
                 sideSafeMsg.setText("끼어들어도 좋습니다.");
                 break;
         }
-        RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) sideSafeMsg.getLayoutParams();
-        params3.addRule(RelativeLayout.CENTER_IN_PARENT);
-        sideSafeMsg.setLayoutParams(params3);
     }
 
     // 전방 데이터 전달
@@ -613,6 +611,7 @@ public class DrivingActivity extends AppCompatActivity {
         backDistance.setTextColor(Color.WHITE);
         sideSafeMsg = new TextView(getApplicationContext());
         sideSafeMsg.setText("잠시만 기다려주세요");
+        sideSafeMsg.setGravity(Gravity.CENTER);
         sideSafeMsg.setTextSize(40);
         sideSafeMsg.setTextColor(Color.WHITE);
 
