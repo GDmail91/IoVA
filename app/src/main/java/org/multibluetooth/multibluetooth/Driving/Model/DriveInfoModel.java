@@ -134,7 +134,13 @@ public class DriveInfoModel extends SQLiteOpenHelper {
     public int getCountRequestNumber(int driveId) {
         int topNumber = 0;
 
-        Cursor cursor = dbR.rawQuery("SELECT COUNT(_id) AS id_count FROM DriveInfo WHERE drive_id = '"+driveId+"' ", null);
+        String sql;
+        if (driveId == 0) {
+            sql = "SELECT COUNT(_id) AS id_count FROM DriveInfo";
+        } else {
+            sql = "SELECT COUNT(_id) AS id_count FROM DriveInfo WHERE drive_id = '"+driveId+"' ";
+        }
+        Cursor cursor = dbR.rawQuery(sql, null);
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 topNumber = cursor.getInt(0);

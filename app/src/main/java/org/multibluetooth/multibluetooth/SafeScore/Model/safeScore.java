@@ -67,53 +67,81 @@ public class SafeScore implements Serializable {
 
     public float getPercentSafeDistance(Context mContext) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
-        int StandardDistanceCount = driveInfoModel.getCountRequestNumber(this.drive_id);
+        int StandardCount = driveInfoModel.getCountRequestNumber(this.drive_id);
         driveInfoModel.close();
-        return 100 - ((float)safe_distance_count / StandardDistanceCount) * 100;
+        return 100 - ((float)safe_distance_count / StandardCount) * 100;
+    }
+
+    public float getPercentSafeDistance(int StandardCount) {
+        return 100 - ((float)safe_distance_count / StandardCount) * 100;
     }
 
     public float getPercentSpeeding(Context mContext) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
-        int StandardSpeedingCount = driveInfoModel.getCountRequestNumber(this.drive_id);
+        int StandardCount = driveInfoModel.getCountRequestNumber(this.drive_id);
         driveInfoModel.close();
-        return 100 - ((float)speeding_count / StandardSpeedingCount) * 100;
+        return 100 - ((float)speeding_count / StandardCount) * 100;
+    }
+
+    public float getPercentSpeeding(int StandardCount) {
+        return 100 - ((float)speeding_count / StandardCount) * 100;
     }
 
     public float getPercentFastAcc(Context mContext) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
-        int StandardFastAccCount = driveInfoModel.getCountRequestNumber(this.drive_id);
+        int StandardCount = driveInfoModel.getCountRequestNumber(this.drive_id);
         driveInfoModel.close();
-        return 100 - ((float)fast_acc_count / StandardFastAccCount) * 100;
+        return 100 - ((float)fast_acc_count / StandardCount) * 100;
+    }
+
+    public float getPercentFastAcc(int StandardCount) {
+        return 100 - ((float)fast_acc_count / StandardCount) * 100;
     }
 
     public float getPercentFastBreak(Context mContext) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
-        int StandardFastBreakCount = driveInfoModel.getCountRequestNumber(this.drive_id);
+        int StandardCount = driveInfoModel.getCountRequestNumber(this.drive_id);
         driveInfoModel.close();
-        return 100 - ((float)fast_break_count / StandardFastBreakCount) * 100;
+        return 100 - ((float)fast_break_count / StandardCount) * 100;
+    }
+
+    public float getPercentFastBreak(int StandardCount) {
+        return 100 - ((float)fast_break_count / StandardCount) * 100;
     }
 
     public float getPercentSuddenStart(Context mContext) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
-        int StandardSuddenStartCount = driveInfoModel.getCountRequestNumber(this.drive_id);
+        int StandardCount = driveInfoModel.getCountRequestNumber(this.drive_id);
         driveInfoModel.close();
-        return 100 - ((float)sudden_start_count / StandardSuddenStartCount) * 100;
+        return 100 - ((float)sudden_start_count / StandardCount) * 100;
+    }
+
+    public float getPercentSuddenStart(int StandardCount) {
+        return 100 - ((float)sudden_start_count / StandardCount) * 100;
     }
 
     public float getPercentSuddenStop(Context mContext) {
         DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
-        int StandardSuddenStopCount = driveInfoModel.getCountRequestNumber(this.drive_id);
+        int StandardCount = driveInfoModel.getCountRequestNumber(this.drive_id);
         driveInfoModel.close();
-        return 100 - ((float)sudden_stop_count / StandardSuddenStopCount) * 100;
+        return 100 - ((float)sudden_stop_count / StandardCount) * 100;
+    }
+
+    public float getPercentSuddenStop(int StandardCount) {
+        return 100 - ((float)sudden_stop_count / StandardCount) * 100;
     }
 
     public int getAvgScore(Context mContext) {
-        int avgScore = (int) ((getPercentSafeDistance(mContext) +
-                getPercentSpeeding(mContext) +
-                getPercentFastAcc(mContext) +
-                getPercentFastBreak(mContext) +
-                getPercentSuddenStart(mContext) +
-                getPercentSuddenStop(mContext)) / 6);
+        DriveInfoModel driveInfoModel = new DriveInfoModel(mContext, DriveInfoModel.DB_NAME, null);
+        int StandardCount = driveInfoModel.getCountRequestNumber(this.drive_id);
+        driveInfoModel.close();
+
+        int avgScore = (int) ((getPercentSafeDistance(StandardCount) +
+                getPercentSpeeding(StandardCount) +
+                getPercentFastAcc(StandardCount) +
+                getPercentFastBreak(StandardCount) +
+                getPercentSuddenStart(StandardCount) +
+                getPercentSuddenStop(StandardCount)) / 6);
         return avgScore;
     }
 

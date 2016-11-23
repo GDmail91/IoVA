@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="평균 안전점수"
+            android:textSize="40sp"
             android:id="@+id/textView"/>
 
         <TextView
@@ -24,6 +25,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearance"
             android:text="0"
+            android:textSize="40sp"
             android:id="@+id/avg_score"/>
     </LinearLayout>
 

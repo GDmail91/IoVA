@@ -2,6 +2,7 @@ package org.multibluetooth.multibluetooth.SafeScore;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -60,6 +61,7 @@ public class SafeScoreActivity extends ScoreBase {
             safeScore = (SafeScore) bundle.getSerializable("drive_item");
         }
 
+        Log.d(TAG, "내용 : "+safeScore.getAvgScore(this));
         avgScoreView = (TextView) findViewById(R.id.avg_score);
         avgScoreView.setTypeface(mTfLight);
         avgScoreView.setTextColor(Color.WHITE);
@@ -95,9 +97,8 @@ public class SafeScoreActivity extends ScoreBase {
 
         XAxis xAxis = mChart.getXAxis();
         xAxis.setTypeface(mTfLight);
-        xAxis.setTextSize(9f);
+        xAxis.setTextSize(13f);
         xAxis.setYOffset(0f);
-        xAxis.setXOffset(0f);
         xAxis.setValueFormatter(new IAxisValueFormatter() {
 
             private String[] mActivities = new String[]{"안전거리 미확보", "과속", "급가속", "급감속", "급출발", "급정거"};
@@ -120,7 +121,7 @@ public class SafeScoreActivity extends ScoreBase {
         yAxis.setTextSize(9f);
         yAxis.setAxisMinimum(0f);
         yAxis.setAxisMaximum(80f);
-        yAxis.setDrawLabels(false);
+        yAxis.setDrawLabels(true);
         yAxis.setDrawTopYLabelEntry(false);
 
         Legend l = mChart.getLegend();
